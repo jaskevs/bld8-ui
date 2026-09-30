@@ -34,3 +34,9 @@ it gains a soft eased shadow and remains a sticky overlay (12 px desktop,
 Escape/focus return, outside click and closing after link selection. Keep
 reduced-motion behaviour and immediate keyboard focus. The public guide explains
 who the library is for without implying the package is available on npm.
+
+## Public source decision - 30 September 2026
+
+The user explicitly chose to keep jaskevs/bld8-ui public and push the source.
+The npm package remains unpublished and UNLICENSED. Git-to-Vercel deployment
+is not connected; the current showcase remains online from direct deployment.

@@ -70,8 +70,10 @@ personal no-reply address for both author and committer, plus the shared persona
 SSH configuration and commit/push guards. The push guard accepts only this exact
 personal destination. Company/global configuration remains unchanged.
 
-This supersedes the earlier no-repository state. Initial source upload is being
-prepared; remote visibility must match the user's choice before pushing.
+This supersedes the earlier no-repository state. On 30 September the user explicitly chose to keep jaskevs/bld8-ui public
+and push the source. The initial source release includes commit 8895f75.
 Connecting GitHub to the existing Vercel project is still a separate unfinished
 step. The showcase remains online at its current Vercel address. The npm package
 remains private/UNLICENSED and is not published by a Git push.
+
+Source repository: https://github.com/jaskevs/bld8-ui (public by user choice).
