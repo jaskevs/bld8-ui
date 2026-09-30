@@ -1,0 +1,13 @@
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+playwright-report/
+test-results/
+*.tgz
+.env*
+.local/
+
+.vercel/
+apps/docs/out/

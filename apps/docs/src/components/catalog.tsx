@@ -1,0 +1,11 @@
+'use client';
+import Link from 'next/link';
+import { useState } from 'react';
+import { Badge, Icon, Input } from '@bld8/ui';
+import { categories, components, type Category } from '@/lib/catalog';
+import { ComponentDemo } from './demos';
+export function Catalog() {
+  const [category,setCategory] = useState<Category>('All components'); const [query,setQuery] = useState('');
+  const visible = components.filter(item => (category === 'All components' || item.category === category) && (item.title + ' ' + item.description).toLowerCase().includes(query.toLowerCase()));
+  return <div className="catalog-layout"><aside className="catalog-sidebar" aria-label="Component filters"><p className="eyebrow">LIBRARY</p><div className="category-list">{categories.map(item => <button type="button" key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}<span>{item === 'All components' ? components.length : components.filter(component => component.category === item).length}</span></button>)}</div><div className="sidebar-note"><span className="small-cross">+</span><p>Shared foundations.<br />Room to make it yours.</p><Link href="/getting-started">Start here <Icon /></Link></div></aside><div className="catalog-main"><div className="catalog-toolbar"><Input type="search" aria-label="Find a component" placeholder="Find a component…" value={query} onChange={event => setQuery(event.target.value)} /><span className="muted" role="status">{visible.length} entries</span></div><div className="component-grid">{visible.map(component => <article className={'component-card' + (component.id === 'table' ? ' component-wide' : '')} key={component.id}><div className="component-meta"><Badge>{component.category}</Badge><span className="component-number">{String(components.indexOf(component) + 1).padStart(2,'0')}</span></div><div className="component-preview"><ComponentDemo id={component.id} /></div><div className="component-bottom"><div><h2><Link href={'/components/' + component.id}>{component.title}<Icon /></Link></h2><p>{component.description}</p></div></div></article>)}</div>{!visible.length && <div className="no-results"><h2>No matching components.</h2><p>Try a broader search or choose another category.</p><button className="plain-link" onClick={() => {setQuery('');setCategory('All components');}}>Reset filters</button></div>}</div></div>;
+}

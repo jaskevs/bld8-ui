@@ -1,0 +1,23 @@
+{
+  "name": "bld8-ui-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "engines": { "node": "22.x" },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/docs",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "playwright test",
+    "pack:ui": "npm pack --workspace=@bld8/ui"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "~5.9.3"
+  }
+}

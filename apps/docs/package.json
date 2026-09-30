@@ -1,0 +1,13 @@
+{
+  "name": "@bld8/docs", "private": true, "version": "0.1.0", "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3120",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 3121",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@bld8/ui": "*", "next": "16.3.6", "react": "19.3.0", "react-dom": "19.3.0",
+    "@fontsource-variable/dm-sans": "5.3.0", "@fontsource-variable/manrope": "5.3.0"
+  }
+}

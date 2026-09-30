@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound() { return <div className="page page-intro"><p className="eyebrow">404</p><h1>Nothing here.</h1><p className="lead">That page is not part of this library.</p><Link className="plain-link" href="/components">Explore the components</Link></div>; }

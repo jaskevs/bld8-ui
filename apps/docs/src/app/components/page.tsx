@@ -1,0 +1,3 @@
+import { Catalog } from '@/components/catalog';
+export const metadata = { title: 'Components' };
+export default function Page() { return <div className="page"><header className="page-intro"><p className="eyebrow">THE LIBRARY</p><h1>Small pieces.<br /><span>Plenty of possibility.</span></h1><p className="lead">Explore the states, try the interactions, then shape the components for your own application.</p></header><Catalog /></div>; }
