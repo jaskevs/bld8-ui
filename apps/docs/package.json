@@ -1,13 +1,22 @@
 {
-  "name": "@bld8/docs", "private": true, "version": "0.1.0", "type": "module",
+  "name": "@bld8/docs",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1 --port 3120",
-    "build": "next build",
+    "build": "node ../../scripts/prepare-library.mjs && next build",
     "start": "next start --hostname 127.0.0.1 --port 3121",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@bld8/ui": "*", "next": "16.3.6", "react": "19.3.0", "react-dom": "19.3.0",
-    "@fontsource-variable/dm-sans": "5.3.0", "@fontsource-variable/manrope": "5.3.0"
+    "@bld8/blocks": "*",
+    "@bld8/ui": "*",
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "@fontsource-variable/manrope": "5.3.0",
+    "lucide-react": "1.55.0",
+    "next": "16.3.8",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   }
 }

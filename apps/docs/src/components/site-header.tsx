@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Icon, IconButton, Tooltip } from '@bld8/ui';
+import { LibrarySearch } from './library-search';
 
-const links = [['/components', 'Components'], ['/motion', 'Motion'], ['/foundations', 'Foundations'], ['/examples', 'Examples'], ['/getting-started', 'Start here']];
+const links = [['/components', 'Components'], ['/blocks', 'Blocks'], ['/templates', 'Templates'], ['/icons', 'Icons'], ['/motion', 'Motion'], ['/getting-started', 'Start here']];
 
 export function SiteHeader() {
   const path = usePathname();
@@ -43,6 +44,7 @@ export function SiteHeader() {
       {links.map(([href, label]) => <Link key={href} href={href} aria-current={path.startsWith(href) ? 'page' : undefined} onClick={() => setMenuOpen(false)}>{label}<span className="nav-marker" aria-hidden="true" /></Link>)}
     </nav>
     <div className="header-actions">
+      <LibrarySearch />
       <Button ref={menuButton} variant="ghost" size="sm" className="mobile-menu-toggle" aria-controls="main-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(current => !current)}>Menu <span className="menu-chevron" data-open={menuOpen}><Icon name="chevron" /></span></Button>
       <Tooltip content={dark ? 'Switch to light theme' : 'Switch to dark theme'}><IconButton variant="ghost" className="theme-toggle" label={dark ? 'Switch to light theme' : 'Switch to dark theme'} onClick={() => { const next = !dark; setDark(next); document.documentElement.dataset.uiTheme = next ? 'dark' : 'light'; }}><Icon name={dark ? 'sun' : 'moon'} /></IconButton></Tooltip>
     </div>

@@ -1,0 +1,19 @@
+{
+  "name": "@bld8/blocks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "files": ["dist", "src", "README.md", "LICENSE"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./styles.css": "./dist/styles.css"
+  },
+  "sideEffects": ["**/*.css"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-styles.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": { "react": "^19.0.0", "react-dom": "^19.0.0" },
+  "dependencies": { "@bld8/ui": "*" }
+}

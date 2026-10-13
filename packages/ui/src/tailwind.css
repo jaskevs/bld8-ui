@@ -1,0 +1,50 @@
+/* BLD8 utilities are prefixed and compiled before distribution. No Preflight. */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme) prefix(bui);
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(bui) source(none);
+@source './';
+@source '../../blocks/src';
+
+@custom-variant dark (&:where([data-ui-theme='dark'], [data-ui-theme='dark'] *));
+@theme inline {
+  --color-background: var(--bui-bg);
+  --color-canvas: var(--bui-canvas);
+  --color-surface: var(--bui-surface);
+  --color-foreground: var(--bui-ink);
+  --color-muted: var(--bui-muted);
+  --color-border: var(--bui-line);
+  --color-primary: var(--bui-primary);
+  --color-primary-hover: var(--bui-primary-hover);
+  --color-primary-foreground: var(--bui-primary-ink);
+  --color-accent: var(--bui-accent);
+  --color-accent-hover: var(--bui-accent-hover);
+  --color-accent-foreground: var(--bui-accent-ink);
+  --color-soft: var(--bui-soft);
+  --color-focus: var(--bui-focus);
+  --color-danger: var(--bui-danger);
+  --color-danger-background: var(--bui-danger-bg);
+  --font-body: var(--bui-font);
+  --radius-control: var(--bui-radius);
+  --radius-panel: var(--bui-panel-radius);
+  --shadow-panel: var(--bui-shadow);
+  --ease-bld8: var(--bui-ease);
+}
+
+/* Compatibility classes keep existing React and HTML consumers working. */
+  .bui-button {
+    @apply bui:relative bui:inline-flex bui:items-center bui:justify-center bui:gap-3 bui:min-h-11 bui:px-4 bui:py-[.6rem] bui:border bui:border-solid bui:border-transparent bui:rounded-control bui:font-body bui:text-sm bui:leading-[1.5] bui:font-semibold bui:cursor-pointer bui:whitespace-nowrap bui:no-underline;
+  }
+  .bui-button--primary { @apply bui:bg-primary bui:text-primary-foreground bui:border-primary; }
+  .bui-button--accent { @apply bui:bg-accent bui:text-accent-foreground bui:border-accent; }
+  .bui-button--secondary { @apply bui:bg-background bui:text-foreground bui:border-border bui:shadow-[0_1px_2px_#19191905]; }
+  .bui-button--ghost { @apply bui:bg-transparent bui:text-foreground; }
+  .bui-button--danger { @apply bui:bg-danger-background bui:text-danger bui:border-danger; }
+  .bui-button--sm { @apply bui:min-h-9 bui:px-3 bui:py-[.35rem] bui:text-[.8125rem]; }
+  .bui-button--lg { @apply bui:min-h-12 bui:px-6; }
+  .bui-input {
+    @apply bui:w-full bui:min-h-11 bui:bg-background bui:text-foreground bui:px-[.8rem] bui:py-[.65rem] bui:border bui:border-solid bui:border-border bui:rounded-control bui:font-body bui:text-sm bui:leading-[1.5];
+  }
+  .bui-input::placeholder { @apply bui:text-muted bui:opacity-85; }
+  .bui-input:focus { @apply bui:border-focus; }
+  .bui-input[aria-invalid='true'] { @apply bui:border-danger; }
+  .bui-textarea { @apply bui:resize-y bui:min-h-28; }

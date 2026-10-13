@@ -1,0 +1,7 @@
+import Link from 'next/link';
+import { Icon } from '@bld8/ui';
+import { library } from '@/lib/library';
+
+export function CollectionPlans() {
+  return <div className="collection-plans">{['Free','Premium'].map(tier => <article className={'collection-plan' + (tier === 'Premium' ? ' collection-plan--premium' : '')} key={tier}><div className="collection-plan-top"><span className="eyebrow">{tier === 'Free' ? 'THE EVERYDAY PIECES' : 'THE FULLER PICTURE'}</span><span className="collection-label">{tier === 'Free' ? 'Start here' : 'Also free'}</span></div><h2>{tier}</h2><div className="collection-price">$0<span>Always free</span></div><p>{tier === 'Free' ? 'Components and focused blocks for the everyday parts of an interface.' : 'More complete layouts, workspace flows and starter templates. The same free access.'}</p><ul>{(tier === 'Free' ? ['All core React components',`${library.blocks.filter(item => item.tier === 'Free').length} focused interface blocks`,'Light and dark themes','Editable source and live previews'] : [`${library.blocks.filter(item => item.tier === 'Premium').length} composed workspace blocks`,`${library.templates.length} complete interface starters`,'Runnable Next.js downloads','Source and previews, with no gate']).map(label => <li key={label}><Icon name="check" />{label}</li>)}</ul><Link href={tier === 'Free' ? '/components' : '/templates'} className={'bui-button bui-button--' + (tier === 'Free' ? 'primary' : 'accent')}>Explore {tier.toLowerCase()} <Icon /></Link><small>MIT licence · Personal & commercial use</small></article>)}</div>;
+}

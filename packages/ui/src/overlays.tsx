@@ -1,5 +1,5 @@
 'use client';
-import { useId, useState, type ReactElement, type ReactNode } from 'react';
+import { useId, useState, type ReactElement, type ReactNode, type RefObject } from 'react';
 import { Dialog as PrimitiveDialog } from '@base-ui/react/dialog';
 import { Popover as PrimitivePopover } from '@base-ui/react/popover';
 import { Tooltip as PrimitiveTooltip } from '@base-ui/react/tooltip';
@@ -7,9 +7,9 @@ import { Menu as PrimitiveMenu } from '@base-ui/react/menu';
 import { Toast as PrimitiveToast } from '@base-ui/react/toast';
 import { Button, Icon, cx } from './core.js';
 
-export interface DialogProps { trigger?: ReactElement; title: string; description?: string; children: ReactNode; open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void }
-function DialogFrame({ trigger, title, description, children, sheet, ...props }: DialogProps & { sheet?: boolean }) {
-  return <PrimitiveDialog.Root {...props}>{trigger && <PrimitiveDialog.Trigger render={trigger} />}<PrimitiveDialog.Portal><PrimitiveDialog.Backdrop className="bui-backdrop" /><PrimitiveDialog.Popup className={cx('bui-dialog', sheet && 'bui-sheet')}><div className="bui-dialog-heading"><div><PrimitiveDialog.Title className="bui-dialog-title">{title}</PrimitiveDialog.Title>{description && <PrimitiveDialog.Description className="bui-dialog-description">{description}</PrimitiveDialog.Description>}</div><PrimitiveDialog.Close render={<Button variant="ghost" className="bui-icon-button" aria-label="Close dialog"><Icon name="close" /></Button>} /></div><div className="bui-dialog-body">{children}</div></PrimitiveDialog.Popup></PrimitiveDialog.Portal></PrimitiveDialog.Root>;
+export interface DialogProps { trigger?: ReactElement; title: string; description?: string; children: ReactNode; open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; initialFocus?:RefObject<HTMLElement|null>; finalFocus?:RefObject<HTMLElement|null> }
+function DialogFrame({ trigger, title, description, children, sheet, initialFocus, finalFocus, ...props }: DialogProps & { sheet?: boolean }) {
+  return <PrimitiveDialog.Root {...props}>{trigger && <PrimitiveDialog.Trigger render={trigger} />}<PrimitiveDialog.Portal><PrimitiveDialog.Backdrop className="bui-backdrop" /><PrimitiveDialog.Popup initialFocus={initialFocus} finalFocus={finalFocus} className={cx('bui-dialog', sheet && 'bui-sheet')}><div className="bui-dialog-heading"><div><PrimitiveDialog.Title className="bui-dialog-title">{title}</PrimitiveDialog.Title>{description && <PrimitiveDialog.Description className="bui-dialog-description">{description}</PrimitiveDialog.Description>}</div><PrimitiveDialog.Close render={<Button variant="ghost" className="bui-icon-button" aria-label="Close dialog"><Icon name="close" /></Button>} /></div><div className="bui-dialog-body">{children}</div></PrimitiveDialog.Popup></PrimitiveDialog.Portal></PrimitiveDialog.Root>;
 }
 export function Dialog(props: DialogProps) { return <DialogFrame {...props} />; }
 export function Sheet(props: DialogProps) { return <DialogFrame {...props} sheet />; }

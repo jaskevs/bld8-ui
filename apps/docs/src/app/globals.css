@@ -89,7 +89,7 @@ code { font-size: .85em; }
 .detail-demo.full-width { width: 100%; }
 .detail-section { padding-block: 2.5rem; border-bottom: 1px solid var(--bui-line); }
 .detail-section h2 { font-size: 1.375rem; margin-bottom: 1.25rem; }
-.detail-section > p { color: var(--bui-muted); font-size: .875rem; line-height: 1.8; margin-top: 1rem; }
+.detail-section > p { color: var(--bui-muted); font-size: .875rem; line-height: 1.8; margin-top: 1rem; overflow-wrap:anywhere; }
 .detail-next { display: flex; justify-content: space-between; gap: 1rem; padding-block: 2rem 4rem; }
 .code-block { border: 1px solid var(--bui-line); background: var(--bui-surface); border-radius: 6px; overflow: hidden; }
 .code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--bui-line); padding: .4rem .75rem .4rem 1rem; font-size: .6875rem; color: var(--bui-muted); }
@@ -283,3 +283,9 @@ main :where(a, button, input, textarea, select, [tabindex]) { scroll-margin-top:
 }
 @supports not (backdrop-filter: blur(1px)) { .site-header { background: var(--bui-bg); } }
 @media (forced-colors: active) { .site-header { background: Canvas; border-color: CanvasText; } .site-header nav a[aria-current] { outline: 1px solid Highlight; } }
+@media (max-width:360px) { .site-header .brand>span:last-child { display:none; } .site-header .header-actions { gap:0; } }
+.bui-context-demo { padding:32px 24px; background:var(--bui-surface); border-radius:8px; min-width:min(300px,100%); }
+.bui-context-demo p { margin-top:8px; }
+.bui-sidebar-demo { background:var(--bui-canvas); padding:16px; border-radius:12px; min-height:360px; }
+.bui-sidebar-demo-content { padding:24px 8px; display:grid; gap:20px; }
+.bui-sidebar-demo-content h3 { margin:0; font-size:1.4rem; font-weight:500; }

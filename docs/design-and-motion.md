@@ -1,5 +1,12 @@
 # Visual direction and motion
 
+Controls added on 13 October use the same palette and timings. Dates use a compact
+grid and a quiet range band. Commands keep a stable search field over a scrollable
+list. File drop feedback and table selection change colour within their bounds.
+Dense table rows retain native horizontal scrolling on small screens. New panels
+are borderless white on grey. Focus remains visible independently of hover;
+reduced motion applies throughout. No calendar animation interrupts key navigation.
+
 Updated 28 September 2026. The user referenced https://www.carlhauser.com/projects
 for a quiet, minimal visual direction and made smooth interactions the priority.
 The interpretation is original BLD8 styling, not copied assets or page content.
@@ -41,7 +48,40 @@ Keyboard focus remains immediate. Reduced-motion settings disable animation and
 transitions, including pseudo-elements, while preserving state changes. Hover
 movement is limited to fine pointers. Keep keyboard dismissal and focus return.
 
-## Try it
+## Library structure - 13 October 2026
+
+The user referenced https://reui.io/ for the component, block and template library
+model. BLD8 retains its existing original palette, typography and Base UI/plain
+CSS implementation. No ReUI code, paid content or assets were copied.
+
+The home now previews compositions, distinguishes controls from blocks and
+templates, and explains both $0 collections. Card previews are original crisp
+HTML/CSS illustrations; full detail previews consume the real reusable package.
+Collection badges indicate composition scope, never a paywall. Desktop/mobile
+preview widths use container queries that travel with the blocks stylesheet.
+
+Existing motion timings, reduced-motion behaviour and white floating-menu border
+remain. Controls keep stable hover targets. No decorative loops or scroll
+interception were added. The light-grey canvas and borderless white panels remain.
+
+## Icon consistency - 13 October 2026
+
+Standard control icons use the Lucide family through one BLD8 wrapper, with an
+18px size, 1.75 stroke and currentColor by default. Named components keep the API
+explicit. The original dotted BLD8 link arrow retains its two trailing dots.
+Icons remain SVG at all sizes; no icon font, raster export or blur effect is used.
+
+The directory has 16/18/20/24/32px previews and 1.5/1.75/2 stroke profiles.
+Actual-size and 2x detail views are labelled. Accent preview uses yellow on
+near-black so the shape remains visible. Desktop has a sticky inspector; mobile
+opens the existing eased Sheet after selection, keeping search and browsing
+visible. Escape restores focus to the initiating tile. Reduced motion is retained.
+
+Text-labelled controls use decorative icons. Standalone meaningful icons and
+icon-only buttons have explicit accessible names. Input adornments share one
+field boundary and immediate keyboard focus indicators.
+
+## Earlier motion studies
 
 /motion contains four live studies: tab selection, saving a preference, accordion
 disclosure and dialog/sheet context. These consume the same public components as

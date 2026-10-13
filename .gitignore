@@ -11,3 +11,7 @@ test-results/
 
 .vercel/
 apps/docs/out/
+apps/docs/src/lib/generated/
+apps/docs/public/downloads/
+apps/docs/public/r/
+apps/docs/public/icon-assets/

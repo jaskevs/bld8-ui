@@ -1,0 +1,3 @@
+import { LibraryCatalog } from '@/components/library-catalog';
+export const metadata = {title:'Blocks',description:'Reusable React interface blocks. Free and Premium collections, both at no cost under MIT.'};
+export default function Page() {return <div className="page"><header className="page-intro library-intro"><p className="eyebrow">THE PIECES, TOGETHER</p><h1>Start a little<br /><span>further along.</span></h1><p className="lead">Forms, dashboards and workspace flows. Working React blocks with the source included. Free and Premium are both free.</p></header><LibraryCatalog kind="blocks" /></div>;}

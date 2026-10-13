@@ -77,3 +77,47 @@ step. The showcase remains online at its current Vercel address. The npm package
 remains private/UNLICENSED and is not published by a Git push.
 
 Source repository: https://github.com/jaskevs/bld8-ui (public by user choice).
+
+## Local library expansion - 13 October 2026
+
+The component/blocks/templates expansion is implemented and verified locally.
+It has not been committed, pushed or deployed by this build request. The existing
+Vercel site therefore still shows the earlier release. The user selected MIT for
+the original code; this supersedes UNLICENSED and licence-pending wording above.
+Both Free and Premium catalogue collections cost $0, with equal source access.
+
+The existing root build command still builds UI then docs. The docs build now
+runs `scripts/prepare-library.mjs`: it compiles the new blocks package, copies
+its styles, generates catalogue/source modules, and prepares all eleven static
+source manifests/ZIP downloads before Next.js builds the pages. `npm ci` needs
+the updated root lockfile and all workspaces.
+
+A future direct-deployment allowlist must include root LICENSE/manifests,
+scripts/library-catalog.mjs, scripts/prepare-library.mjs, the packages/blocks
+manifests/source/build script/README/LICENSE, UI LICENSE and the new docs source.
+Generated downloads/manifests are made by the build and remain ignored in Git.
+Never include parent planning, environment files, credentials or node_modules.
+Git-to-Vercel remains unconfigured; no deployment or account settings changed.
+
+The later icon expansion additionally requires `scripts/prepare-icons.mjs`, the
+pinned Lucide dependency in the lockfile, `packages/ui/LUCIDE_LICENSE`, the new UI
+icon source and docs icon source/styles. Icon SVG assets and typed metadata are
+generated during preparation; they remain ignored and should not be maintained
+manually. The public directory is self-hosted, without an icon CDN or paid gate.
+
+## October source release - 13 October 2026
+
+The user authorised committing and pushing the pending UI expansion to the
+personal public jaskevs/bld8-ui repository on main. The earlier local-only
+source status above describes implementation before this release request.
+This source release includes all 40 component guidance entries, eight blocks,
+three templates, the icon directory, Tailwind build/watch support and licence
+notices. Verification is recorded in verification.md.
+
+A future deployment must include the UI Tailwind source/build script and pinned
+CLI dependency, SHADCN_LICENSE, DAY_PICKER_LICENSE, all blocks and generators.
+The build creates compiled CSS and eleven ZIP starters. Do not include local
+previews, upstream download caches or any account files.
+
+No new deployment or Git-to-Vercel connection is part of this source push. The
+public Vercel showcase therefore still needs a separate release of this source.

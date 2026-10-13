@@ -1,0 +1,22 @@
+import Link from 'next/link';
+import { Icon } from '@bld8/ui';
+import type { LibraryItem } from '@/lib/library';
+
+export function LibraryArtwork({ id }: { id: string }) {
+  if (['resources','project-planner','outline'].includes(id)) return <div className={'library-art library-art--' + id} aria-hidden="true"><div className="art-workflow">
+    <div className="art-workflow-heading"><span className="art-mark">✳</span><strong>{id==='resources' ? 'The reference library.' : id==='outline' ? 'Outline / your next idea.' : 'A little room to plan.'}</strong><span>•••</span></div>
+    <div className="art-workflow-tabs"><span>{id==='resources' ? 'All files' : 'Planning'}</span><span>{id==='resources' ? 'Archived' : 'Resources'}</span><i /></div>
+    {id==='resources' ? ['Interface brief.pdf','Research notes.txt','Navigation sketches.png'].map((name,index)=><div className="art-workflow-row" key={name}><span className="art-file-glyph"><Icon name="plus" size={14} /></span><span>{name}<small>{['PDF · 144 KB','TXT · 4 KB','PNG · 805 KB'][index]}</small></span><b>Active</b></div>) : ['Keyboard review','Interface studies','Form patterns'].map((name,index)=><div className="art-workflow-row" key={name}><span className="art-check-glyph">{index===2 ? '✓' : ''}</span><span>{name}<small>{['Engineering','Design / Research','Documentation'][index]}</small></span><b>{20+index*4} OCT</b></div>)}
+    <div className="art-workflow-footer"><span>{id==='resources' ? '2 SELECTED' : '3 PROJECTS'}</span><span>{id==='resources' ? 'Export metadata ↗' : 'Next review →'}</span></div>
+  </div></div>;
+  return <div className={'library-art library-art--' + id} aria-hidden="true">
+    {(id === 'sign-in' || id === 'account-settings') ? <div className="art-form"><span className="art-mark">✳</span><strong>{id === 'sign-in' ? 'Welcome back.' : 'Your profile.'}</strong><span className="art-field" /><span className="art-field art-field--short" /><span className="art-action">{id === 'sign-in' ? 'Continue' : 'Save profile'} <Icon /></span></div>
+    : id === 'project-board' ? <div className="art-board">{['Planned','In progress','Done'].map((label,index) => <div key={label}><small>{label}</small><span className="art-task"><i />{index === 0 ? 'First ideas' : index === 1 ? 'In the details' : 'Ready to share'}</span>{index === 0 && <span className="art-task"><i />A little progress</span>}</div>)}</div>
+    : id === 'team' ? <div className="art-team"><strong>Better, together.</strong>{['Maya Chen','Oliver Reed','Sam Rivera'].map((name,index) => <div key={name}><span className="art-avatar">{name.split(' ').map(part => part[0]).join('')}</span><span>{name}<small>{index === 0 ? 'Admin' : 'Editor'}</small></span><i /></div>)}</div>
+    : id === 'launch' ? <div className="art-landing"><small>GATHER / YOUR NEXT IDEA</small><strong>A calmer place<br />for your next idea.</strong><span className="art-action">Try the demo <Icon /></span><div className="art-landing-line" /></div>
+    : <div className={'art-dashboard' + (id === 'studio' ? ' art-dashboard--shell' : '')}>{id === 'studio' && <aside><strong>Studio</strong><span /><span /><span /></aside>}<div><div className="art-dashboard-heading"><strong>{id === 'studio' ? 'Your workspace.' : 'A good rhythm.'}</strong><small>THIS WEEK</small></div><div className="art-stat-row">{['8,420','24','86%'].map(value => <span key={value}><small>OVERVIEW</small><strong>{value}</strong></span>)}</div><div className="art-chart">{[35,55,45,74,60,95,80].map((value,index) => <i key={index} style={{height:value + '%'}} />)}</div>{id === 'workspace' && <div className="art-feed"><span /><span /></div>}</div></div>}
+  </div>;
+}
+export function LibraryCard({ item, kind = 'blocks' }: { item: LibraryItem; kind?: 'blocks' | 'templates' }) {
+  return <article className="library-card"><LibraryArtwork id={item.id} /><div className="library-card-body"><div className="library-card-meta"><span>{item.category}</span><span className={'collection-label' + (item.tier === 'Premium' ? ' collection-label--premium' : '')}>{item.tier === 'Premium' ? 'Premium · Free' : 'Free'}</span></div><h2><Link href={'/' + kind + '/' + item.id}>{item.name}<Icon /></Link></h2><p>{item.description}</p></div></article>;
+}

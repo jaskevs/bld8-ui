@@ -1,10 +1,10 @@
 # BLD8 UI
 
-A React component library and public Next.js showcase. First implementation: 28 September 2026.
+A React component library, reusable blocks and a Next.js showcase. Free and Premium collections are both free under MIT. The original first implementation was 28 September 2026; the library expansion was requested on 13 October.
 
 Live showcase: https://bld8-ui.vercel.app. See [deployment details](docs/deployment.md).
 
-The recommended approach is a custom styled layer on the maintained Base UI primitives. The library adds BLD8 colours, typography, spacing, motion, composed APIs and examples. It does not fork Base UI or shadcn, and it does not change the portfolio website.
+Base UI supplies complex interaction behaviour. Selected shadcn/ui Base UI composition patterns are adapted into the library, with Tailwind for new component styling and original BLD8 tokens, motion and APIs. The package ships compiled CSS; consuming applications do not need a Tailwind build. See docs/tailwind-and-shadcn.md and docs/upstream.json for the authoring workflow and provenance.
 
 ## Run locally
 
@@ -31,11 +31,71 @@ The tests start a fresh production showcase on port 3121. Build first. If that p
 
 - `packages/ui/src`: reusable React components, typed APIs, styles and tokens.
 - `packages/ui/dist`: generated JavaScript, declarations and CSS.
-- `apps/docs/src`: home, searchable catalog, 28 component/pattern pages, motion studies, foundations, examples and usage guide.
+- `packages/blocks/src`: eight reusable compositions and three interface templates, using the public UI exports.
+- `apps/docs/src`: home, searchable component/block/template catalogues, preview/source explorers, $0 collections, motion studies and usage guide.
+- `scripts/library-catalog.mjs`: block/template metadata, categories and collection labels.
+- `scripts/prepare-library.mjs`: source manifests and runnable Next.js ZIP starters, generated from an explicit file allowlist during builds.
 - `tests`: interactive behaviour, responsive layouts and automated accessibility.
 - `docs`: architecture, scope and verification.
 
-The catalog groups 31 component families into 28 entries (Input/Field, Spinner/Skeleton and Card/Separator share entries). Icon and provider helpers are additional exports. See `docs/scope.md` for the exact release boundaries.
+The catalogue has 40 guidance entries, eight blocks (four Free and four Premium)
+and three Premium templates. Every collection costs $0 with no signup, payment,
+unlock or licence key. Premium means fuller composition, not paid access.
+
+## Working application patterns
+
+- MultiSelect searches stable option IDs and supports removable chips, disabled
+  choices, form values and validation descriptions.
+- CommandPalette supplies keyboard navigation, keyword search and action callbacks.
+  The showcase uses it for library search with Ctrl/Command+K.
+- Calendar, DatePicker and DateRangePicker use pinned React DayPicker 10.0.2,
+  bounds, keyboard navigation and local date-only form values.
+- FileUpload validates count/type/size, handles browse/drop/removal and accepts an
+  async transport callback with progress, cancellation and retry. Without that
+  callback no file leaves the browser. Server checks remain application concerns.
+- DataTable retains its original API and adds page selection, mixed state,
+  selection across filters/pages, visible columns, facets, compact density,
+  bulk action slots and loading/error/retry. createTableCSV exports scalar metadata
+  with quoting and formula escaping.
+- ProjectPlanner and ResourceManager compose those APIs into working flows.
+  Outline keeps view state mounted while navigating. Provide callbacks for file
+  storage, authentication and persistent application data.
+
+Preview /components, /blocks/project-planner, /blocks/resources and
+/templates/outline on the local server. All eleven ZIP starters include editable
+source, compiled packages and the dependency notices.
+
+## Icons and composed controls
+
+The `/icons` directory covers 1,877 canonical icons from pinned Lucide React
+1.55.0. Browse by name/category, preview sizes/strokes, copy React usage or SVG,
+and download the SVG with its licence notices. Mobile selection opens the
+existing BLD8 Sheet inspector; desktop has a sticky preview panel.
+
+```tsx
+import { Search, Save } from 'lucide-react';
+import { Icon, IconButton, Button, Field, InputGroup, Input } from '@bld8/ui';
+
+<Icon icon={Search} />
+<IconButton icon={Search} label="Search" />
+<Button leadingIcon={Save}>Save changes</Button>
+<Field label="Search projects">
+  <InputGroup leading={<Icon icon={Search} />}>
+    <Input type="search" />
+  </InputGroup>
+</Field>
+```
+
+Icon defaults are 18px, stroke 1.75 and currentColor. Supply `label` for a
+meaningful standalone icon; icons accompanying text stay decorative. Icon-only
+buttons require a label. Existing short names and dotted BLD8 arrows are retained.
+Button supports leading/trailing Lucide components. InputGroup supports icons,
+text adornments and labelled actions while retaining native field semantics.
+
+Use named Lucide imports in applications. The entire icon directory is generated
+as SVG assets and name metadata at build time; it is not a generic application
+icon-name loader. Lucide retains its ISC/MIT notices in `packages/ui/LUCIDE_LICENSE`
+and SVG downloads. Original BLD8 code remains MIT. Generated assets are ignored.
 
 ## Design direction
 
@@ -58,6 +118,8 @@ For another app, build and pack this workspace, then install the resulting local
 
 ## Status and ownership
 
-This is an initial implementation with a public showcase, not a claim of a mature or fully audited system. The public licence is pending, so the package is marked private and UNLICENSED. Base UI is MIT-licensed; attribution is recorded in `packages/ui/THIRD_PARTY_NOTICES.md`.
+The user selected MIT on 13 October 2026 for all original BLD8 UI/blocks/source. Keep the included notices when distributing it. Base UI is also MIT-licensed; attribution is recorded in `packages/ui/THIRD_PARTY_NOTICES.md`. Packages remain marked private to prevent accidental npm publication; source access and MIT reuse are independent of npm publication. No public namespace has been reserved.
 
-The showcase is deployed to personal Vercel. Source: [jaskevs/bld8-ui](https://github.com/jaskevs/bld8-ui), public by user choice. It is an independent repository with the isolated personal remote. Automatic Git deployment is not connected. Preserve the repository-local personal SSH identity and commit guards. Any future commits must use Jaison <26425317+jaskevs@users.noreply.github.com> as both author and committer, with no co-author trailers.
+ZIP starters include a Next.js app, compiled local packages, editable source and notices. Unzip, run `npm install` and `npm run dev`, then open localhost:3000. They are frontend starters: authentication, persistence and backend services belong to the consuming application. Library JSON manifests at `/r/index.json` are our own simple source format, not shadcn-compatible registry items or an MCP server.
+
+The earlier showcase is deployed to personal Vercel. The October expansion is included in the 13 October source release. Deploying that expansion remains a separate step. Source: [jaskevs/bld8-ui](https://github.com/jaskevs/bld8-ui), public by user choice. It is an independent repository with the isolated personal remote. Automatic Git deployment is not connected. Preserve the repository-local personal SSH identity and commit guards. Any future commits must use Jaison <26425317+jaskevs@users.noreply.github.com> as both author and committer, with no co-author trailers.

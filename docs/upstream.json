@@ -1,0 +1,28 @@
+{
+  "repository": "https://github.com/shadcn-ui/ui",
+  "revision": "30a58d4498f270af1c1e981a7d78a15cf5740841",
+  "license": "MIT; full notice in packages/ui/SHADCN_LICENSE",
+  "files": [
+    {
+      "source": "apps/v4/registry/bases/base/ui/sidebar.tsx",
+      "sha256": "f0f4c21b8fa1b4750711711ac7a6833c713cf93a23f1d2143cf5ec26f1661d56",
+      "adaptedIn": "packages/ui/src/sidebar.tsx"
+    },
+    {
+      "source": "apps/v4/registry/bases/base/ui/drawer.tsx",
+      "sha256": "7180299dff3cc1659ab75130f0521ba485e18b38625b904e1da4049f23479060",
+      "adaptedIn": "packages/ui/src/drawer.tsx"
+    },
+    {
+      "source": "apps/v4/registry/bases/base/ui/context-menu.tsx",
+      "sha256": "e4359306eb2242681388aa1b3a541de49dce46c375db1593f8d3362f6bb023ca",
+      "adaptedIn": "packages/ui/src/context-menu.tsx"
+    },
+    {
+      "source": "apps/v4/registry/bases/base/ui/button.tsx",
+      "sha256": "74f982d7ad7a764e3c95a519fc063a671e66ad758ea31dc89d747838e20c2487",
+      "adaptedIn": "packages/ui/src/variants.ts"
+    }
+  ],
+  "notes": "Adapted provider/composition patterns, not a fork. Original BLD8 tokens, public APIs, motion and prefixed Tailwind classes. Reconcile upstream manually; shadcn CLI update is not supported."
+}

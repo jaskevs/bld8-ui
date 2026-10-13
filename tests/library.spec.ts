@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { components } from '../apps/docs/src/lib/catalog';
 
 test('catalog filters by category and query, with working detail pages', async ({ page }) => {
   await page.goto('/components');
   await page.getByRole('button', { name: 'Forms', exact: false }).click();
-  await expect(page.locator('.component-card')).toHaveCount(8);
+  await expect(page.locator('.component-card')).toHaveCount(components.filter(item => item.category === 'Forms').length);
   await page.getByRole('searchbox', { name: 'Find a component' }).fill('combobox');
   await expect(page.locator('.component-card')).toHaveCount(1);
   await page.locator('.component-bottom').getByRole('link', { name: 'Combobox' }).click();

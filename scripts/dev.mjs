@@ -1,12 +1,23 @@
 import { spawn, execFileSync } from 'node:child_process';
 import { watch, copyFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
+const require=createRequire(new URL('../packages/ui/package.json',import.meta.url));
+const tailwindCli=join(dirname(require.resolve('@tailwindcss/cli/package.json')),'dist/index.mjs');
 const compiler = 'node_modules/typescript/bin/tsc';
 const config = 'packages/ui/tsconfig.json';
 execFileSync(process.execPath, [compiler, '-p', config], { stdio: 'inherit' });
-for (const file of ['styles.css','tokens.css']) copyFileSync('packages/ui/src/' + file, 'packages/ui/dist/' + file);
+execFileSync(process.execPath,['packages/ui/scripts/copy-styles.mjs'],{stdio:'inherit'});
+execFileSync(process.execPath, ['scripts/prepare-library.mjs'], { stdio: 'inherit' });
 const types = spawn(process.execPath, [compiler, '-p', config, '--watch', '--preserveWatchOutput'], { stdio: 'inherit' });
+const blockTypes = spawn(process.execPath, [compiler, '-p', 'packages/blocks/tsconfig.json', '--watch', '--preserveWatchOutput'], { stdio: 'inherit' });
+const utilities=spawn(process.execPath,[tailwindCli,'--input','packages/ui/src/tailwind.css','--output','packages/ui/dist/tailwind.css','--watch=always','--minify'],{stdio:'inherit'});
 const watcher = watch('packages/ui/src', (_event, filename) => { if (filename === 'styles.css' || filename === 'tokens.css') copyFileSync('packages/ui/src/' + filename, 'packages/ui/dist/' + filename); });
+let refresh;
+const refreshLibrary = () => { clearTimeout(refresh); refresh = setTimeout(() => { try { execFileSync(process.execPath, ['scripts/prepare-library.mjs', '--source-only'], { stdio:'inherit' }); } catch { console.error('Library source refresh failed; fix the source and save again.'); } }, 600); };
+const blocksWatcher = watch('packages/blocks/src', (_event,filename) => { if (filename === 'styles.css') copyFileSync('packages/blocks/src/styles.css','packages/blocks/dist/styles.css'); refreshLibrary(); });
+const distWatchers = ['packages/ui/dist','packages/blocks/dist'].map(folder => watch(folder, refreshLibrary));
 const docs = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'dev', 'apps/docs', '--hostname', '127.0.0.1', '--port', '3120'], { stdio: 'inherit' });
 let stopping = false;
-function stop(code = 0) { if (stopping) return; stopping = true; watcher.close(); types.kill(); docs.kill(); process.exit(code); }
+function stop(code = 0) { if (stopping) return; stopping = true; clearTimeout(refresh); watcher.close(); blocksWatcher.close(); for (const watcher of distWatchers) watcher.close(); types.kill(); blockTypes.kill(); utilities.kill(); docs.kill(); process.exit(code); }
 process.on('SIGINT', () => stop()); process.on('SIGTERM', () => stop()); docs.on('exit', code => stop(code ?? 0));

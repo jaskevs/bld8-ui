@@ -1,29 +1,34 @@
 'use client';
 import { createContext, useContext, useId, useState, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { Icon } from './icons.js';
+import { cn } from './utils.js';
+import { buttonVariants } from './variants.js';
+export { Icon, type IconProps, type IconName } from './icons.js';
 
 export function cx(...values: (string | false | undefined)[]) { return values.filter(Boolean).join(' '); }
-export function Icon({ name = 'arrow', ...props }: ComponentProps<'svg'> & { name?: 'arrow' | 'check' | 'close' | 'chevron' | 'plus' | 'search' | 'copy' | 'sun' | 'moon' }) {
-  const paths = { check: 'm5 12 4 4 10-10', close: 'm6 6 12 12M18 6 6 18', chevron: 'm6 9 6 6 6-6', plus: 'M12 5v14M5 12h14', search: 'm16 16 4 4M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0', copy: 'M8 8h12v12H8zM4 16V4h12', sun: 'M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0', moon: 'M20 14a8 8 0 0 1-10-10 9 9 0 1 0 10 10' };
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" data-bui-icon={name} {...props}>{name === 'arrow' ? [[10,6],[14,6],[18,6],[14,10],[18,10],[10,14],[18,14],[6,18]].map(([x,y]) => <circle key={x + ',' + y} cx={x} cy={y} r="1.25" fill="currentColor" stroke="none" />) : <path d={paths[name]} />}</svg>;
+export type ButtonProps = ComponentProps<'button'> & { variant?: 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md' | 'lg'; loading?: boolean; leadingIcon?:LucideIcon; trailingIcon?:LucideIcon };
+export function Button({ variant = 'primary', size = 'md', loading, disabled, className, children, type = 'button', leadingIcon, trailingIcon, ...props }: ButtonProps) {
+  return <button {...props} type={type} disabled={disabled || loading} aria-busy={loading || undefined} className={cn(buttonVariants({variant,size}),className)}><span className="bui-button-content">{leadingIcon && <Icon icon={leadingIcon} size={size === 'sm' ? 16 : 18} />}{children}{trailingIcon && <Icon icon={trailingIcon} size={size === 'sm' ? 16 : 18} />}</span>{loading && <span className="bui-button-spinner"><Spinner /></span>}</button>;
 }
-export type ButtonProps = ComponentProps<'button'> & { variant?: 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger'; size?: 'sm' | 'md' | 'lg'; loading?: boolean };
-export function Button({ variant = 'primary', size = 'md', loading, disabled, className, children, type = 'button', ...props }: ButtonProps) {
-  return <button {...props} type={type} disabled={disabled || loading} aria-busy={loading || undefined} className={cx('bui-button', 'bui-button--' + variant, 'bui-button--' + size, className)}><span className="bui-button-content">{children}</span>{loading && <span className="bui-button-spinner"><Spinner /></span>}</button>;
-}
-export function IconButton({ label, children, ...props }: ButtonProps & { label: string }) { return <Button {...props} aria-label={label} className={cx('bui-icon-button', props.className)}>{children}</Button>; }
-const FieldContext = createContext<{ id: string; description?: string; invalid: boolean } | null>(null);
+export function IconButton({ label, icon, children, ...props }: ButtonProps & { label: string; icon?:LucideIcon }) { return <Button {...props} aria-label={label} className={cx('bui-icon-button', props.className)}>{children ?? (icon && <Icon icon={icon} />)}</Button>; }
+const FieldContext = createContext<{ id: string; description?: string; invalid: boolean; required?: boolean } | null>(null);
 export function Field({ label, hint, error, id: suppliedId, children, required }: { label: string; hint?: string; error?: string; id?: string; children: ReactNode; required?: boolean }) {
   const generated = useId(); const id = suppliedId || generated;
   const description = [hint && id + '-hint', error && id + '-error'].filter(Boolean).join(' ') || undefined;
-  return <FieldContext.Provider value={{ id, description, invalid: !!error }}><div className="bui-field"><label className="bui-label" htmlFor={id}>{label}{required && <span aria-hidden="true"> *</span>}</label>{children}{hint && <p id={id + '-hint'} className="bui-hint">{hint}</p>}{error && <p id={id + '-error'} className="bui-error" role="alert">{error}</p>}</div></FieldContext.Provider>;
+  return <FieldContext.Provider value={{ id, description, invalid: !!error, required }}><div className="bui-field"><label className="bui-label" htmlFor={id}>{label}{required && <span aria-hidden="true"> *</span>}</label>{children}{hint && <p id={id + '-hint'} className="bui-hint">{hint}</p>}{error && <p id={id + '-error'} className="bui-error" role="alert">{error}</p>}</div></FieldContext.Provider>;
 }
-export function Input({ className, ...props }: ComponentProps<'input'>) {
+export function Input({ className, density = 'comfortable', ...props }: ComponentProps<'input'> & { density?: 'comfortable' | 'compact' }) {
   const field = useContext(FieldContext);
-  return <input id={field?.id} aria-describedby={field?.description} aria-invalid={field?.invalid || undefined} {...props} className={cx('bui-input', className)} />;
+  return <input id={field?.id} aria-describedby={field?.description} aria-invalid={field?.invalid || undefined} required={field?.required} {...props} data-density={density} className={cx('bui-input', className)} />;
 }
 export function Textarea({ className, ...props }: ComponentProps<'textarea'>) {
   const field = useContext(FieldContext);
-  return <textarea id={field?.id} aria-describedby={field?.description} aria-invalid={field?.invalid || undefined} rows={4} {...props} className={cx('bui-input', 'bui-textarea', className)} />;
+  return <textarea id={field?.id} aria-describedby={field?.description} aria-invalid={field?.invalid || undefined} required={field?.required} rows={4} {...props} className={cx('bui-input', 'bui-textarea', className)} />;
+}
+export function InputGroup({leading,trailing,className,children,...props}:ComponentProps<'div'> & {leading?:ReactNode;trailing?:ReactNode}) {
+  const field=useContext(FieldContext);
+  return <div {...props} data-invalid={field?.invalid || undefined} className={cx('bui-input-group',className)}>{leading && <span className="bui-input-adornment">{leading}</span>}{children}{trailing && <span className="bui-input-adornment">{trailing}</span>}</div>;
 }
 export function Checkbox({ label, description, className, ...props }: Omit<ComponentProps<'input'>, 'type'> & { label: string; description?: string }) {
   const hintId = useId();

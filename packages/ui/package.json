@@ -3,18 +3,45 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "license": "UNLICENSED",
-  "files": ["dist", "README.md", "THIRD_PARTY_NOTICES.md"],
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "LUCIDE_LICENSE",
+    "DAY_PICKER_LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "SHADCN_LICENSE"
+  ],
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tokens.css": "./dist/tokens.css"
   },
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/copy-styles.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "peerDependencies": { "react": "^19.0.0", "react-dom": "^19.0.0" },
-  "dependencies": { "@base-ui/react": "1.8.0" }
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.8.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.55.0",
+    "react-day-picker": "10.0.2",
+    "tailwind-merge": "3.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.0",
+    "tailwindcss": "4.3.0"
+  }
 }

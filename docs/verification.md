@@ -1,4 +1,130 @@
+## Tailwind and navigation foundation - 13 October 2026
+
+- Production build: 66 pages/routes; all three workspace typechecks pass.
+  Catalogue: 40 guidance entries, eight blocks, three templates, eleven starters.
+- Final full browser run: 81 passed, with one test expecting to read background
+  status while a radio submenu was still open. The test now verifies selection,
+  dismisses both menu levels and checks the status; that targeted case passes.
+  No application change was needed for that final test correction.
+- New coverage includes drawer focus containment/restoration and draft retention,
+  real emulated touch swipe dismissal, context-menu keyboard activation,
+  disabled/checkbox/radio actions, nested menus, responsive sidebar collapse,
+  mobile selection/focus, dark/light axe and reduced motion.
+- Existing workflow, icon, motion, layout and collection checks pass. The first
+  migration run exposed link colours overridden by unlayered app resets;
+  compatibility styles retain their previous priority and light/dark axe passes.
+- A real utility edit was applied and restored in the local preview. Tailwind
+  rebuilt and the browser updated without restarting. React may refresh the
+  page for shared-module changes; persistence of unsaved preview state across
+  every code edit is not promised.
+- All eleven ZIPs pass CRC/path/source/license checks, including compiled
+  Tailwind CSS and SHADCN_LICENSE. The Outline starter was independently
+  extracted, installed from cache and built (UI + blocks + Next 16.3.8).
+- npm pack --dry-run includes the new compiled controls, CSS and shadcn notice.
+  npm audit reports zero vulnerabilities. Git diff whitespace checks pass.
+- Final Outline desktop/mobile and drawer images reviewed in .local/previews.
+  A development hydration warning was traced to screenshot caret-hiding styles;
+  a clean interaction replay produced no browser errors.
+- Local preview: http://127.0.0.1:3120. No commit, push, deployment or npm release.
+  The /r manifests retain their own BLD8 schema; no shadcn CLI compatibility claim.
+  Non-Chromium coverage and manual screen-reader testing remain outstanding.
+
+
 # Verification - 28 September 2026
+
+## Application workflows - 13 October 2026
+
+- Production build succeeds with 63 generated pages/routes; all three workspace
+  typechecks pass. There are 37 guidance entries, eight blocks, three templates
+  and eleven generated starters.
+- The full 71-test regression run passed. Final focus/clearable/compact refinements
+  were checked in 54 affected cases: 53 passed together; one broad name match was
+  made exact and passed separately. Three final capture/layout/axe checks also pass.
+- Command search/actions/shortcut, focus restoration, multi-select form values,
+  date bounds and keyboard movement, local date-only values, range clearing,
+  file checks/removal and upload progress/cancel/retry were exercised.
+- Table selection survives pages/filters, with mixed header state, visible columns,
+  density and bulk actions. Resource CSV exports chosen metadata with quoting and
+  formula escaping; archives can be undone. Outline retains edits across views.
+  Project creation validates and updates the displayed table.
+- Axe passes in light/dark themes and open command/range overlays. No page overflow
+  at 1440/768/390/320 px; calendar popups fit the viewport. Desktop/mobile/dark
+  Outline captures were reviewed and saved in the task's local preview folder.
+- All eleven ZIPs pass CRC/safe-path checks and contain compiled/editable source
+  and MIT/Lucide/DayPicker notices. They exclude environment files, credentials,
+  parent paths and installed dependencies. The final Outline ZIP was extracted
+  into a separate folder, installed from the offline cache and built independently.
+- Local preview stays on 3120. No commit, push, npm publication, account change
+  or deployment was made. Real persistence/uploads, non-Chromium coverage and
+  manual screen-reader verification are not claimed.
+
+## Icon foundation and control extensions - 13 October 2026
+
+Verified against the final icon directory/mobile inspector implementation:
+
+- Production build: 53 generated pages. UI/blocks compilation and all three
+  workspace type checks passed.
+- Final full browser suite: all 53 checks passed in 36.7 seconds. This includes
+  the existing component/blocks tests and 11 icon/control/mobile checks.
+- Full directory: 1,877 canonical Lucide 1.55.0 icons, excluding aliases, with
+  generated 1.5/1.75/2 stroke SVG profiles and retained ISC/Feather MIT notices.
+- Search, category filtering, pagination and empty-state reset; actual React-code
+  copy and SVG copy; downloads preserve stroke settings and licence notices.
+- Shared icon dimensions and stroke defaults; meaningful image labels,
+  decorative button glyphs and the unchanged eight-dot BLD8 arrow artwork.
+- InputGroup clear actions, native field labels, invalid descriptions and visible
+  keyboard focus. Button/IconButton Lucide props work with existing variants.
+- Automated axe checks in both themes for the directory, Icon and InputGroup;
+  the open mobile inspector also passes. Escape restores focus to the tile that
+  opened it. Existing accessibility/overlay and reduced-motion checks still pass.
+- No page overflow at 1440/768/390/320 px. Desktop/mobile/dark screenshots were
+  reviewed; mobile browsing remains visible ahead of its on-demand Sheet.
+- Extracted a regenerated Studio starter, installed from the offline cache and
+  built it independently with Lucide and the included LUCIDE_LICENSE file.
+
+The first build exposed a JSX style-brace error in the preview helper; it was
+corrected before these final checks. Generated icon assets stay out of Git and
+out of ordinary application icon imports. No commits, pushes, deployment or npm
+publication occurred. Manual assistive-technology review remains pending.
+
+## Library expansion - 13 October 2026
+
+Completed locally against the current source:
+
+- Core UI and blocks compilation, Next.js production build (50 generated pages),
+  and explicit TypeScript checks for all three workspaces.
+- All 42 Playwright checks passed in the final full run (29.8 seconds). This
+  includes the existing 26 checks plus 16 collection/blocks/template checks.
+- Category, collection and text filtering; reset/empty results; full source and
+  stylesheet views; all eight anonymous manifests and ZIP downloads.
+- Sign-in validation without a real authentication claim; account validation and
+  local saving; period/metric changes; activity filtering; duplicate-invitation
+  rejection/local row creation; task creation/stage changes; template view
+  navigation; dialog dismissal and focus return.
+- Automated axe checks for new home, catalogues, plans, team, board and Studio
+  in both themes. Existing component/overlay accessibility checks also pass.
+- No horizontal page overflow at 1440, 768, 390 and 320 px across the new pages;
+  no browser page errors. Mobile preview adapts to its container independently
+  of the desktop viewport; reduced motion disables width transitions.
+- Extracted Studio ZIP into a separate temporary workspace, installed using the
+  existing offline npm cache, and successfully built the independent Next.js app.
+  Repeated the build from the final generated ZIP after reusable style changes.
+- All eight archives passed ZIP CRC, path allowlist and licence-presence checks.
+  All original BLD8 source is MIT by the user's explicit choice; Base UI's notice
+  is included. No environment files or workspace credentials are in the ZIPs.
+- Reviewed desktop home/catalogue/Studio, mobile home and dark plans screenshots.
+- A real temporary package CSS variable edit refreshed the open development page
+  without navigation or reload. The edit was restored and removal was confirmed.
+
+The first pass exposed ambiguous code locators and required labels whose visual
+asterisk did not match an exact label-text selector. The tests now use accessible
+names, and required fields propagate their native required state. Final checks
+pass. Screenshot/validation artifacts stay outside the repository.
+
+Local preview is running at http://127.0.0.1:3120. No commit, push, deployment or
+npm publication occurred in this request. Manual screen-reader review,
+Safari/Firefox, RTL/localisation and real backend integration remain pending.
+Later historical sections below describe the earlier release.
 
 Completed locally:
 
