@@ -8,6 +8,7 @@ import '@bld8/blocks/styles.css';
 import './globals.css';
 import './library.css';
 import './icons.css';
+import './playground.css';
 const display = localFont({ src: '../../../../node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2', variable: '--font-display', display: 'swap' });
 const body = localFont({ src: '../../../../node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2', variable: '--font-body', display: 'swap' });
 export const metadata: Metadata = { title: { default: 'BLD8 UI — Components, blocks & templates', template: '%s — BLD8 UI' }, description: 'Considered React components, working interface blocks and starter templates. Free and Premium collections, both free under MIT.', metadataBase: new URL(siteUrl), robots: { index: true, follow: true } };

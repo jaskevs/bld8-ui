@@ -1,21 +1,30 @@
-# BLD8 UI
+# Current scope
 
-Local React 19 component package. Import components from @bld8/ui and styles once from @bld8/ui/styles.css. Wrap the application in UIProvider for tooltips and toast. Uses Base UI for complex interactions and native HTML for simple controls.
+43 component guidance entries, eight reusable blocks, three templates, the Lucide directory, component playground, shadcn registry and thirteen ZIP starters are implemented.
 
-MIT licensed. Not published to npm; the showcase's runnable ZIP starters include this package as a local workspace. Keep LICENSE, THIRD_PARTY_NOTICES.md, LUCIDE_LICENSE and DAY_PICKER_LICENSE when distributing it. See the showcase and docs for props, examples and scope.
+The library includes native forms, Base UI selection/navigation/overlays, command search, date/range fields, file selection and upload callbacks, feedback, tables, drawer, context menus and responsive sidebar. Source and both collection tiers are free under MIT.
 
-Extended APIs include MultiSelect, CommandPalette, Calendar, DatePicker,
-DateRangePicker and FileUpload. DataTable adds optional selection, column
-visibility, scalar filters, bulk actions, density and loading/error states.
-Input supports compact density; Select/Combobox support clearable selection.
-Dialog accepts initialFocus and finalFocus refs for composed workflows.
+The playground configures fourteen representative controls and supports validated shareable URLs. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
 
-Calendars return local Date objects; formatDateValue serialises YYYY-MM-DD
-without converting to UTC. Command shortcuts are opt-in and register once.
-FileUpload only makes requests through your onUpload callback, with AbortSignal
-and onProgress(file,percent). Validate uploads again on the server. Tables are
-client-side for manageable datasets, without virtualization or server pagination.
-createTableCSV uses explicit exportValue/sortValue scalars; React cell output is
-never scraped into an export.
+Outline is the browser-persisted reference application for forms and tables. Its project flows include validation, recovery, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
 
-Drawer, ContextMenu and responsive Sidebar extend the navigation set. Selected shadcn/ui Base UI patterns are adapted with attribution in SHADCN_LICENSE. Keep that notice with distributions. Tailwind 4.3.0 authors prefixed bui: utilities without Preflight; npm run build compiles them into dist/tailwind.css, imported by dist/styles.css. App consumers only import the CSS entry point. Source edits require the package build (or the repository dev watcher). Tokens remain --bui-*.
+Tables support externally controlled queries, resizing and pinned columns, but not virtualization. The form adapter does not replace schema validation or a server's validation rules. Browser storage is suitable for this example, not shared multi-user persistence. The repository interface is the integration boundary for a real service.
+
+Automated accessibility and browser checks cover the included examples. Manual assistive-technology and broader cross-browser review remain necessary before making certification claims. The npm packages are still private and unpublished; use the registry or source starters.
+
+
+The current extension adds complete TypeScript-derived prop tables, inline table
+editing, a typed Outline HTTP adapter, a runnable session-scoped API example and
+optional React Hook Form bindings. The two integration starters include the
+sample API. Production authentication and database storage are application work.
+
+Optional integration items include `react-hook-form`, `react-hook-form-example`,
+`editable-cell` and `outline-http`. The form adapter adds React Hook Form only
+when explicitly installed. The form example includes client bindings and its
+HTTP adapter; the standalone HTTP/form starters supply a runnable reference
+server. Use the service contract to connect a different backend.
+
+EditableCell supports explicit text/date/select edits, async save recovery and
+an edit-start revision for concurrency checks. React Hook Form bindings are
+optional: import RHFField/RHFControl from @bld8/ui/react-hook-form. Input refs,
+blur and field errors connect native and controlled inputs to the host form.

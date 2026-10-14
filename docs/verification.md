@@ -1,3 +1,36 @@
+## Playground and workflow integrations - 14 October 2026
+
+- Production build passes: 74 generated pages plus the dynamic example API.
+  All three workspace type checks pass. The catalogue has 43 guidance entries,
+  fourteen playground controls, thirteen ZIP starters and 92 registry items.
+- The full 107-test Playwright run passes in Edge (2.7 minutes). This covers
+  configuration URLs and invalid values, overlay focus, disabled selections,
+  calendar bounds, loading/error/empty states, TypeScript prop tables, inline
+  validation/cancel/save/recovery, conflicting cell drafts, the real HTTP
+  contract, cancellation and React Hook Form focus/controlled fields.
+- Automated light/dark accessibility, existing interactions, reduced motion
+  and responsive layout checks pass. After the final action-column spacing
+  and service-footer refinement, all seven affected checks pass again.
+- The official shadcn 4.21.4 CLI installed the new form example and HTTP adapter
+  into a fresh Next.js 16.3.8 consumer. That consumer builds independently;
+  browser interaction saved both an inline edit and a controlled form record
+  through its own sample API, with no page errors.
+- The extracted React Hook Form/HTTP starter installed and built independently,
+  including its API route. All thirteen final archives pass CRC, path,
+  licence-presence and local-artifact checks. A package dry run includes the
+  optional form adapter, editable cell and licence.
+- npm audit reports zero vulnerabilities. Public registry URLs were restored
+  after local CLI testing. Git diff whitespace checks pass.
+- Desktop table/inline-edit/prop docs and mobile date/form captures were
+  reviewed; no page errors occurred during the capture run. No source text
+  attributes generation to an assistant. Existing upstream notices remain.
+
+The sample server stores bounded, temporary session data; the session header is
+not authentication. Production ownership and atomic database writes remain the
+host application's responsibility. Manual screen-reader review and broader
+non-Chromium coverage are still pending. These checks completed before committing the source. This batch has not been
+deployed to Vercel or published to npm. Preview: http://127.0.0.1:3120.
+
 ## Tailwind and navigation foundation - 13 October 2026
 
 - Production build: 66 pages/routes; all three workspace typechecks pass.
@@ -182,7 +215,7 @@ Shared gutters align header, page content and footer. Catalog cards now stretch
 consistently and align caption dividers. Panel padding, radii and grid gaps share
 values. The small brand mark is an aligned SVG, and text-link underlines use the
 same eased timing as the component interactions. Borderless white cards remain.
-Updated foundation examples, button usage guidance and Claude instructions.
+Updated foundation examples, button usage guidance and contributor guidance.
 
 Validation:
 - Library and showcase production build passed; 36 generated routes.
@@ -232,3 +265,42 @@ and their own server on port 3122. Existing development servers were preserved.
 Generated output, test results, local artifacts, .env files and .vercel metadata
 are excluded from Git. Personal identity and work-hour hooks apply to this new
 repository; no npm publication or new deployment is part of the source push.
+
+
+## Registry, playground and Outline - 14 October 2026
+
+- Production build passed with 69 generated pages; all three workspace type checks passed.
+- The final 92-check Edge suite passed 91 checks in its full run. The remaining
+  persistence/deletion test used an ambiguous cell selector; after making that
+  selector exact, its targeted rerun passed. No application change was needed.
+- Checks include real project persistence, duplicate validation, rejected-save
+  recovery, dirty-draft dismissal, record-version conflicts, selection across
+  fetched pages, resizing, preferences/resources across reloads and deletion.
+- Automated axe checks passed for both themes. Responsive checks passed at 320,
+  390, 768 and 1440 px. Desktop/mobile playground, Outline and editor captures
+  were reviewed; the final capture reported no browser page errors.
+- The actual shadcn 4.21.4 CLI installed Outline into a clean Next.js 16.3.8 app,
+  which built independently. Namespace installation into a Vite 8.3.4 app with
+  a custom UI alias also built. Vite emitted expected RSC directive warnings.
+- All eleven starter archives passed CRC, path, compiled/source-file and licence
+  checks. Registry items have resolvable internal dependency URLs and scoped targets.
+- Production dependency audit reported zero vulnerabilities. Diff whitespace
+  checks passed. Required third-party notices remain intact in packages, registry files and starters.
+
+The example uses browser storage, not a cloud backend. Automated checks do not
+constitute accessibility certification or full cross-browser coverage. No commits
+or pushes were created during the restricted Melbourne work-time window.
+
+
+The public registry at ui.bld8.dev was also installed with the real CLI into the
+independent Next.js consumer, which built successfully. Anonymous HTTPS checks
+returned 200 for the home, registry, playground, Outline, Form, registry item/index,
+ZIP download and sitemap routes. The public registry has 84 items and no local
+host dependency URLs. The custom domain resolves normally on this workstation.
+
+
+The final catalogue registration uses the same FormDemo as the detail page. Its
+behaviour test and eight affected accessibility/responsive checks passed after
+rebuilding the catalogue. The suite now contains 93 checks. The local development
+preview is available on port 3120; temporary registry and production-preview
+servers were stopped.

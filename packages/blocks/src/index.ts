@@ -9,3 +9,7 @@ export * from './templates.js';
 export * from './project-planner.js';
 export * from './resource-manager.js';
 export * from './operations-template.js';
+export * from './outline-projects.js';
+export * from './outline-repository.js';
+export * from './outline-http.js';
+export * from './outline-http-demo.js';

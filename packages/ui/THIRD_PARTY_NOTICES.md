@@ -40,3 +40,7 @@ SOFTWARE.
 Selected composition patterns are adapted from shadcn/ui (MIT, copyright 2023 shadcn). Pinned upstream revision: 30a58d4498f270af1c1e981a7d78a15cf5740841. The full notice is in SHADCN_LICENSE. Drawer, context-menu and sidebar compositions and the button variant pattern retain BLD8 styling and focused APIs. Provenance and source hashes: docs/upstream.json in the repository.
 
 Tailwind CSS 4.3.0 and its CLI are build dependencies (MIT). clsx, class-variance-authority and tailwind-merge are runtime dependencies (MIT). Their notices accompany installed npm distributions. Compiled utilities are included; consuming applications do not need Tailwind.
+
+## React Hook Form
+
+React Hook Form 7.90.0 is an optional MIT dependency for the adapter and examples. Its package includes the original licence. No upstream source is vendored. https://github.com/react-hook-form/react-hook-form

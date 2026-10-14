@@ -1,0 +1,8 @@
+export interface ApiProperty {name:string;type:string;required:boolean;defaultValue:string;description:string;native:boolean}
+export interface ApiSection {name:string;kind:string;properties:ApiProperty[]}
+function Table({name,rows}:{name:string;rows:ApiProperty[]}){
+  return <div className="api-table-scroll" role="region" aria-label={name+' props'} tabIndex={0}><table className="api-table"><caption className="bui-sr-only">{name} public properties</caption><thead><tr><th scope="col">Prop</th><th scope="col">Type</th><th scope="col">Default</th></tr></thead><tbody>{rows.map(row=><tr key={row.name}><th scope="row"><code>{row.name}</code>{row.required && <small>Required</small>}</th><td><code>{row.type}</code>{row.description && <p>{row.description}</p>}</td><td><code>{row.defaultValue}</code></td></tr>)}</tbody></table></div>;
+}
+export function PropTable({sections}:{sections:ApiSection[]}){
+  return <div className="api-sections">{sections.map(section=>{const custom=section.properties.filter(row=>!row.native),native=section.properties.filter(row=>row.native);return <section key={section.name} className="api-section"><h3>{section.name}</h3>{custom.length>0 && <Table name={section.name} rows={custom} />}{native.length>0 && <details className="api-native"><summary>Forwarded React / HTML props <span>{native.length}</span></summary><Table name={section.name+' native'} rows={native} /></details>}{!section.properties.length && <p className="bui-hint">This component has no configuration props.</p>}</section>;})}<p className="bui-hint">Tables come from the public TypeScript declarations. Related types are shown alongside their component. A dash means no default is declared at the public function boundary.</p></div>;
+}

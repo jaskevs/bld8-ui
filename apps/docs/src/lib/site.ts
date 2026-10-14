@@ -1,2 +1,1 @@
-// Use the live showcase address until a custom domain is connected.
-export const siteUrl = 'https://bld8-ui.vercel.app';
+export const siteUrl = 'https://ui.bld8.dev';

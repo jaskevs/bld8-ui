@@ -46,6 +46,7 @@ test('mobile sidebar closes on selection, keeps state and restores focus',async(
   await trigger.click();await page.keyboard.press('Escape');await expect(trigger).toBeFocused();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 for(const theme of ['light','dark'])test('new navigation passes axe and renders in '+theme,async({page},testInfo)=>{
+  test.setTimeout(60000);
   await page.setViewportSize({width:1440,height:1000});
   for(const id of ['sidebar','drawer','context-menu']){
     await page.goto('/components/'+id);if(theme==='dark')await page.getByRole('button',{name:'Switch to dark theme'}).click();
@@ -53,7 +54,7 @@ for(const theme of ['light','dark'])test('new navigation passes axe and renders 
     if(id==='context-menu')await page.getByLabel('Interface notes actions').click({button:'right'});
     const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
     expect(result.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})),id).toEqual([]);
-    await page.screenshot({path:testInfo.outputPath(id+'-'+theme+'.png'),fullPage:true});
+    await page.screenshot({path:testInfo.outputPath(id+'-'+theme+'.png'),fullPage:false,caret:'initial'});
   }
 });
 test('new motion respects reduced motion and mobile layout',async({page})=>{

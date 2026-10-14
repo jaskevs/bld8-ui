@@ -1,4 +1,6 @@
 'use client';
+import { EditableCellDemo, RHFNativeDemo } from './workflow-demos';
+import { FormDemo } from './form-demo';
 import { useState } from 'react';
 import { SidebarDemo, DrawerDemo, ContextMenuDemo } from './navigation-demos';
 import { Camera, Mail, Save, Search, X, ArrowRight } from 'lucide-react';
@@ -31,6 +33,9 @@ export const projectColumns: Column<ProjectRow>[] = [
 export function ComponentDemo({ id }: { id: string }) {
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch(id) {
+    case 'editable-cell': return <EditableCellDemo />;
+    case 'react-hook-form': return <RHFNativeDemo />;
+    case 'form': return <FormDemo />;
     case 'sidebar': return <SidebarDemo />;
     case 'drawer': return <DrawerDemo />;
     case 'context-menu': return <ContextMenuDemo />;

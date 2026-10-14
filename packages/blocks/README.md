@@ -1,16 +1,36 @@
-# BLD8 Blocks
+# Current scope
 
-Original React compositions built from `@bld8/ui`. Both Free and Premium collections are available at no cost under MIT.
+43 component guidance entries, eight reusable blocks, three templates, the Lucide directory, component playground, shadcn registry and thirteen ZIP starters are implemented.
 
-Import `@bld8/ui/styles.css` and `@bld8/blocks/styles.css`, wrap the app in `UIProvider`, then import blocks from `@bld8/blocks`.
+The library includes native forms, Base UI selection/navigation/overlays, command search, date/range fields, file selection and upload callbacks, feedback, tables, drawer, context menus and responsive sidebar. Source and both collection tiers are free under MIT.
 
-Eight blocks: SignInForm, AccountSettings, MetricsOverview, WorkspaceOverview,
-TeamDirectory, ProjectBoard, ProjectPlanner and ResourceManager. Three interface
-starters: StudioTemplate, LaunchTemplate and OperationsTemplate (Outline).
+The playground configures fourteen representative controls and supports validated shareable URLs. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
 
-ProjectPlanner validates project names, dates and disciplines and accepts an async
-onCreate callback. ResourceManager accepts onImport for real storage and supports
-metadata CSV export and one-step archive undo. Both report local changes through
-update callbacks. Outline retains view state while navigating; a reload resets it.
+Outline is the browser-persisted reference application for forms and tables. Its project flows include validation, recovery, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
 
-Demo data and local state are illustrative. Bring your own authentication, persistence and service connections. See each block's typed props and the documentation preview for the supported behaviour. Packages remain unpublished to npm; the showcase downloads include local workspaces and compiled files.
+Tables support externally controlled queries, resizing and pinned columns, but not virtualization. The form adapter does not replace schema validation or a server's validation rules. Browser storage is suitable for this example, not shared multi-user persistence. The repository interface is the integration boundary for a real service.
+
+Automated accessibility and browser checks cover the included examples. Manual assistive-technology and broader cross-browser review remain necessary before making certification claims. The npm packages are still private and unpublished; use the registry or source starters.
+
+
+The current extension adds complete TypeScript-derived prop tables, inline table
+editing, a typed Outline HTTP adapter, a runnable session-scoped API example and
+optional React Hook Form bindings. The two integration starters include the
+sample API. Production authentication and database storage are application work.
+
+Optional integration items include `react-hook-form`, `react-hook-form-example`,
+`editable-cell` and `outline-http`. The form adapter adds React Hook Form only
+when explicitly installed. The form example includes client bindings and its
+HTTP adapter; the standalone HTTP/form starters supply a runnable reference
+server. Use the service contract to connect a different backend.
+
+EditableCell supports explicit text/date/select edits, async save recovery and
+an edit-start revision for concurrency checks. React Hook Form bindings are
+optional: import RHFField/RHFControl from @bld8/ui/react-hook-form. Input refs,
+blur and field errors connect native and controlled inputs to the host form.
+
+Outline now supports inline name/date/status edits. The pure
+@bld8/blocks/outline-http subpath exports createOutlineHttpRepository for the
+documented JSON contract. The optional HTTP demo and two integration starters
+include a temporary session-scoped reference API; real authentication and
+database persistence belong to the consuming application.

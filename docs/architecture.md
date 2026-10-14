@@ -1,97 +1,40 @@
-# Architecture and foundation choice
+# Architecture
 
-Decision: React first, Base UI for behaviour, selected shadcn/ui Base UI compositions, Tailwind authoring and original BLD8 tokens/motion. Updated with user approval on 13 October 2026.
+React 19 provides the component model, Base UI maintains complex interactions, and selected shadcn/ui Base UI patterns inform Drawer, ContextMenu and Sidebar. BLD8 owns the styled layer, composition APIs and examples. Native HTML is used for simpler fields and controls.
 
-## Options considered
+`packages/ui` builds ESM, declarations and CSS. `packages/blocks` composes its public exports. Neither package depends on Next.js. `apps/docs` consumes both packages and supplies content, fonts, the catalogue and playground.
 
-- Base UI plus a styled layer: selected. Its unstyled primitives let the project retain its own CSS and visual identity, while upstream maintains complex interaction behaviour.
-- Adapt shadcn/ui: now selected for scoped Base UI composition patterns. Drawer, context menu, sidebar and button variants are the first adaptations. Their styling and APIs are adapted to BLD8. The pinned revision, original paths and hashes are in docs/upstream.json; the complete MIT notice ships in SHADCN_LICENSE.
-- Fork an entire library: unnecessary for this initial release; it would add upstream reconciliation work unrelated to the intended visual and component API work.
-- Generate every interaction from scratch: avoid reimplementing focus management, keyboard selection and popup behaviour without a need.
+Styles use namespaced `--bui-*` tokens. Tailwind compiles prefixed utilities without Preflight. Existing CSS keeps its cascade priority. Set `data-ui-theme` on the document root so portalled content inherits the theme. Motion uses shared easing with reduced-motion overrides.
 
-## Boundaries
+## Forms
 
-`packages/ui` compiles to an ESM package with declarations and a separate CSS entry point. React and React DOM are peers. Base UI stays a normal runtime dependency. Native HTML handles simple fields, switches, checkboxes and radio groups. Complex selection, overlays, tabs, accordion and toast use Base UI.
+`useForm` accepts initial values, validation and an async submit function. Validation may be async; both callbacks receive an AbortSignal. Submissions are guarded against repeats. Reset and unmount abort pending work, and stale completions are ignored. Field errors, service errors, dirty state and saved state are explicit. Successful responses may return normalised values.
 
-`apps/docs` is a Next.js consumer of the built package. It supplies fonts, page layout, fixtures, demo actions and short usage guidance. The development runner watches package TS and CSS so the docs update after a save. Package source does not import Next.js.
+`Form` binds submission and first-invalid-field focus. Give input controls a name matching their value key. `Field` handles labels and descriptions. `useUnsavedChanges` handles browser exits; application dialogs own in-app dismissal confirmation. Values should be serialisable; call reset when intentionally replacing a mounted form's initial values.
 
-Themes live in namespaced CSS variables. Set the theme on the document root so portal content inherits it. Every application still owns meaningful labels, content, errors and data handling. App composition requires its own accessibility validation.
+The optional `@bld8/ui/react-hook-form` entry point integrates existing React Hook Form state through RHFField and RHFControl. It forwards value, blur, error and input refs without adding a required form dependency to core component imports.
 
-## Application workflows - 13 October 2026
+## Tables
 
-MultiSelect and CommandPalette use Base UI Combobox for keyboard interaction.
-CommandPalette composes a controlled Dialog and targets its input via initialFocus.
-The consuming app owns navigation. Shortcut registration is opt-in, once per app.
-Popup positioners sit above dialog surfaces so nested calendars/selects work.
+The default DataTable path filters, sorts and pages local rows. `server={query,onQueryChange,totalRows}` turns off those transformations and renders the supplied page. The application fetches and validates query results. `TableQuery` contains search, facets, sort, page and pageSize. Reset page when changing the query. The Outline adapter demonstrates aborting obsolete requests and clamping the page after a deletion.
 
-React DayPicker 10.0.2 supplies calendar date math and keyboard navigation, with
-BLD8 token-based styling. Date/range inputs compose Base UI Popover. Date-only
-hidden values use local year/month/day rather than toISOString. Calendar locale
-and display locale are separate. Required-date validation belongs to the app.
+Selection is stored as row keys, including keys absent from the current page. Use `renderSelectedActions` for service-backed bulk actions; `renderBulkActions` supplies selected rows available in the current rows array. Keep row keys stable and clear selection after successful mutations. Column widths support pointer/keyboard resizing and start/end pinning. CSV reads explicit scalar exports and escapes formula-leading strings. Virtualization is not included.
 
-FileUpload owns local file selection/validation; its optional transport callback
-receives an AbortSignal and per-file progress. A run counter rejects stale work
-after cancellation or unmount. The showcase labels its callback simulation.
+`EditableCell` supplies explicit text/date/select editing, abortable saves, draft recovery and keyboard save/cancel. It captures the original value and revision when editing starts. The application retains ownership of committed data and optimistic concurrency checks.
 
-DataTable retains the native-table API for client datasets. Rows require stable,
-unique keys. Selection is independent of filtering/pagination; the header selects
-the current page. Visibility preserves non-hideable columns and at least one
-column. CSV reads explicit exportValue/sortValue scalars rather than React cells.
-Server pagination, virtualization and resizing need a separate future contract.
+## Outline
 
-ProjectPlanner and ResourceManager expose service/update callbacks; default state
-is local metadata. Outline keeps inactive views mounted so edits survive switching.
-All eleven starters include their compiled packages, editable source and notices.
-The DayPicker licence is included in packed UI files and starter bundles.
+Outline composes public components into a browser-persisted example. `OutlineRepository` defines async list/save/status/delete operations. The browser adapter persists project metadata, validates names and checks record versions to reject stale edits. `createOutlineHttpRepository` implements a fetch adapter with validated response shapes, field errors, record conflicts and cancellation. The runnable reference API in `examples/outline-http` scopes temporary process-local data to a demo session. A production service owns authentication, authorisation, atomic writes and database persistence.
 
-## Next decisions
+The project editor preserves rejected drafts, shows field/service errors and confirms dismissal when dirty. The table loads through the repository, supports multi-page selection and provides bulk operations. Resource metadata and profile preferences are stored separately in the browser. Files are never uploaded. Other blocks retain their independent callbacks and in-memory defaults.
 
-MIT was selected by the user on 13 October 2026. The npm namespace remains undecided. The showcase now supplies runnable ZIP starters with local UI/blocks workspaces and generated source manifests, so reuse does not depend on npm publication. An Angular implementation would share tokens and design decisions, while using Angular-native component behaviour; React wrappers cannot be reused directly.
+## Distribution
 
-## Blocks and interface starters - 13 October 2026
+Build preparation creates source-view modules, real shadcn registry items and ZIP starters from explicit source allowlists. Registry files install under the consumer's UI alias without an unpublished package dependency. ZIPs include local workspaces, compiled output and editable source. Generated assets are ignored in Git. See registry.md and deployment.md.
 
-`packages/blocks` is a second framework-independent React package. The showcase
-imports its public exports; it does not contain alternate demo implementations.
-Eight compositions and three interface starters use the existing UI primitives.
+## Documentation
 
-`scripts/library-catalog.mjs` is the metadata source of truth. Build preparation
-compiles blocks, generates ignored typed metadata/source modules and static JSON
-source manifests, then creates ZIP starters using an explicit file allowlist.
-The ZIP writer uses Node's standard compression and standard ZIP headers/CRC32;
-no new runtime or archive dependency was added. Starters contain a minimal Next.js
-consumer, package manifests, compiled distributions, editable source and licences.
-No parent workspace, .env, credentials or installed dependencies are included.
-
-Generated downloads and `/r` manifests are available without accounts or keys.
-The manifest is a documented BLD8 format, not shadcn registry compatibility or an
-MCP server. React 19 remains the peer requirement. Templates own local view state;
-real authentication, persistence and backend behaviour remain consumer concerns.
-
-## Uniform icon family - 13 October 2026
-
-Lucide React 1.55.0 is an installed dependency. Application code passes named
-icon components to the BLD8 Icon wrapper. Standard icons share size, stroke,
-colour inheritance and accessibility rules; the dotted BLD8 arrow remains
-original artwork. The wrapper keeps the existing small name API compatible.
-
-The documentation's full directory is separate from that consumer API.
-`prepare-icons.mjs` uses the installed package's dynamic imports and `__iconData`
-only in Node at build time. It deduplicates aliases, renders canonical SVGs with
-upstream licence notices, and emits typed name/category metadata. The docs client
-loads SVG previews for its paginated results rather than all React icon modules.
-The generator/version fingerprint caches unchanged outputs. This internal
-metadata contract must be reviewed when updating Lucide.
-
-InputGroup and Button/IconButton icon props compose these same public exports.
-The library has no Next.js icon dependency, CDN requirement or dynamic icon
-loader in ordinary consumer code. ZIP starters include Lucide as a pinned npm
-dependency and its licence notices.
-
-## Sources checked 28 September 2026
-
-- https://base-ui.com/react/overview/about
-- https://base-ui.com/react/overview/quick-start
-- https://ui.shadcn.com/docs
-- https://www.spartan.ng/documentation/introduction
-
-Base UI 1.8.0, React 19.3.0 and Next.js 16.3.8 are pinned in the lockfile. Review upstream release notes and run the suite before updates.
+The playground validates and serialises component configuration into shareable URLs.
+Public prop tables are derived by prepare-api.mjs from TypeScript exports; forwarded
+React/HTML props remain available in expandable sections. Canonical examples are
+shared by the docs app and the two HTTP/form integration starters.

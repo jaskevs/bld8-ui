@@ -1,5 +1,5 @@
 'use client';
-import { useId } from 'react';
+import { useId, type Ref, type FocusEventHandler } from 'react';
 import { Combobox } from '@base-ui/react/combobox';
 import { Icon, type Option } from './core.js';
 import { useControllableValue } from './state.js';
@@ -16,9 +16,11 @@ export interface MultiSelectProps {
   name?: string;
   disabled?: boolean;
   required?: boolean;
+  inputRef?:Ref<HTMLInputElement>;
+  onBlur?:FocusEventHandler<HTMLInputElement>;
 }
 
-export function MultiSelect({ label, options, value, defaultValue = [], onValueChange, placeholder = 'Choose options…', hint, error, ...props }: MultiSelectProps) {
+export function MultiSelect({ label, options, value, defaultValue = [], onValueChange, placeholder = 'Choose options…', hint, error, inputRef, onBlur, ...props }: MultiSelectProps) {
   const id = useId();
   const [selected, setSelected] = useControllableValue(value, defaultValue, onValueChange);
   const labelFor = (value: string) => options.find(option => option.value === value)?.label ?? value;
@@ -30,7 +32,7 @@ export function MultiSelect({ label, options, value, defaultValue = [], onValueC
         <Combobox.Value>{(values: string[]) => values.map(value => <Combobox.Chip key={value} className="bui-chip">
           {labelFor(value)}<Combobox.ChipRemove aria-label={'Remove ' + labelFor(value)}><Icon name="close" size={14} /></Combobox.ChipRemove>
         </Combobox.Chip>)}</Combobox.Value>
-        <Combobox.Input id={id} aria-describedby={descriptions} aria-invalid={!!error || undefined} placeholder={selected.length ? 'Add another…' : placeholder} className="bui-chip-input" />
+        <Combobox.Input ref={inputRef} onBlur={onBlur} id={id} aria-describedby={descriptions} aria-invalid={!!error || undefined} placeholder={selected.length ? 'Add another…' : placeholder} className="bui-chip-input" />
         <Combobox.Trigger className="bui-combobox-trigger" aria-label={'Show ' + label.toLowerCase() + ' options'}><Icon name="chevron" /></Combobox.Trigger>
       </Combobox.Chips>
       <Combobox.Portal><Combobox.Positioner className="bui-positioner" sideOffset={6}><Combobox.Popup className="bui-popup bui-select-popup">

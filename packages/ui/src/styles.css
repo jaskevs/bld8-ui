@@ -274,3 +274,23 @@
 @media(hover:hover) and (pointer:fine) { .bui-sidebar-button:hover:not([data-active]):not(:disabled) { background:var(--bui-surface); } }
 @media(prefers-reduced-motion:reduce) { .bui-drawer,.bui-drawer-backdrop,.bui-context-menu,.bui-context-item,.bui-sidebar,.bui-sidebar-button { transition:none; } }
 @media(forced-colors:active) { .bui-sidebar,.bui-drawer { border:1px solid CanvasText; } .bui-sidebar-button[data-active],.bui-context-item[data-highlighted] { outline:2px solid Highlight; } }
+
+.bui-table th {position:relative}
+.bui-column-resize {position:absolute;inset-block:8px;inset-inline-end:0;width:10px;cursor:col-resize;touch-action:none;border-inline-end:2px solid transparent;z-index:2}
+.bui-column-resize:hover,.bui-column-resize:focus-visible {border-color:var(--bui-focus);background:var(--bui-raised)}
+.bui-table td {overflow-wrap:anywhere}
+
+.bui-table th {text-align:start}
+.bui-table [data-pinned] {position:sticky}
+.bui-table-scroll {container-type:inline-size;container-name:bld8-table}
+.bui-table-scroll-hint {display:none;margin:.5rem 0}
+@container bld8-table (max-width:600px) {.bui-table [data-pinned] {position:static}}
+@media(max-width:760px){.bui-table-scroll-hint {display:block}}
+
+.bui-editable-cell {display:flex;align-items:center;justify-content:space-between;gap:8px;white-space:normal;min-width:0}
+.bui-editable-trigger {flex:none;color:var(--bui-muted);transition:color var(--bui-duration) var(--bui-ease)}
+.bui-editable-cell:is(:hover,:focus-within) .bui-editable-trigger {color:var(--bui-ink)}
+.bui-cell-editor {white-space:normal;display:grid;gap:8px;min-width:0}
+.bui-cell-editor-controls {display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.bui-cell-editor-controls>.bui-input {width:100%;min-width:0;flex-basis:100%}
+.bui-cell-editor .bui-error {margin:0}

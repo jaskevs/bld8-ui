@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Icon, IconButton, Tooltip } from '@bld8/ui';
 import { LibrarySearch } from './library-search';
 
-const links = [['/components', 'Components'], ['/blocks', 'Blocks'], ['/templates', 'Templates'], ['/icons', 'Icons'], ['/motion', 'Motion'], ['/getting-started', 'Start here']];
+const links = [['/components', 'Components'], ['/blocks', 'Blocks'], ['/templates', 'Templates'], ['/icons', 'Icons'], ['/playground', 'Playground'], ['/getting-started', 'Start here']];
 
 export function SiteHeader() {
   const path = usePathname();
@@ -26,6 +26,8 @@ export function SiteHeader() {
     media.addEventListener('change', updateViewport);
     return () => { window.removeEventListener('scroll', updateScroll); media.removeEventListener('change', updateViewport); };
   }, []);
+
+  useEffect(() => { const sync=()=>setDark(document.documentElement.dataset.uiTheme==='dark'); sync(); const observer=new MutationObserver(sync); observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-ui-theme']}); return()=>observer.disconnect(); }, []);
 
   useEffect(() => {
     if (!menuOpen) return;

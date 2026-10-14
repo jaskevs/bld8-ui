@@ -19,7 +19,11 @@
       "import": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./tokens.css": "./dist/tokens.css"
+    "./tokens.css": "./dist/tokens.css",
+    "./react-hook-form": {
+      "types": "./dist/react-hook-form.d.ts",
+      "import": "./dist/react-hook-form.js"
+    }
   },
   "sideEffects": [
     "**/*.css"
@@ -30,7 +34,8 @@
   },
   "peerDependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.90.0"
   },
   "dependencies": {
     "@base-ui/react": "1.8.0",
@@ -42,6 +47,12 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "4.3.0",
+    "react-hook-form": "7.90.0",
     "tailwindcss": "4.3.0"
+  },
+  "peerDependenciesMeta": {
+    "react-hook-form": {
+      "optional": true
+    }
   }
 }

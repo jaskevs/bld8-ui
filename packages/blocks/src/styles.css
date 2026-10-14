@@ -108,3 +108,9 @@
 .bblocks-operations-layout { margin-top:24px; align-items:stretch; }
 .bblocks-operations-toolbar { display:flex; align-items:center; gap:12px; font-size:.75rem; }
 .bblocks-operations-layout .bblocks-operations-intro { padding:20px 0 24px; }
+
+.bblocks-inline-actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bblocks-project-name {white-space:normal;text-align:start;justify-content:flex-start;max-width:100%}
+
+.bblocks-table-options>.bui-field {width:180px;max-width:100%;flex:0 0 auto}
+.bblocks-project-name {padding-inline:0}

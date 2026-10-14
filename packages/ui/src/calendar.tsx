@@ -1,5 +1,5 @@
 'use client';
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState, type Ref, type FocusEventHandler } from 'react';
 import { DayPicker, type DateRange, type DayPickerLocale } from 'react-day-picker';
 import { Popover } from '@base-ui/react/popover';
 import { CalendarDays, X } from 'lucide-react';
@@ -50,8 +50,10 @@ export interface DatePickerProps extends Omit<CalendarBaseProps, 'label' | 'auto
   hint?: string;
   error?: string;
   formatLocale?: string;
+  inputRef?:Ref<HTMLButtonElement>;
+  onBlur?:FocusEventHandler<HTMLButtonElement>;
 }
-export function DatePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date', hint, error, formatLocale = 'en-AU', ...calendar }: DatePickerProps) {
+export function DatePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date', hint, error, formatLocale = 'en-AU', inputRef, onBlur, ...calendar }: DatePickerProps) {
   const id = useId(); const [open, setOpen] = useState(false);
   const trigger=useRef<HTMLButtonElement>(null);
   const [selected, setSelected] = useControllableValue(value, defaultValue, onValueChange);
@@ -59,7 +61,7 @@ export function DatePicker({ label, value, defaultValue = null, onValueChange, n
   return <div className="bui-field">
     <label htmlFor={id} className="bui-label">{label}</label>
     <div className="bui-date-field">
-      <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={trigger} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={hint || error ? id + '-description' : undefined} className="bui-input bui-date-trigger">
+      <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={hint || error ? id + '-description' : undefined} className="bui-input bui-date-trigger">
         <Icon icon={CalendarDays} /><span data-placeholder={!selected || undefined}>{display}</span><Icon name="chevron" />
       </Popover.Trigger><Popover.Portal><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup className="bui-popup bui-calendar-popup">
         <Popover.Title className="bui-sr-only">{label}</Popover.Title>
@@ -76,14 +78,14 @@ export interface DateRangePickerProps extends Omit<DatePickerProps, 'value' | 'd
   defaultValue?: DateRange | null;
   onValueChange?: (value: DateRange | null) => void;
 }
-export function DateRangePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date range', hint, error, formatLocale = 'en-AU', ...calendar }: DateRangePickerProps) {
+export function DateRangePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date range', hint, error, formatLocale = 'en-AU', inputRef, onBlur, ...calendar }: DateRangePickerProps) {
   const id = useId(); const [open, setOpen] = useState(false);
   const trigger=useRef<HTMLButtonElement>(null);
   const [selected, setSelected] = useControllableValue(value, defaultValue, onValueChange);
   const format = (date:Date) => new Intl.DateTimeFormat(formatLocale, {day:'numeric',month:'short',year:'numeric'}).format(date);
   const display = selected?.from ? format(selected.from) + (selected.to ? ' – ' + format(selected.to) : ' – Choose end date') : placeholder;
   return <div className="bui-field"><label htmlFor={id} className="bui-label">{label}</label><div className="bui-date-field">
-    <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={trigger} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={hint || error ? id + '-description' : undefined} className="bui-input bui-date-trigger">
+    <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={hint || error ? id + '-description' : undefined} className="bui-input bui-date-trigger">
       <Icon icon={CalendarDays} /><span data-placeholder={!selected?.from || undefined}>{display}</span><Icon name="chevron" />
     </Popover.Trigger><Popover.Portal><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup className="bui-popup bui-calendar-popup">
       <Popover.Title className="bui-sr-only">{label}</Popover.Title>

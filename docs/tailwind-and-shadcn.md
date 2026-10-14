@@ -71,6 +71,6 @@ hashes. packages/ui/SHADCN_LICENSE contains the full MIT notice. Preserve it in
 package archives and starters, alongside the existing third-party notices.
 Upstream source changes are reviewed manually before adaptation.
 
-The source manifests under /r are still the BLD8 JSON format. This batch does
-not introduce shadcn CLI registry installation. The supported delivery paths
-are local workspaces and runnable ZIP starters; packages are not on npm.
+The shadcn registry under /r installs source and dependencies through the real CLI.
+Earlier source manifests remain under /sources. Local workspaces and runnable
+ZIP starters are also supported; packages remain unpublished on npm. See registry.md.

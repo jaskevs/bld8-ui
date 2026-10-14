@@ -12,6 +12,10 @@ export function LibrarySearch() {
     ...components.map(item=>entry('component:'+item.id,item.title,'/components/'+item.id,'Component',item.description,Box)),
     ...library.blocks.map(item=>entry('block:'+item.id,item.name,'/blocks/'+item.id,'Block',item.description,Layers)),
     ...library.templates.map(item=>entry('template:'+item.id,item.name,'/templates/'+item.id,'Template',item.description,LayoutTemplate)),
+    entry('rhf','React Hook Form integration','/integrations/react-hook-form','Integration','Use your existing form state with BLD8',Box),
+    entry('http','Outline HTTP example','/examples/outline-http','Example','Project workflows over a real JSON API',Box),
+    entry('registry','Install from the registry','/registry','Guide','Add editable source with the shadcn CLI',Box),
+    entry('playground','Component playground','/playground','Tools','Configure variants, states and matching code',Shapes),
     entry('icons','Icon directory','/icons','Foundation','Browse the Lucide icon family',Shapes),
     entry('guide','Usage guide','/getting-started','Guide','Install, run and adapt the source',Box),
   ];
