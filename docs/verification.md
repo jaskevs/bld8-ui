@@ -1,3 +1,259 @@
+## Source release validation - 16 October 2026
+
+- The production build, all workspace type checks and all 142 browser cases pass
+  in a clean final run with no skips or retries. Coverage includes shared control
+  geometry/material, keyboard and system-colour states, reduced motion, responsive
+  layouts, table editing/drafts, forms, dates, file feedback and Outline workflows.
+- Installed registry CSS matches the final package output and all 13 source ZIPs.
+  The isolated consumer build passes; archive integrity, safe paths, licences and
+  pending source/credential checks pass. Manual screen-reader/non-Chromium review
+  remains separate from these automated checks.
+- The source includes the GitHub validation workflow and connection guide. Source
+  publication and Vercel production deployment are separate operations; verify the
+  project's Git connection and required checks before assuming automatic release.
+- The other seven active workspace repositories were checked against GitHub main
+  and already match, with no pending changes. Personal identity, isolated SSH and
+  the Melbourne commit-window guards remain in place.
+
+## Borderless choices share the switch material - 16 October 2026
+
+- Checkbox/radio faces now use the switch track's exact grey off fill, yellow
+  selected fill and inset shadow tokens, with no border in ordinary themes.
+  Radio dots use the switch thumb's highlight, resting/hover/press shadows and
+  easing. Crisp ticks and 10 px radio dots retain their visual centres after
+  border removal. Faces remain 20 px; label targets remain 44 px.
+- Explicit keyboard focus and system-colour boundaries remain. Forced colours
+  restore a 1 px system edge and compensate indicator positions without changing
+  the outer size. Disabled, mixed checkbox and reduced-motion states remain.
+- Production build and all 30 affected checks pass with no skips or retries.
+  The light/dark comparison checks verify identical rendered fill and shadow
+  values for all three controls in both states. Keyboard, high contrast, mobile
+  containment and table selection coverage passes; specimens were reviewed.
+- The actual CLI updates the isolated consumer, whose production build passes.
+  Installed CSS and all 13 source ZIPs match the final package output. Archive
+  integrity, safe paths and licence checks pass.
+- No commits, pushes or deployments were performed.
+
+## Shared material across the library - 16 October 2026
+
+- A warm grey canvas and borderless white panels now share restrained highlights
+  and lower shadows. Fields use a light inset; actions have modest elevation;
+  selected choices and calendar endpoints use yellow with dark indicators.
+  Chip, file, navigation, progress and overlay surfaces use the same palette and
+  shadow tokens. Public components carry the changes into blocks and templates.
+- Checkbox/radio faces are 20 px with 44 px label targets. Switches remain
+  44 x 26 px with a 20 px rigid thumb and even 3 px inset. Sliders have a 6 px
+  recessed yellow/grey track and an 18 px solid thumb in a 44 px target. Regular,
+  compact and large fields/actions retain 44 / 36 / 48 px heights.
+- Hover and press change lighting without scaling the switch or slider thumb.
+  Native dragging, keyboard behaviour, immediate focus, errors, disabled states,
+  system-colour boundaries and reduced motion remain supported. Text and icons
+  stay vector/DOM content with no blur filters.
+- Production build and workspace type checks pass. The full 142-case Edge run
+  passed 140 cases and found a system-colour switch-fill issue in two theme cases.
+  Explicit system colours and immediate high-contrast changes fix that issue;
+  all ten choice/motion/contrast rechecks, including both switch cases, pass.
+  Coverage includes shared geometry, light/dark automated accessibility, mobile
+  containment, focus return, tables, forms, date ranges, registry guidance,
+  playgrounds and template workflows. No cases are skipped.
+- Public light/dark control specimens and composed workflows were visually
+  reviewed. The actual registry CLI installs eight stylesheet/licence files
+  into a clean independent app, whose production build passes. Installed CSS and
+  all 13 ZIPs match the final package output; archive integrity, safe paths and
+  licence checks pass. Manual screen-reader/non-Chromium review remains open.
+- No commits, pushes or deployments were performed.
+
+## Recessed switch with rigid travel - 16 October 2026
+
+- Switches now have a grey recessed track and a shaded white thumb in both
+  states. The selected track stays yellow. A 20 px thumb has a uniform 3 px
+  inset in the 44 x 26 px track. Hover and press change lighting only; the thumb
+  never stretches, shrinks, bounces or overshoots. Dedicated switch shadows leave
+  the approved checkbox/radio faces and indicators unchanged.
+- Production build and workspace type checks pass. The 24 existing affected
+  Edge checks and both revised light/dark switch checks pass without skips.
+  The focus check tabs to the switch to exercise actual keyboard modality.
+  Light/dark checks sample the actual thumb
+  transition in both directions, verify constant dimensions and monotonic travel,
+  test presses, custom sizes/insets and system-colour focus. Existing keyboard,
+  rapid reversal, reduced-motion, accessibility and table-selection checks pass.
+- Light/dark on/off specimens were visually inspected. The actual registry CLI
+  installs eight stylesheet/licence files into an independent clean app, whose
+  production build passes. Its installed styles and all 13 source ZIPs match the
+  final package output; archive paths, integrity and licence checks pass.
+- No commits, pushes or deployments were performed.
+
+## Flush switch geometry and shared selected colours - 16 October 2026
+
+- Switch tracks and thumbs have a continuous 1 px outline. Full-height thumbs
+  meet the outside boundary at both ends, including when pressed; travel follows
+  the width and height tokens. Selected radios and checkboxes now share the
+  yellow switch face, dark indicator, dark edge and inset depth.
+- Production build passes. The 24 existing affected checks pass, followed by
+  both new light/dark boundary checks. The new checks initially compared viewport
+  positions across automatic browser scrolling; they now compare document
+  positions. They verify flush endpoints, press feedback, stable hit areas,
+  custom sizes and matching selected colours. Keyboard, reduced-motion,
+  forced-colour and table-selection coverage remains passing.
+- Light/dark specimens were visually inspected. The actual registry CLI installs
+  eight stylesheet/licence files into a clean app, whose independent production
+  build passes. Installed styles and all 13 ZIPs match the final package output;
+  archive integrity, safe paths and licence checks pass.
+- No commits, pushes or deployments were performed.
+
+## Active choice depth refinement - 15 October 2026
+
+- Active switches, radios and checkboxes use a slightly deeper 2 px / 4 px inset
+  upper edge and a quiet lower highlight. Shadow strength follows the surface:
+  yellow tracks and inverse dark faces retain their approved colours and easing.
+- Production build passes. All 24 affected control, motion, accessibility and
+  table-selection checks pass with no skipped cases. Light/dark states were
+  visually inspected; native keyboard, reduced-motion and drag feedback remain.
+- The shared stylesheet registry item installs eight files into a clean app via
+  the actual CLI, and its independent Next.js build passes. Installed styles and
+  all 13 source downloads match the final package output. Safe paths and licence
+  checks pass.
+- No commits, pushes or deployments were performed.
+
+## Inset depth and inverse selection - 15 October 2026
+
+- Production build and workspace type checks pass. All 140 Edge cases pass in
+  one clean run with no skips or retries. Five added cases check inverse selected
+  colours, real box-shadow interpolation, switch inset transitions, stable control
+  bounds, rendered slider hover feedback, pointer dragging, keyboard min/max/steps,
+  reduced motion and system-colour focus/indicators in light and dark themes.
+- Radio and checkbox faces invert to dark with yellow indicators. Switch tracks
+  retain yellow with inset depth. Matching transparent inset layers at rest allow
+  the shadow to interpolate instead of switching discretely. Slider feedback uses
+  native range pseudos; no delayed value-following or extra runtime was added.
+- The real registry CLI installs 32 files into a separate empty-source app. Its
+  independent Next.js production build passes. Installed styles/tokens and every
+  source ZIP match the final package output byte for byte; all 13 archives retain
+  safe paths and licences. No publishing, commits or pushes were performed.
+- Light/dark choice and native slider states were visually inspected. The local
+  Foundations control specimen has a direct #control-states anchor.
+
+## Whole control family and choice motion - 15 October 2026
+
+- Final production build passes with 74 generated pages and the sample API.
+  Workspace type checks pass. The final Edge run passes all 135 cases in one
+  clean run, with no skips or retries, using two workers and a 90-second budget.
+- Eleven added checks cover real radio/checkmark/switch transitions, switch
+  reversal during travel, stable hit areas, reduced motion, forced-colour focus,
+  long chips, required/search feedback, manual tab activation, unavailable tabs,
+  pagination, scrolling dialog bodies, file errors/removal and progress bounds.
+- Light/dark control specimens pass automated accessibility checks. Layouts stay
+  contained at 320, 390, 768 and 1440 px. Choice depth, navigation, search and date
+  specimens were visually inspected. Existing table, form, HTTP, upload, drawer,
+  menu, keyboard and focus-return workflows all pass in the same run.
+- The actual registry CLI installs 32 files into a clean independent application.
+  Its Next.js production build passes with the new Combobox ref/feedback API,
+  required selection, long chips, menu icons/shortcut hints, alerts, progress,
+  files, overlays and Outline. The installed stylesheet includes the final choice
+  shadows, transitions, disabled states and scrollable dialog body.
+- All 13 source downloads pass CRC and safe-path checks and include final source,
+  compiled styles and required licence notices. Project source/documentation
+  scans find no design-reference branding. Functional registry schemas and legal
+  attribution are preserved.
+- These are automated Edge and build checks, with visual specimen review; no
+  manual screen-reader or non-Chromium certification is claimed. Nothing in this
+  pass was committed, pushed or deployed.
+
+## Table layout and editing experience - 15 October 2026
+
+- The final production build passes with 74 generated pages plus the sample API;
+  workspace type checks pass. All 124 regression cases are verified across the
+  full and focused runs, with no skipped cases.
+- The full run passed 118 cases. Five multi-page accessibility cases exceeded
+  their 30-second budgets during a concurrent consumer build; one HTTP mobile
+  case exposed a sidebar first-paint overflow. All six pass in a serial rerun
+  with a 90-second budget after the CSS fix. The final 16 sidebar/table cases also
+  pass against the final styles. This was not a single clean 124-case run.
+- Six new cases verify the actual header/value grid, 48 px selection column,
+  numeric text edges, real resized widths, direct F2 editing, validation/cancel,
+  row-menu focus return, density options and retained drafts during an HTTP refresh.
+  Light/dark accessibility and mobile horizontal scrolling are included.
+- Editable cells show their values, with no separate Edit label or pencil.
+  Outline has one action menu per row for full details and deletion. Date display
+  is readable; underlying date-only values and revision checks are unchanged.
+- Headers, values and pinned offsets use measured column widths. Density and
+  checkbox padding stay consistent; mobile resize handles stay within the scroll
+  region. Relative cells contain their hidden keyboard descriptions, preventing
+  those descriptions from causing page overflow.
+- Narrow sidebar layouts are established by CSS before the client observer
+  hydrates the drawer. The table scroll region uses a quiet inset keyboard focus
+  edge, with a system-colour fallback.
+- Existing rows stay mounted while updating or recovering from a refresh error.
+  A visible updating state avoids replacing the table and discarding a draft.
+- The official shadcn CLI installs Outline into a fresh independent Next.js
+  consumer; that application builds successfully. The installer also updates the
+  final CSS. All 13 archives pass CRC, source/style, path and licence checks,
+  including the final containment fix.
+- Desktop project/resource captures, dark mode and narrow layouts were reviewed.
+  Whitespace and source-attribution scans pass; production registry dependencies
+  still use https://ui.bld8.dev. The local preview remains on port 3120.
+
+This refinement is local and uncommitted. No commit, push or deployment was made.
+Manual screen-reader and non-Chromium review remain outstanding. Design rules
+and editing guidance are recorded in design-and-motion.md and workflow-integrations.md.
+
+## Complete control design pass - 15 October 2026
+
+- The final production build passes with 74 generated pages plus the sample API.
+  All workspace type checks pass.
+- The final full regression suite passes all 118 tests without retries or skipped
+  cases. It includes automated light/dark accessibility, keyboard interaction,
+  reduced motion, touch targets, responsive layouts and Outline workflows.
+- Control geometry is shared across buttons, fields, choices, menus and overlays.
+  Radio/slider styling retains native keyboard behaviour; slider fill follows its
+  min/max range. Choice labels and descriptions have distinct accessible bindings.
+- The shadow refinement keeps panels borderless and adds restrained surface,
+  resting-action, hover and overlay elevation. Hover/press targets stay still;
+  field and menu focus feedback appears immediately. Shared easing remains in use.
+- The Foundations Control states section uses public components. Light/dark and
+  mobile specimen captures, plus the aligned Outline form, were visually reviewed.
+  Isolated specimen exports hide fixed navigation only during capture; focus and
+  navigation assertions run against the real interface.
+- The official shadcn CLI installs Outline and Slider into an isolated consumer;
+  its independent Next.js production build passes. The installed files include
+  the final source, compiled styles, tokens and notices.
+- All thirteen starter archives pass CRC, path, source/style and licence checks.
+  Generated production registry URLs still point at https://ui.bld8.dev.
+  Whitespace and source-attribution scans pass.
+
+This pass is local and uncommitted. No commit, push or deployment was made.
+Manual screen-reader and non-Chromium review have not been completed. The design
+reference and reusable rules are recorded in design-and-motion.md. Existing GitHub
+connection steps remain in ci-and-vercel.md.
+
+## Shared focus, alignment and motion - 15 October 2026
+
+- Production build succeeds with 74 generated pages plus the sample API.
+- The 111-case full regression run passed 110 cases. The remaining case expected
+  the old offset focus outline. Its revised assertion checks the continuous
+  focus edge and forced-colours fallback; all nine affected cases pass.
+- A further three checks pass after the final cell-select Escape guard, including
+  resource-filter alignment and date/status field alignment. The extra Escape
+  case verifies that closing an option menu preserves the edit until cancelled.
+- Four new layout/motion checks verify shared 44px table controls, labelled Base UI
+  filters, the actual invalid-date focus target, aligned project fields, mobile
+  stacking and retained settings drafts while switching views. Reduced motion
+  disables workspace entry animation.
+- Automated light/dark accessibility checks pass across the changed examples.
+  Desktop filter/project and mobile form captures were reviewed.
+- The official shadcn CLI installed Outline into a fresh Next.js consumer; the
+  independent application builds. All thirteen source archives pass integrity,
+  path and local-artifact exclusion checks. Registry dependency URLs use the
+  production origin again. Whitespace and source-attribution scans pass.
+- The GitHub workflow is prepared with Node 22, production build, workspace type
+  checks and Chromium tests. YAML parsing succeeds with read-only repository
+  permission. It has not run on GitHub; it activates only after source is pushed.
+
+This refinement remains local and uncommitted. No code commit or push occurred
+inside the 08:00–17:00 Melbourne window. The public site still serves the
+previous verified release. Manual screen-reader and non-Chromium review remain
+outstanding. See ci-and-vercel.md for connection and deployment-check steps.
+
 ## Playground and workflow integrations - 14 October 2026
 
 - Production build passes: 74 generated pages plus the dynamic example API.

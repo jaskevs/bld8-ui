@@ -42,7 +42,7 @@ npm run typecheck
 npm test
 ```
 
-For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests start a fresh production server on 3121; set `BLD8_UI_TEST_PORT` to another free port when necessary. Build before testing. See [contributing](CONTRIBUTING.md) for release and repository conventions.
+For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests start a fresh production server on 3121; set `BLD8_UI_TEST_PORT` to another free port when necessary. Build before testing. See [contributing](CONTRIBUTING.md) for release and repository conventions. [CI and Vercel setup](docs/ci-and-vercel.md) explains the personal-account connection and required release checks.
 
 ## What is included
 

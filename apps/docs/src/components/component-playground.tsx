@@ -2,14 +2,14 @@
 import Link from 'next/link';
 import {useEffect,useState} from 'react';
 import {Link2,RotateCcw} from 'lucide-react';
-import {Button,Checkbox,Field,Input,Switch} from '@bld8/ui';
+import {Button,Checkbox,Field,Input,Select,Switch} from '@bld8/ui';
 import {playgroundDefaults,playgroundKeyboard,playgroundModules,playgroundNames,readPlayground,statesFor,writePlayground,type PlaygroundName,type PlaygroundSettings} from '@/lib/playground-state';
 import {playgroundCode} from '@/lib/playground-code';
 import {CodeBlock} from './code-block';
 import {PlaygroundPreview} from './playground-preview';
 
 function Choice({label,value,options,onChange}:{label:string;value:string;options:readonly string[];onChange:(value:string)=>void}){
-  return <label className="bui-field"><span className="bui-label">{label}</span><select className="bui-input" aria-label={label} value={value} onChange={event=>onChange(event.target.value)}>{options.map(value=><option key={value}>{value}</option>)}</select></label>;
+  return <Select label={label} value={value} options={options.map(value=>({value,label:value}))} onValueChange={next=>{if(next!==null)onChange(next);}} />;
 }
 export function ComponentPlayground({initialComponent='Button'}:{initialComponent?:PlaygroundName}){
   const [settings,setSettings]=useState<PlaygroundSettings>({...playgroundDefaults,component:initialComponent});

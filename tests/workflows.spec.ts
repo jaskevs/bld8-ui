@@ -1,3 +1,4 @@
+import {chooseOption,chooseReviewDate} from './helpers/controls';
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { createTableCSV } from '../packages/ui/dist/data-table.js';
@@ -62,7 +63,7 @@ test('upload callback reports progress, aborts cleanly and retries failure',asyn
 test('table selection survives pages and filters, columns and bulk changes work',async ({page})=>{
   await page.goto('/components/advanced-table');await page.getByRole('checkbox',{name:'Select Navigation study',exact:true}).check();await expect(page.getByRole('checkbox',{name:'Select current page'})).toHaveAttribute('aria-checked','mixed');
   await page.getByRole('button',{name:'Next',exact:true}).click();await page.getByRole('checkbox',{name:'Select current page'}).check();await expect(page.getByRole('status').filter({hasText:'4 selected'})).toBeVisible();
-  await page.getByRole('combobox',{name:'Statuses',exact:true}).selectOption('Review');await expect(page.locator('.bui-table tbody tr')).toHaveCount(2);await expect(page.getByRole('status').filter({hasText:'4 selected'})).toBeVisible();
+  await chooseOption(page,page.getByRole('combobox',{name:'Statuses',exact:true}),'Review');await expect(page.locator('.bui-table tbody tr')).toHaveCount(2);await expect(page.getByRole('status').filter({hasText:'4 selected'})).toBeVisible();
   await page.getByRole('button',{name:'Columns',exact:true}).click();await page.getByRole('checkbox',{name:'Owner',exact:true}).uncheck();await expect(page.getByRole('columnheader',{name:'Owner'})).not.toBeVisible();await expect(page.getByRole('checkbox',{name:'Project',exact:true})).toBeDisabled();await page.keyboard.press('Escape');
   await page.getByRole('button',{name:'Mark ready',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'selected'})).not.toBeVisible();await expect(page.locator('.bui-table tbody tr')).toHaveCount(1);
   await page.getByRole('radio',{name:'Compact',exact:true}).check();await expect(page.locator('.bui-data-table')).toHaveAttribute('data-density','compact');
@@ -76,13 +77,13 @@ test('planner validates and creates a reusable project record',async ({page})=>{
 test('resource library exports chosen records and reverses archive',async ({page})=>{
   await page.goto('/blocks/resources');await page.getByRole('checkbox',{name:'Select Research notes.txt',exact:true}).check();const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'Export CSV',exact:true}).click();const download=await downloading;expect(download.suggestedFilename()).toBe('resource-metadata.csv');
   const stream=await download.createReadStream();const chunks:Buffer[]=[];for await(const chunk of stream!) chunks.push(Buffer.from(chunk));expect(Buffer.concat(chunks).toString()).toContain('Research notes.txt');expect(Buffer.concat(chunks).toString()).not.toContain('Interface brief.pdf');
-  await page.getByRole('button',{name:'Archive',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'1 resources archived.'})).toBeVisible();await page.getByRole('combobox',{name:'Statuses'}).selectOption('Archived');await expect(page.getByRole('table')).toContainText('Research notes.txt');
+  await page.getByRole('button',{name:'Archive',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'1 resources archived.'})).toBeVisible();await chooseOption(page,page.getByRole('combobox',{name:'Statuses'}),'Archived');await expect(page.getByRole('table')).toContainText('Research notes.txt');
   await page.getByRole('button',{name:'Undo archive'}).click();await expect(page.getByRole('table')).not.toContainText('Research notes.txt');
 });
 test('Outline keeps local edits when switching views and command navigation works',async ({page})=>{
   await page.goto('/templates/outline');const nav=page.getByRole('navigation',{name:'Outline views'});await nav.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('textbox',{name:'Display name',exact:true}).fill('A lasting draft');
   await nav.getByRole('button',{name:'Planning',exact:true}).click();await nav.getByRole('button',{name:'Settings',exact:true}).click();await expect(page.getByRole('textbox',{name:'Display name',exact:true})).toHaveValue('A lasting draft');
-  await page.getByRole('button',{name:'Find a view'}).click();await page.getByRole('dialog',{name:'Outline navigation'}).getByRole('combobox').fill('resources');await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'Keep the references close.'})).toBeVisible();
+  await page.getByRole('button',{name:'Find a view'}).click();await page.getByRole('dialog',{name:'Outline navigation'}).getByRole('combobox').fill('resources');await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'Resources',exact:true})).toBeVisible();
 });
 test('CSV keeps quoted content and protects formula-leading fields',()=>{
   const csv=createTableCSV([{name:'=HYPERLINK("x")',amount:-12},{name:'a,"b"\nline',amount:10}],[{key:'name',header:'Name',cell:row=>row.name,exportValue:row=>row.name},{key:'amount',header:'Amount',cell:row=>row.amount,exportValue:row=>row.amount}]);

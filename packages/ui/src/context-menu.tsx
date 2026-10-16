@@ -23,16 +23,16 @@ export function ContextMenuItem({className,destructive=false,...props}:Styled<Pr
 }
 export function ContextMenuCheckboxItem({className,children,...props}:Styled<Primitive.CheckboxItem.Props>) {
   return <Primitive.CheckboxItem {...props} className={cn(itemClass,className)}>
-    <span className="bui:flex bui:size-4 bui:shrink-0"><Primitive.CheckboxItemIndicator><Check size={16} strokeWidth={1.75} /></Primitive.CheckboxItemIndicator></span>{children}
+    <span className="bui:flex bui:size-4 bui:shrink-0"><Primitive.CheckboxItemIndicator><Check size={16} strokeWidth={1.75} aria-hidden="true" /></Primitive.CheckboxItemIndicator></span>{children}
   </Primitive.CheckboxItem>;
 }
 export function ContextMenuRadioItem({className,children,...props}:Styled<Primitive.RadioItem.Props>) {
   return <Primitive.RadioItem {...props} className={cn(itemClass,className)}>
-    <span className="bui:flex bui:size-4 bui:shrink-0"><Primitive.RadioItemIndicator><Circle size={12} fill="currentColor" /></Primitive.RadioItemIndicator></span>{children}
+    <span className="bui:flex bui:size-4 bui:shrink-0"><Primitive.RadioItemIndicator><Circle size={12} fill="currentColor" aria-hidden="true" /></Primitive.RadioItemIndicator></span>{children}
   </Primitive.RadioItem>;
 }
 export function ContextMenuSubTrigger({className,children,...props}:Styled<Primitive.SubmenuTrigger.Props>) {
-  return <Primitive.SubmenuTrigger {...props} className={cn(itemClass,className)}>{children}<ChevronRight size={16} strokeWidth={1.75} className="bui:ml-auto" /></Primitive.SubmenuTrigger>;
+  return <Primitive.SubmenuTrigger {...props} className={cn(itemClass,className)}>{children}<ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" className="bui:ml-auto" /></Primitive.SubmenuTrigger>;
 }
 export function ContextMenuSeparator({className,...props}:Styled<Primitive.Separator.Props>) {
   return <Primitive.Separator {...props} className={cn('bui:my-1 bui:h-px bui:border-0 bui:bg-border',className)} />;

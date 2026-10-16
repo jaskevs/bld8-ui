@@ -46,6 +46,7 @@ export interface DatePickerProps extends Omit<CalendarBaseProps, 'label' | 'auto
   defaultValue?: Date | null;
   onValueChange?: (value: Date | null) => void;
   name?: string;
+  required?: boolean;
   placeholder?: string;
   hint?: string;
   error?: string;
@@ -53,15 +54,15 @@ export interface DatePickerProps extends Omit<CalendarBaseProps, 'label' | 'auto
   inputRef?:Ref<HTMLButtonElement>;
   onBlur?:FocusEventHandler<HTMLButtonElement>;
 }
-export function DatePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date', hint, error, formatLocale = 'en-AU', inputRef, onBlur, ...calendar }: DatePickerProps) {
+export function DatePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date', hint, error, formatLocale = 'en-AU', inputRef, onBlur, required=false, ...calendar }: DatePickerProps) {
   const id = useId(); const [open, setOpen] = useState(false);
   const trigger=useRef<HTMLButtonElement>(null);
   const [selected, setSelected] = useControllableValue(value, defaultValue, onValueChange);
   const display = selected ? new Intl.DateTimeFormat(formatLocale, {day:'numeric', month:'short', year:'numeric'}).format(selected) : placeholder;
   return <div className="bui-field">
-    <label htmlFor={id} className="bui-label">{label}</label>
+    <label htmlFor={id} className="bui-label">{label}{required && <span aria-hidden="true"> *</span>}</label>
     <div className="bui-date-field">
-      <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={hint || error ? id + '-description' : undefined} className="bui-input bui-date-trigger">
+      <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} data-field-name={name} title={display} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={[required && id+'-required',(hint || error) && id+'-description'].filter(Boolean).join(' ') || undefined} className="bui-input bui-date-trigger">
         <Icon icon={CalendarDays} /><span data-placeholder={!selected || undefined}>{display}</span><Icon name="chevron" />
       </Popover.Trigger><Popover.Portal><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup className="bui-popup bui-calendar-popup">
         <Popover.Title className="bui-sr-only">{label}</Popover.Title>
@@ -69,6 +70,7 @@ export function DatePicker({ label, value, defaultValue = null, onValueChange, n
       </Popover.Popup></Popover.Positioner></Popover.Portal></Popover.Root>
       {selected && <IconButton icon={X} label={'Clear ' + label.toLowerCase()} size="sm" variant="ghost" disabled={calendar.disabled} onClick={() => {setSelected(null);trigger.current?.focus();}} />}
     </div>
+    {required && <span className="bui-sr-only" id={id+'-required'}>Required</span>}
     {name && <input type="hidden" name={name} value={formatDateValue(selected ?? undefined)} />}
     {(hint || error) && <p id={id + '-description'} className={error ? 'bui-error' : 'bui-hint'} role={error ? 'alert' : undefined}>{error || hint}</p>}
   </div>;
@@ -78,14 +80,14 @@ export interface DateRangePickerProps extends Omit<DatePickerProps, 'value' | 'd
   defaultValue?: DateRange | null;
   onValueChange?: (value: DateRange | null) => void;
 }
-export function DateRangePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date range', hint, error, formatLocale = 'en-AU', inputRef, onBlur, ...calendar }: DateRangePickerProps) {
+export function DateRangePicker({ label, value, defaultValue = null, onValueChange, name, placeholder = 'Choose a date range', hint, error, formatLocale = 'en-AU', inputRef, onBlur, required=false, ...calendar }: DateRangePickerProps) {
   const id = useId(); const [open, setOpen] = useState(false);
   const trigger=useRef<HTMLButtonElement>(null);
   const [selected, setSelected] = useControllableValue(value, defaultValue, onValueChange);
   const format = (date:Date) => new Intl.DateTimeFormat(formatLocale, {day:'numeric',month:'short',year:'numeric'}).format(date);
   const display = selected?.from ? format(selected.from) + (selected.to ? ' – ' + format(selected.to) : ' – Choose end date') : placeholder;
-  return <div className="bui-field"><label htmlFor={id} className="bui-label">{label}</label><div className="bui-date-field">
-    <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={hint || error ? id + '-description' : undefined} className="bui-input bui-date-trigger">
+  return <div className="bui-field"><label htmlFor={id} className="bui-label">{label}{required && <span aria-hidden="true"> *</span>}</label><div className="bui-date-field">
+    <Popover.Root open={open} onOpenChange={setOpen}><Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} data-field-name={name} title={display} id={id} disabled={calendar.disabled} aria-invalid={!!error || undefined} aria-describedby={[required && id+'-required',(hint || error) && id+'-description'].filter(Boolean).join(' ') || undefined} className="bui-input bui-date-trigger">
       <Icon icon={CalendarDays} /><span data-placeholder={!selected?.from || undefined}>{display}</span><Icon name="chevron" />
     </Popover.Trigger><Popover.Portal><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup className="bui-popup bui-calendar-popup">
       <Popover.Title className="bui-sr-only">{label}</Popover.Title>
@@ -94,6 +96,7 @@ export function DateRangePicker({ label, value, defaultValue = null, onValueChan
     </Popover.Popup></Popover.Positioner></Popover.Portal></Popover.Root>
     {selected && <IconButton icon={X} label={'Clear ' + label.toLowerCase()} size="sm" variant="ghost" disabled={calendar.disabled} onClick={() => {setSelected(null);trigger.current?.focus();}} />}
   </div>
+    {required && <span className="bui-sr-only" id={id+'-required'}>Required</span>}
     {name && <><input type="hidden" name={name + '.from'} value={formatDateValue(selected?.from)} /><input type="hidden" name={name + '.to'} value={formatDateValue(selected?.to)} /></>}
     {(hint || error) && <p id={id + '-description'} className={error ? 'bui-error' : 'bui-hint'} role={error ? 'alert' : undefined}>{error || hint}</p>}
   </div>;

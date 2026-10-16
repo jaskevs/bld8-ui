@@ -46,7 +46,7 @@ export function FileUpload({ label, value, defaultValue = [], onValueChange, acc
       if (next.length >= fileLimit) { rejected.push(file.name + ': limit of ' + fileLimit + ' files reached.'); continue; }
       next.push(file);
     }
-    setFiles(next); setErrors(rejected); setProgress({}); setStatus(next.length + ' files selected.');
+    setFiles(next); setErrors(rejected); setProgress({}); setStatus(next.length + (next.length===1 ? ' file selected.' : ' files selected.'));
   };
   async function upload() {
     if (!onUpload || !files.length || busy || disabled) return;
@@ -62,16 +62,16 @@ export function FileUpload({ label, value, defaultValue = [], onValueChange, acc
       if (run.current === current && !abort.signal.aborted) { setErrors([error instanceof Error ? error.message : 'Upload failed. Try again.']); setStatus(''); }
     } finally { if (run.current === current) {setBusy(false);controller.current = null;} }
   }
-  return <div className="bui-file-upload">
+  return <div className="bui-file-upload" aria-busy={busy || undefined}>
     <label htmlFor={id} className="bui-label">{label}</label>
     <div className="bui-dropzone" data-dragging={dragging || undefined} data-disabled={disabled || busy || undefined}
       onDragOver={event => {event.preventDefault();if(!disabled && !busy) {event.dataTransfer.dropEffect='copy';setDragging(true);}}}
       onDragLeave={event => {if(!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false);}}
       onDrop={event => {event.preventDefault();setDragging(false);add(Array.from(event.dataTransfer.files));}}>
       <span className="bui-file-symbol"><Icon icon={Upload} size={24} /></span><strong>Drop files here</strong>
-      <p className="bui-hint">{hint ?? (accept || 'Any file type') + ' · Up to ' + fileLimit + ' files · ' + bytes(sizeLimit) + ' each'}</p>
-      <input ref={input} id={id} type="file" multiple={fileLimit > 1} accept={accept} disabled={disabled || busy} className="bui-sr-only" aria-describedby={id + '-help'} onChange={event => {add(Array.from(event.target.files ?? []));event.target.value='';}} />
-      <Button ref={browse} variant="secondary" size="sm" disabled={disabled || busy} onClick={() => input.current?.click()}>Browse files</Button>
+      <p id={id+'-caption'} className="bui-hint">{hint ?? (accept || 'Any file type') + ' · Up to ' + fileLimit + ' files · ' + bytes(sizeLimit) + ' each'}</p>
+      <input ref={input} id={id} tabIndex={-1} aria-invalid={!!errors.length || undefined} type="file" multiple={fileLimit > 1} accept={accept} disabled={disabled || busy} className="bui-sr-only" aria-describedby={id + '-help'} onChange={event => {add(Array.from(event.target.files ?? []));event.target.value='';}} />
+      <Button ref={browse} aria-describedby={id+'-caption'} variant="secondary" size="sm" disabled={disabled || busy} onClick={() => input.current?.click()}>Browse files</Button>
       <span id={id + '-help'} className="bui-sr-only">{accept || 'Any file type'}. Maximum {fileLimit} files, {bytes(sizeLimit)} per file. Drag and drop or browse.</span>
     </div>
     {errors.length > 0 && <Alert title="Check the files" tone="danger" live><ul className="bui-file-errors">{errors.map((error,index) => <li key={index}>{error}</li>)}</ul></Alert>}

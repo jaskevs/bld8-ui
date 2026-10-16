@@ -31,12 +31,12 @@ export function OperationsTemplate({repository:provided}:{repository?:OutlineRep
       <SidebarInset>
         <div className="bblocks-operations-toolbar"><SidebarTrigger /><span className="bblocks-muted">{view}</span></div>
         <ContextMenu><ContextMenuTrigger className="bblocks-operations-intro" aria-label="Workspace quick navigation">
-          <p className="bblocks-kicker">SMALL PLANS. USEFUL DETAILS.</p><h2 ref={heading} tabIndex={-1}>{view==='Planning' ? 'Make room for the next idea.' : view==='Resources' ? 'Keep the references close.' : 'A few details, made yours.'}</h2><p className="bblocks-muted">{provided?'Projects use your connected service. References and preferences stay in this browser.':'Projects, references and preferences. Saved in this browser; no account required.'}</p>
+          <p className="bblocks-kicker">SMALL PLANS. USEFUL DETAILS.</p><h2 ref={heading} tabIndex={-1}>{view==='Planning' ? 'Projects' : view==='Resources' ? 'Resources' : 'Settings'}</h2><p className="bblocks-muted">{provided?'Projects use your connected service. References and preferences stay in this browser.':'Projects, references and preferences. Saved in this browser; no account required.'}</p>
         </ContextMenuTrigger><ContextMenuContent aria-label="Workspace quick navigation">{views.map(item=><ContextMenuItem key={item.id} onClick={()=>navigate(item.id)}><item.icon size={16} aria-hidden="true" />Open {item.id.toLowerCase()}</ContextMenuItem>)}</ContextMenuContent></ContextMenu>
         {storageError && <Alert title="Storage needs attention" tone="warning">{storageError}</Alert>}
-        <div hidden={view!=='Planning'}>{repository?<OutlineProjects repository={repository} />:<p role="status">Opening the workspace…</p>}</div>
-        <div hidden={view!=='Resources'}>{preferences && <ResourceManager initialRecords={preferences.resources} onRecordsChange={resources=>{try{savePreferences({resources});setStorageError('');}catch{setStorageError('Resource changes are only in memory: browser storage could not be updated.');}}} />}</div>
-        <div hidden={view!=='Settings'}>{preferences && <AccountSettings initialValues={preferences.profile} onSave={async profile=>{savePreferences({profile});setStorageError('');}} />}</div>
+        <div className="bblocks-operations-view" hidden={view!=='Planning'}>{repository?<OutlineProjects repository={repository} />:<p role="status">Opening the workspace…</p>}</div>
+        <div className="bblocks-operations-view" hidden={view!=='Resources'}>{preferences && <ResourceManager initialRecords={preferences.resources} onRecordsChange={resources=>{try{savePreferences({resources});setStorageError('');}catch{setStorageError('Resource changes are only in memory: browser storage could not be updated.');}}} />}</div>
+        <div className="bblocks-operations-view" hidden={view!=='Settings'}>{preferences && <AccountSettings initialValues={preferences.profile} onSave={async profile=>{savePreferences({profile});setStorageError('');}} />}</div>
       </SidebarInset>
     </SidebarProvider>
     <footer className="bblocks-note">Outline / BLD8 UI · MIT · Both collections free. {provided?'Connected project service · Browser preferences':'Local browser storage'} · File metadata only · Connect the repository adapter to your own API.</footer>

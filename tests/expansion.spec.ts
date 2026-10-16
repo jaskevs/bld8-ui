@@ -1,3 +1,4 @@
+import {chooseOption,chooseReviewDate} from './helpers/controls';
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {createOutlineHttpRepository,OutlineHttpError} from '../packages/blocks/dist/outline-http.js';
@@ -10,23 +11,23 @@ test('playground links restore configuration and ignore invalid URL values',asyn
   await context.grantPermissions(['clipboard-read','clipboard-write']);
   await page.goto('/playground?component=Drawer&side=right&focus=close&state=Error&dark=true&mobile=true');
   const controls=page.getByRole('region',{name:'Playground controls'});
-  await expect(controls.getByRole('combobox',{name:'Component',exact:true})).toHaveValue('Drawer');await expect(controls.getByRole('combobox',{name:'Placement'})).toHaveValue('right');await expect(controls.getByRole('switch',{name:'Dark preview'})).toBeChecked();
+  await expect(controls.getByRole('combobox',{name:'Component',exact:true})).toHaveText('Drawer');await expect(controls.getByRole('combobox',{name:'Placement'})).toHaveText('right');await expect(controls.getByRole('switch',{name:'Dark preview'})).toBeChecked();
   await controls.getByRole('button',{name:'Copy configuration link'}).click();await expect(controls.getByRole('status')).toHaveText('Configuration link copied.');const link=await page.evaluate(()=>navigator.clipboard.readText());
-  await page.goto('/');await page.goto(link);await expect(controls.getByRole('combobox',{name:'State'})).toHaveValue('Error');await expect(controls.getByRole('switch',{name:'Narrow preview'})).toBeChecked();
+  await page.goto('/');await page.goto(link);await expect(controls.getByRole('combobox',{name:'State'})).toHaveText('Error');await expect(controls.getByRole('switch',{name:'Narrow preview'})).toBeChecked();
   const invalid=readPlayground('?component=Bad&state=Wrong&variant=wat&value=999&pageSize=0&date=2026-02-30&selected=design,unknown,design');expect(invalid.component).toBe('Button');expect(invalid.state).toBe('Default');expect(invalid.value).toBe(100);expect(invalid.pageSize).toBe(1);expect(invalid.date).toBe('2026-10-20');expect(invalid.selected).toEqual(['design']);expect(readPlayground(writePlayground(invalid))).toEqual(invalid);
 });
 
 test('overlay playground preserves focus, switches feedback and dismisses from the keyboard',async({page})=>{
   for(const component of ['Dialog','Drawer']){
     await page.goto('/playground?component='+component+'&state=Error&focus=close');const trigger=page.getByRole('button',{name:'Open '+component.toLowerCase(),exact:true});await trigger.click();const dialog=page.getByRole('dialog',{name:'Project note'});await expect(dialog.getByRole('button',{name:'Done',exact:true})).toBeFocused();await expect(dialog.getByRole('alert')).toContainText('Unable to save');await dialog.getByRole('button',{name:'Retry note'}).click();await expect(dialog.getByRole('alert')).toHaveCount(0);await page.keyboard.press('Escape');await expect(trigger).toBeFocused();
-    await page.getByRole('combobox',{name:'State',exact:true}).selectOption('Loading');await trigger.click();await expect(dialog.getByRole('button',{name:'Save note'})).toBeDisabled();await expect(dialog.getByRole('textbox',{name:'Note title'})).toBeDisabled();await page.keyboard.press('Escape');
+    await chooseOption(page,page.getByRole('combobox',{name:'State',exact:true}),'Loading');await trigger.click();await expect(dialog.getByRole('button',{name:'Save note'})).toBeDisabled();await expect(dialog.getByRole('textbox',{name:'Note title'})).toBeDisabled();await page.keyboard.press('Escape');
   }
 });
 
 test('multi-select, calendar bounds and table error states use the public controls',async({page})=>{
   await page.goto('/playground?component=MultiSelect&disabledOption=true');const preview=page.getByRole('region',{name:'Component preview'});const input=preview.getByRole('combobox',{name:'Disciplines',exact:true});await input.fill('Research');await expect(page.getByRole('option',{name:'Research',exact:true})).toHaveAttribute('aria-disabled','true');await page.keyboard.press('Escape');await input.fill('Engineering');await page.getByRole('option',{name:'Engineering',exact:true}).click();await expect(page).toHaveURL(/selected=design%2Cengineering/);
   await page.goto('/playground?component=DatePicker&minDate=2026-10-20&maxDate=2026-10-24');await page.getByRole('region',{name:'Component preview'}).getByRole('button',{name:'Review date',exact:true}).click();await expect(page.getByRole('button',{name:/Monday, October 19th, 2026/})).toBeDisabled();await page.keyboard.press('Escape');
-  await page.goto('/playground?component=DataTable&state=Error');await expect(page.getByRole('region',{name:'Component preview'}).getByRole('alert')).toContainText('example service');await page.getByRole('button',{name:'Retry',exact:true}).click();await expect(page.getByRole('button',{name:'Next',exact:true})).toBeEnabled();await page.getByRole('combobox',{name:'State',exact:true}).selectOption('Empty');await expect(page.getByRole('heading',{name:'No records yet'})).toBeVisible();
+  await page.goto('/playground?component=DataTable&state=Error');await expect(page.getByRole('region',{name:'Component preview'}).getByRole('alert')).toContainText('example service');await page.getByRole('button',{name:'Retry',exact:true}).click();await expect(page.getByRole('button',{name:'Next',exact:true})).toBeEnabled();await chooseOption(page,page.getByRole('combobox',{name:'State',exact:true}),'Empty');await expect(page.getByRole('heading',{name:'No records yet'})).toBeVisible();
 });
 
 test('all documentation entries have prop tables derived from their TypeScript APIs',async({page})=>{
@@ -38,18 +39,18 @@ test('all documentation entries have prop tables derived from their TypeScript A
 
 test('Outline inline edits validate, cancel, save and preserve a rejected draft',async({page})=>{
   await page.goto('/templates/outline');const edit=page.getByRole('button',{name:'Edit project name for Keyboard review',exact:true});await edit.click();const input=page.getByRole('textbox',{name:'project name for Keyboard review',exact:true});await expect(input).toBeFocused();await input.fill('');await input.press('Enter');await expect(page.getByText('Use at least three characters.',{exact:true})).toBeVisible();await input.fill('Interface studies');await input.press('Enter');await expect(page.getByText('A project with this name already exists.',{exact:true})).toBeVisible();await expect(input).toHaveValue('Interface studies');await input.press('Escape');await expect(edit).toBeFocused();
-  await edit.click();await input.fill('Inline review');await input.press('Enter');await expect(page.getByRole('button',{name:'Inline review',exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Inline review',exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'Edit status for Inline review',exact:true}).click();await page.getByRole('combobox',{name:'status for Inline review',exact:true}).selectOption('Ready');await page.getByRole('button',{name:'Save status for Inline review',exact:true}).click();await expect(page.getByRole('row').filter({hasText:'Inline review'})).toContainText('Ready');
+  await edit.click();await input.fill('Inline review');await input.press('Enter');await expect(page.getByRole('button',{name:'Edit project name for Inline review',exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('button',{name:'Edit project name for Inline review',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Edit status for Inline review',exact:true}).click();await chooseOption(page,page.getByRole('combobox',{name:'status for Inline review',exact:true}),'Ready');await page.getByRole('button',{name:'Save status for Inline review',exact:true}).click();await expect(page.getByRole('row').filter({hasText:'Inline review'})).toContainText('Ready');
 });
 
 test('HTTP example sends real queries and recovers from a failed inline save',async({page})=>{
   const mutations:string[]=[];page.on('request',request=>{if(request.url().includes('/api/examples/outline/projects')&&request.method()==='PATCH')mutations.push(request.url());});
-  await page.goto('/examples/outline-http');await page.getByRole('button',{name:'Fail next save',exact:true}).click();await page.getByRole('button',{name:'Edit project name for Keyboard review',exact:true}).click();const input=page.getByRole('textbox',{name:'project name for Keyboard review',exact:true});await input.fill('HTTP review');await input.press('Enter');await expect(page.getByRole('alert').filter({hasText:'sample service rejected'})).toBeVisible();await expect(input).toHaveValue('HTTP review');await expect(input).toBeFocused();await input.press('Enter');await expect(page.getByRole('button',{name:'HTTP review',exact:true})).toBeVisible();expect(mutations).toHaveLength(2);await page.reload();await expect(page.getByRole('button',{name:'HTTP review',exact:true})).toBeVisible();
+  await page.goto('/examples/outline-http');await page.getByRole('button',{name:'Fail next save',exact:true}).click();await page.getByRole('button',{name:'Edit project name for Keyboard review',exact:true}).click();const input=page.getByRole('textbox',{name:'project name for Keyboard review',exact:true});await input.fill('HTTP review');await input.press('Enter');await expect(page.getByRole('alert').filter({hasText:'sample service rejected'})).toBeVisible();await expect(input).toHaveValue('HTTP review');await expect(input).toBeFocused();await input.press('Enter');await expect(page.getByRole('button',{name:'Edit project name for HTTP review',exact:true})).toBeVisible();expect(mutations).toHaveLength(2);await page.reload();await expect(page.getByRole('button',{name:'Edit project name for HTTP review',exact:true})).toBeVisible();
 });
 
 test('two simultaneous cell drafts retain the version captured when editing began',async({page})=>{
   await page.goto('/templates/outline');await page.getByRole('button',{name:'Edit project name for Keyboard review',exact:true}).click();const name=page.getByRole('textbox',{name:'project name for Keyboard review',exact:true});await name.fill('Older draft');
-  await page.getByRole('button',{name:'Edit review date for Keyboard review',exact:true}).click();const date=page.locator('input[aria-label="review date for Keyboard review"]');await date.fill('2026-12-03');await date.press('Enter');await expect(name.locator('xpath=ancestor::tr')).toContainText('2026-12-03');
+  await page.getByRole('button',{name:'Edit review date for Keyboard review',exact:true}).click();const date=page.locator('input[aria-label="review date for Keyboard review"]');await date.fill('2026-12-03');await date.press('Enter');await expect(name.locator('xpath=ancestor::tr')).toContainText('03 Dec 2026');
   await page.getByRole('button',{name:'Save project name for Keyboard review',exact:true}).click();await expect(page.getByRole('alert').filter({hasText:'changed in another tab'})).toBeVisible();await expect(name).toHaveValue('Older draft');
 });
 

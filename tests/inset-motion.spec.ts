@@ -1,0 +1,33 @@
+import {test,expect} from '@playwright/test';
+
+for(const theme of ['light','dark'])test('yellow choices ease into shared inset depth in '+theme,async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/foundations#control-states');if(theme==='dark')await page.getByRole('button',{name:'Switch to dark theme'}).click();const specimen=page.getByRole('region',{name:'Control standards'});
+  const toggle=specimen.getByRole('switch',{name:'Weekly digest',exact:true});await toggle.uncheck();await toggle.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})));});
+  const offPlate=await toggle.evaluate(el=>({background:getComputedStyle(el).backgroundColor,shadow:getComputedStyle(el).boxShadow,border:getComputedStyle(el).borderWidth}));
+  for(const choice of [specimen.getByRole('radio',{name:'Compact',exact:true}),specimen.getByRole('checkbox',{name:'Include archived',exact:true})])expect(await choice.evaluate(el=>({background:getComputedStyle(el).backgroundColor,shadow:getComputedStyle(el).boxShadow,border:getComputedStyle(el).borderWidth}))).toEqual(offPlate);
+  for(const control of [specimen.getByRole('radio',{name:'Compact',exact:true}),specimen.getByRole('checkbox',{name:'Include archived',exact:true})]){
+    const rest=await control.evaluate(el=>getComputedStyle(el).boxShadow);const box=await control.boundingBox();
+    const transitions=await control.evaluate(el=>{getComputedStyle(el).boxShadow;(el as HTMLInputElement).click();return el.getAnimations({subtree:true}).filter(a=>(a as CSSTransition).transitionProperty==='box-shadow'&&a.playState==='running').length;});expect(transitions).toBeGreaterThan(0);
+    await expect.poll(()=>control.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(255, 226, 74)');const selected=await control.evaluate(el=>getComputedStyle(el).boxShadow);expect(selected).toContain('inset');expect(selected).not.toBe(rest);expect(await control.boundingBox()).toEqual(box);
+    const indicator=await control.evaluate(el=>{const style=getComputedStyle(el,'::after');return (el as HTMLInputElement).type==='radio'?style.backgroundColor:style.borderBottomColor;});expect(indicator).toBe('rgb(23, 23, 23)');
+  }
+  const off=await toggle.evaluate(el=>getComputedStyle(el).boxShadow);const transitions=await toggle.evaluate(el=>{(el as HTMLInputElement).click();return el.getAnimations({subtree:true}).filter(a=>(a as CSSTransition).transitionProperty==='box-shadow'&&a.playState==='running').length;});expect(transitions).toBeGreaterThan(0);await expect(toggle).toBeChecked();await expect.poll(()=>toggle.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(255, 226, 74)');expect(await toggle.evaluate(el=>getComputedStyle(el).boxShadow)).not.toBe(off);
+  await toggle.evaluate(async el=>{await Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})));});
+  const onPlate=await toggle.evaluate(el=>({background:getComputedStyle(el).backgroundColor,shadow:getComputedStyle(el).boxShadow,border:getComputedStyle(el).borderWidth}));expect(onPlate.border).toBe('0px');
+  for(const choice of [specimen.getByRole('radio',{name:'Compact',exact:true}),specimen.getByRole('checkbox',{name:'Include archived',exact:true})])expect(await choice.evaluate(el=>({background:getComputedStyle(el).backgroundColor,shadow:getComputedStyle(el).boxShadow,border:getComputedStyle(el).borderWidth}))).toEqual(onPlate);
+  const panel=specimen.locator('.control-standards-panel').filter({has:page.getByRole('heading',{name:'Choices',exact:true})});await panel.screenshot({path:'.local/previews/inset-choices-'+theme+'.png',animations:'disabled',style:'.site-header,.skip-link{visibility:hidden!important}'});
+});
+
+for(const theme of ['light','dark'])test('slider hover and press feedback preserve direct manipulation in '+theme,async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.goto('/foundations#control-states');if(theme==='dark')await page.getByRole('button',{name:'Switch to dark theme'}).click();const slider=page.getByRole('region',{name:'Control standards'}).getByRole('slider',{name:'Preview scale',exact:true});await slider.scrollIntoViewIfNeeded();await page.mouse.move(0,0);const box=(await slider.boundingBox())!;const rest=await slider.screenshot({path:'.local/previews/inset-slider-rest-'+theme+'.png',animations:'disabled'});
+  await slider.hover();await expect(slider).toHaveValue('65');const hover=await slider.screenshot({path:'.local/previews/inset-slider-hover-'+theme+'.png',animations:'disabled'});expect(Buffer.compare(rest,hover)).not.toBe(0);expect(await slider.boundingBox()).toEqual(box);
+  await page.mouse.move(box.x+9+(box.width-18)*(65-25)/75,box.y+box.height/2);await page.mouse.down();await slider.screenshot({path:'.local/previews/inset-slider-pressed-'+theme+'.png',animations:'disabled'});await page.mouse.move(box.x+9+(box.width-18)*.9,box.y+box.height/2,{steps:8});await page.mouse.up();expect(Number(await slider.inputValue())).toBeGreaterThanOrEqual(90);expect(await slider.boundingBox()).toEqual(box);
+  await slider.focus();await page.keyboard.press('Home');await expect(slider).toHaveValue('25');await page.keyboard.press('End');await expect(slider).toHaveValue('100');await page.keyboard.press('ArrowLeft');await expect(slider).toHaveValue('95');
+});
+
+test('inset controls retain immediate reduced-motion states and system-colour contrast',async({page})=>{
+  await page.goto('/foundations#control-states');const specimen=page.getByRole('region',{name:'Control standards'});const radio=specimen.getByRole('radio',{name:'Compact',exact:true});await radio.focus();await page.keyboard.press('Space');await expect(radio).toBeChecked();expect(await radio.evaluate(el=>el.getAnimations({subtree:true}).filter(a=>a.playState==='running').length)).toBe(0);expect(await radio.evaluate(el=>getComputedStyle(el,'::after').opacity)).toBe('1');
+  const checkbox=specimen.getByRole('checkbox',{name:'Include archived',exact:true});await checkbox.focus();await page.keyboard.press('Space');await expect(checkbox).toBeChecked();expect(await checkbox.evaluate(el=>getComputedStyle(el,'::after').transitionDuration)).toBe('0s');
+  await page.emulateMedia({forcedColors:'active'});for(const control of [radio,checkbox]){await control.focus();expect(await control.evaluate(el=>getComputedStyle(el).boxShadow)).toBe('none');expect(await control.evaluate(el=>getComputedStyle(el).outlineStyle)).toBe('solid');}
+  expect(await checkbox.evaluate(el=>getComputedStyle(el,'::after').borderBottomColor)).not.toBe('rgb(255, 226, 74)');
+});

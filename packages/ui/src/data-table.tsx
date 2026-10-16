@@ -1,8 +1,9 @@
 'use client';
 import { useId, useMemo, useRef, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, SlidersHorizontal } from 'lucide-react';
-import { Alert, Button, Checkbox, EmptyState, Icon, Input, Pagination, Skeleton } from './core.js';
+import { Alert, Button, Checkbox, EmptyState, Icon, Input, Pagination, Skeleton, Spinner } from './core.js';
 import { Popover } from './overlays.js';
+import { Select } from './controls.js';
 import { useControllableValue } from './state.js';
 
 export interface Column<T> {
@@ -13,6 +14,10 @@ export interface Column<T> {
   exportValue?: (row: T) => string | number;
   hideable?: boolean;
   width?:number; minWidth?:number; pinned?:'start'|'end';
+  align?:'start'|'center'|'end';
+  /** Extra available width is assigned to flexible columns. */
+  flex?:number;
+  resizable?:boolean;
 }
 export interface TableFilter<T> { key:string; label:string; options:{value:string;label:string}[]; value:(row:T)=>string }
 export interface TableQuery { search:string; filters:Record<string,string>; sort:{key:string;descending:boolean}|null; page:number; pageSize:number }
@@ -22,6 +27,8 @@ export interface DataTableProps<T> {
   searchText?: (row: T) => string; pageSize?: number;
   filters?: TableFilter<T>[];
   columnVisibility?: boolean;
+  /** Additional view controls inside the Columns popover. */
+  viewOptions?:ReactNode;
   visibleColumnKeys?: string[];
   defaultVisibleColumnKeys?: string[];
   onVisibleColumnKeysChange?: (keys:string[])=>void;
@@ -51,17 +58,20 @@ export function createTableCSV<T>(rows:T[], columns:Column<T>[]) {
 function SelectionCheckbox({label, checked, mixed, onChange}:{label:string;checked:boolean;mixed?:boolean;onChange:()=>void}) {
   const ref=useRef<HTMLInputElement>(null);
   useEffect(() => {if(ref.current) ref.current.indeterminate=!!mixed;},[mixed]);
-  return <input ref={ref} type="checkbox" className="bui-checkbox" aria-label={label} aria-checked={mixed ? 'mixed' : checked} checked={checked} onChange={onChange} />;
+  return <label className="bui-table-select"><input ref={ref} type="checkbox" className="bui-checkbox" aria-label={label} aria-checked={mixed ? 'mixed' : checked} checked={checked} onChange={onChange} /></label>;
 }
 export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageSize = 5, filters = [], columnVisibility = false,
   visibleColumnKeys, defaultVisibleColumnKeys, onVisibleColumnKeysChange, selectable = false, rowLabel = rowKey,
-  selectedKeys, defaultSelectedKeys = [], onSelectedKeysChange, renderBulkActions, density = 'comfortable', loading, error, onRetry, server, renderSelectedActions, resizableColumns=false }: DataTableProps<T>) {
+  selectedKeys, defaultSelectedKeys = [], onSelectedKeysChange, renderBulkActions, density = 'comfortable', loading, error, onRetry, server, renderSelectedActions, resizableColumns=false, viewOptions }: DataTableProps<T>) {
   const id=useId();
   const [local,setLocal]=useState<TableQuery>({...defaultTableQuery,pageSize});
   const state=server?.query ?? {...local,pageSize};
   const query=state.search, page=state.page, facets=state.filters, sort=state.sort;
   const changeQuery=(patch:Partial<TableQuery>)=>{const next={...state,...patch};if(server)server.onQueryChange(next);else setLocal(next);};
   const [widths,setWidths]=useState<Record<string,number>>({});
+  const [scrollElement,setScrollElement]=useState<HTMLDivElement|null>(null);
+  const [viewportWidth,setViewportWidth]=useState(0);
+  useEffect(()=>{if(!scrollElement)return;const observer=new ResizeObserver(([entry])=>setViewportWidth(Math.floor(entry.contentRect.width)));observer.observe(scrollElement);return()=>observer.disconnect();},[scrollElement]);
   const [selected,setSelected]=useControllableValue(selectedKeys,defaultSelectedKeys,onSelectedKeysChange);
   const [shown,setShown]=useControllableValue(visibleColumnKeys,defaultVisibleColumnKeys ?? columns.map(column=>column.key),onVisibleColumnKeysChange);
   const activeColumns=columns.filter(column=>column.hideable===false || shown.includes(column.key));
@@ -80,32 +90,42 @@ export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageS
   const pageRows=server ? rows : visible.slice((activePage-1)*size,activePage*size);
   const pageSelected=pageRows.filter(row=>selectedSet.has(rowKey(row))).length;
   const toggle=(keys:string[])=>{const next=new Set(selected);const all=keys.every(key=>next.has(key));keys.forEach(key=>all ? next.delete(key) : next.add(key));setSelected([...next]);};
-  const width=(column:Column<T>)=>widths[column.key] ?? column.width ?? 180;
+  const baseWidth=(column:Column<T>)=>Math.max(column.minWidth ?? 100,widths[column.key] ?? column.width ?? 180);
+  const fixedLayout=resizableColumns || displayedColumns.some(column=>column.width!==undefined || column.pinned);
+  const baseTotal=displayedColumns.reduce((sum,column)=>sum+baseWidth(column),selectable?48:0);
+  const extra=Math.max(0,viewportWidth-baseTotal);
+  const flexible=displayedColumns.filter(column=>(column.flex ?? 0)>0 && widths[column.key]===undefined);
+  const stretch=flexible.length?flexible:displayedColumns.filter(column=>widths[column.key]===undefined && column.resizable!==false).slice(0,1);
+  const weight=stretch.reduce((sum,column)=>sum+(column.flex ?? 1),0);
+  const width=(column:Column<T>)=>baseWidth(column)+(stretch.includes(column)?extra*(column.flex ?? 1)/weight:0);
+  const tableWidth=stretch.length?Math.max(baseTotal,viewportWidth):baseTotal;
   const columnStyle=(column:Column<T>):CSSProperties=>{
     const index=displayedColumns.indexOf(column);
     const offset=column.pinned==='start' ? displayedColumns.slice(0,index).filter(item=>item.pinned==='start').reduce((sum,item)=>sum+width(item),selectable?48:0) : displayedColumns.slice(index+1).filter(item=>item.pinned==='end').reduce((sum,item)=>sum+width(item),0);
-    return {width:resizableColumns || column.pinned ? width(column):column.width,minWidth:column.minWidth ?? 100,...(column.pinned ? {insetInlineStart:column.pinned==='start'?offset:undefined,insetInlineEnd:column.pinned==='end'?offset:undefined,zIndex:1,background:'var(--bui-bg)'}:{})};
+    return {width:fixedLayout ? width(column):column.width,minWidth:column.minWidth ?? 100,textAlign:column.align ?? 'start',...(column.pinned ? {insetInlineStart:column.pinned==='start'?offset:undefined,insetInlineEnd:column.pinned==='end'?offset:undefined,zIndex:1}:{})};
   };
-  const resize=(column:Column<T>,value:number)=>setWidths(current=>({...current,[column.key]:Math.min(600,Math.max(column.minWidth ?? 100,value))}));
+  const maximumWidth=Math.max(600,viewportWidth);
+  const resize=(column:Column<T>,value:number)=>setWidths(current=>({...current,[column.key]:Math.min(maximumWidth,Math.max(column.minWidth ?? 100,value))}));
   return <div className="bui-data-table" data-density={density} aria-busy={loading || undefined}>
     {(searchText || server || filters.length>0 || columnVisibility) && <div className="bui-table-toolbar">
       {(searchText || server) && <Input type="search" aria-label={'Search ' + caption.toLowerCase()} placeholder="Filter records…" value={query} onChange={event=>{changeQuery({search:event.target.value,page:1});}} />}
-      {filters.map(filter=><label className="bui-table-filter" key={filter.key} htmlFor={id+filter.key}><span className="bui-sr-only">{filter.label}</span><select id={id+filter.key} className="bui-input" disabled={loading} value={facets[filter.key] ?? ''} onChange={event=>{changeQuery({filters:{...facets,[filter.key]:event.target.value},page:1});}}><option value="">All {filter.label.toLowerCase()}</option>{filter.options.map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select></label>)}
+      {filters.map(filter=><div className="bui-table-filter" key={filter.key}><Select label={filter.label} labelVisibility="hidden" value={facets[filter.key] ?? ''} options={[{value:'',label:'All '+filter.label.toLowerCase()},...filter.options]} onValueChange={value=>changeQuery({filters:{...facets,[filter.key]:value ?? ''},page:1})} /></div>)}
       <span className="bui-hint" aria-live="polite">{total} results</span>
-      {columnVisibility && <Popover title="Visible columns" trigger={<Button variant="secondary" size="sm" leadingIcon={SlidersHorizontal}>Columns</Button>}><div className="bui-column-options">{columns.map(column=><Checkbox key={column.key} label={column.header} checked={displayedColumns.some(item=>item.key===column.key)} disabled={column.hideable===false || (displayedColumns.length===1 && displayedColumns[0].key===column.key)} onChange={event=>setShown(event.target.checked ? [...shown,column.key] : shown.filter(key=>key!==column.key))} />)}</div></Popover>}
+      {columnVisibility && <Popover title="Visible columns" trigger={<Button variant="secondary" className="bui-table-columns" leadingIcon={SlidersHorizontal}>Columns</Button>}><div className="bui-column-options">{viewOptions && <div className="bui-table-view-options">{viewOptions}</div>}{columns.map(column=><Checkbox key={column.key} label={column.header} checked={displayedColumns.some(item=>item.key===column.key)} disabled={column.hideable===false || (displayedColumns.length===1 && displayedColumns[0].key===column.key)} onChange={event=>setShown(event.target.checked ? [...shown,column.key] : shown.filter(key=>key!==column.key))} />)}</div></Popover>}
     </div>}
     {selectable && selected.length>0 && <div className="bui-table-selection"><span role="status">{selected.length} selected</span><div>{renderSelectedActions ? renderSelectedActions(selected) : renderBulkActions?.(selectedRows)}<Button size="sm" variant="ghost" onClick={()=>setSelected([])}>Clear selection</Button></div></div>}
-    {error ? <Alert title="Unable to load records" tone="danger" live>{error}{onRetry && <Button size="sm" variant="secondary" onClick={onRetry}>Retry</Button>}</Alert> : loading ? <div className="bui-table-loading"><span role="status" className="bui-hint">Loading {caption.toLowerCase()}…</span>{[0,1,2].map(index=><Skeleton key={index} height="3rem" />)}</div> : <>
-      <div className="bui-table-scroll" tabIndex={0} role="region" aria-label={caption + ' table'}><table className="bui-table" style={resizableColumns?{tableLayout:'fixed',minWidth:displayedColumns.reduce((sum,column)=>sum+width(column),selectable?48:0)}:undefined}><caption className="bui-sr-only">{caption}</caption><thead><tr>
+    {error && <Alert title="Unable to load records" tone="danger" live>{error}{onRetry && <Button size="sm" variant="secondary" onClick={onRetry}>Retry</Button>}</Alert>}
+    {error && !rows.length ? null : loading && !rows.length ? <div className="bui-table-loading"><span role="status" className="bui-hint">Loading {caption.toLowerCase()}…</span>{[0,1,2].map(index=><Skeleton key={index} height="3rem" />)}</div> : <>
+      <div ref={setScrollElement} className="bui-table-scroll" tabIndex={0} role="region" aria-label={caption + ' table'}><table className="bui-table" style={fixedLayout?{tableLayout:'fixed',width:tableWidth,minWidth:tableWidth}:undefined}><caption className="bui-sr-only">{caption}</caption>{fixedLayout && <colgroup>{selectable && <col style={{width:48}} />}{displayedColumns.map(column=><col key={column.key} style={{width:width(column)}} />)}</colgroup>}<thead><tr>
         {selectable && <th scope="col" className="bui-table-check"><SelectionCheckbox label="Select current page" checked={pageRows.length>0 && pageSelected===pageRows.length} mixed={pageSelected>0 && pageSelected<pageRows.length} onChange={()=>toggle(pageRows.map(rowKey))} /></th>}
-        {displayedColumns.map(column=><th scope="col" key={column.key} data-pinned={column.pinned} style={columnStyle(column)} aria-sort={column.sortValue ? sort?.key===column.key ? sort.descending ? 'descending' : 'ascending' : 'none' : undefined}>{column.sortValue ? <button type="button" onClick={()=>{changeQuery({sort:sort?.key===column.key && sort.descending ? null : {key:column.key,descending:sort?.key===column.key && !sort.descending},page:1});}}>{column.header}<Icon icon={sort?.key===column.key ? sort.descending ? ArrowDown : ArrowUp : ArrowUpDown} size={14} /></button> : column.header}{resizableColumns && <span className="bui-column-resize" role="separator" tabIndex={0} aria-label={'Resize '+column.header} aria-orientation="vertical" aria-valuemin={column.minWidth ?? 100} aria-valuemax={600} aria-valuenow={width(column)} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();resize(column,width(column)+(event.key==='ArrowRight'?10:-10));}if(event.key==='Home'){event.preventDefault();resize(column,column.minWidth ?? 100);}}} onPointerDown={event=>{event.preventDefault();const start=event.clientX,initial=width(column);const target=event.currentTarget;target.setPointerCapture(event.pointerId);const move=(move:PointerEvent)=>resize(column,initial+move.clientX-start);const stop=()=>{target.removeEventListener('pointermove',move);target.removeEventListener('pointerup',stop);target.removeEventListener('pointercancel',stop);};target.addEventListener('pointermove',move);target.addEventListener('pointerup',stop);target.addEventListener('pointercancel',stop);}} />}</th>)}
+        {displayedColumns.map(column=><th scope="col" aria-label={column.header} key={column.key} data-pinned={column.pinned} data-align={column.align ?? 'start'} style={columnStyle(column)} aria-sort={column.sortValue ? sort?.key===column.key ? sort.descending ? 'descending' : 'ascending' : 'none' : undefined}>{column.sortValue ? <button type="button" onClick={()=>{changeQuery({sort:sort?.key===column.key && sort.descending ? null : {key:column.key,descending:sort?.key===column.key && !sort.descending},page:1});}}>{column.header}<Icon icon={sort?.key===column.key ? sort.descending ? ArrowDown : ArrowUp : ArrowUpDown} size={14} /></button> : column.header}{resizableColumns && column.resizable!==false && <span className="bui-column-resize" role="separator" tabIndex={0} aria-label={'Resize '+column.header} aria-orientation="vertical" aria-valuemin={column.minWidth ?? 100} aria-valuemax={maximumWidth} aria-valuenow={width(column)} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();resize(column,width(column)+(event.key==='ArrowRight'?10:-10));}if(event.key==='Home'){event.preventDefault();resize(column,column.minWidth ?? 100);}}} onPointerDown={event=>{event.preventDefault();const start=event.clientX,initial=width(column);const target=event.currentTarget;target.setPointerCapture(event.pointerId);const move=(move:PointerEvent)=>resize(column,initial+move.clientX-start);const stop=()=>{target.removeEventListener('pointermove',move);target.removeEventListener('pointerup',stop);target.removeEventListener('pointercancel',stop);};target.addEventListener('pointermove',move);target.addEventListener('pointerup',stop);target.addEventListener('pointercancel',stop);}} />}</th>)}
       </tr></thead><tbody>{pageRows.map(row=><tr key={rowKey(row)} data-selected={selectable && selectedSet.has(rowKey(row)) || undefined}>
         {selectable && <td className="bui-table-check"><SelectionCheckbox label={'Select ' + rowLabel(row)} checked={selectedSet.has(rowKey(row))} onChange={()=>toggle([rowKey(row)])} /></td>}
-        {displayedColumns.map(column=><td key={column.key} data-pinned={column.pinned} style={columnStyle(column)}>{column.cell(row)}</td>)}
+        {displayedColumns.map(column=><td key={column.key} data-pinned={column.pinned} data-align={column.align ?? 'start'} style={columnStyle(column)}><div className="bui-table-cell">{column.cell(row)}</div></td>)}
       </tr>)}</tbody></table></div>
       {visible.length===0 && <EmptyState title={!query && !Object.values(facets).some(Boolean) ? 'No records yet' : 'No matching records'} action={query || Object.values(facets).some(Boolean) ? <Button variant="secondary" size="sm" onClick={()=>{changeQuery({search:'',filters:{},page:1});}}>Clear filter</Button> : undefined}>{!query && !Object.values(facets).some(Boolean) ? 'Records will appear here when they are added.' : 'Try another search or filter.'}</EmptyState>}
-      {resizableColumns && <p className="bui-table-scroll-hint bui-hint">Scroll horizontally to see every column.</p>}
-      <Pagination page={activePage} totalPages={pages} onPageChange={page=>changeQuery({page})} />
+      {fixedLayout && viewportWidth>0 && viewportWidth<baseTotal && <p className="bui-table-scroll-hint bui-hint">Scroll horizontally to see every column.</p>}
+      <div className="bui-table-footer"><span className="bui-table-feedback bui-hint" role="status">{loading?<><Spinner /> Updating records…</>:total?`${(activePage-1)*size+1}–${Math.min(activePage*size,total)} of ${total}`:'0 records'}</span><Pagination page={activePage} totalPages={pages} onPageChange={page=>changeQuery({page})} /></div>
     </>}
   </div>;
 }

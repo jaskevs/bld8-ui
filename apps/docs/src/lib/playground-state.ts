@@ -44,7 +44,7 @@ export function playgroundKeyboard(component:PlaygroundName){
   if(['Dialog','Drawer'].includes(component))return 'Enter opens the surface. Tab stays inside it; Escape dismisses it and returns focus to the trigger.';
   if(component==='MultiSelect')return 'Type to filter. Use arrows and Enter to choose, Backspace to remove a chip, and Escape to close an open list. When the list is already closed, Escape clears the selection.';
   if(['Calendar','DatePicker','DateRangePicker'].includes(component))return 'Use arrows to move by day, Home/End within the week, and Page Up/Down between months. Enter selects a date; Escape closes a popup.';
-  if(component==='DataTable')return 'Tab reaches sorting, selection and edit actions. Enter saves an edited cell; Escape cancels it. Focus a resize handle and use Left/Right to adjust its width.';
+  if(component==='DataTable')return 'Tab reaches sorting, selection and edit actions. Enter saves a text/date cell; choose a status and use Save for select cells. Escape closes an open menu, then cancels the edit. Focus a resize handle and use Left/Right to adjust its width.';
   if(component==='Tabs')return 'Use Left/Right to move between tabs. Selection follows keyboard focus.';
   if(component==='Select')return 'Use arrows or typeahead to choose an option. Enter confirms; Escape closes the list.';
   return 'Use Tab to focus the control. Enter activates buttons; Space toggles switches. Focus remains visible in both themes.';

@@ -43,7 +43,8 @@ test('input adornments keep native labels, clear actions and visible keyboard fo
   const search=page.getByRole('searchbox',{name:'Search library'});await search.fill('notes');
   const clear=page.getByRole('button',{name:'Clear search',exact:true});await clear.click();
   await expect(search).toHaveValue('');await expect(clear).toBeDisabled();
-  await search.focus();expect(await search.locator('..').evaluate(el => getComputedStyle(el).outlineStyle)).toBe('solid');
+  await search.focus();const edge=await search.locator('..').evaluate(el=>({outline:getComputedStyle(el).outlineStyle,shadow:getComputedStyle(el).boxShadow}));expect(edge.outline).toBe('none');expect(edge.shadow).toContain('1px');
+  await page.emulateMedia({forcedColors:'active'});expect(await search.locator('..').evaluate(el=>getComputedStyle(el).outlineStyle)).toBe('solid');await page.emulateMedia({forcedColors:'none'});
   const invalid=page.getByRole('textbox',{name:'Account reference'});await expect(invalid).toHaveAttribute('aria-invalid','true');
   await expect(invalid).toHaveAttribute('aria-describedby',/.+/);
 });

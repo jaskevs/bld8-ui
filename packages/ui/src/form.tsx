@@ -18,7 +18,7 @@ export function useForm<T extends object>({initialValues,validate,onSubmit,onSuc
   const formRef=useRef<HTMLFormElement>(null);const request=useRef<AbortController|null>(null);
   const dirty=JSON.stringify(values)!==JSON.stringify(baseline);
   useEffect(()=>()=>request.current?.abort(),[]);
-  function focusError(next:FormErrors<T>) {const name=Object.keys(next).find(key=>next[key as keyof T]);if(name) requestAnimationFrame(()=>formRef.current?.querySelector<HTMLElement>(`[name="${CSS.escape(name)}"]`)?.focus());}
+  function focusError(next:FormErrors<T>) {const name=Object.keys(next).find(key=>next[key as keyof T]);if(name) requestAnimationFrame(()=>formRef.current?.querySelector<HTMLElement>(`[data-field-name="${CSS.escape(name)}"], [name="${CSS.escape(name)}"]:not([type="hidden"])`)?.focus());}
   function setField<K extends keyof T>(key:K,value:T[K]) {if(request.current)return;setValues(current=>({...current,[key]:value}));setErrors(current=>({...current,[key]:undefined}));setError('');setSaved(false);}
   function reset(next:T=baseline) {request.current?.abort();request.current=null;setPending(false);setValues(next);setBaseline(next);setErrors({});setError('');setSaved(false);}
   async function submit(event?:FormEvent) {

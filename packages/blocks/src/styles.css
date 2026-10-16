@@ -114,3 +114,49 @@
 
 .bblocks-table-options>.bui-field {width:180px;max-width:100%;flex:0 0 auto}
 .bblocks-project-name {padding-inline:0}
+
+/* Consistent form tracks and restrained workspace transitions. */
+.bblocks-form-grid { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:20px; }
+.bblocks-form-grid>.bui-field { min-width:0; }
+.bblocks-heading>div { min-width:0; }
+.bblocks-heading>.bui-button { flex-shrink:0; }
+.bblocks-operations-layout { gap:24px; }
+.bblocks-operations-layout .bblocks-operations-intro h2 { font-size:clamp(1.5rem,2.8vw,2rem); line-height:1.2; }
+.bblocks-operations .bblocks-heading h2 { font-size:clamp(1.25rem,2.2vw,1.625rem); }
+.bblocks-operations-view:not([hidden]) { animation:bblocks-view-enter var(--bui-duration) var(--bui-ease); }
+@keyframes bblocks-view-enter { from { opacity:0; translate:0 4px; } to { opacity:1; translate:0 0; } }
+@container bld8-preview (max-width:550px) { .bblocks-form-grid { grid-template-columns:minmax(0,1fr); } }
+@media(prefers-reduced-motion:reduce) { .bblocks-operations-view:not([hidden]) { animation:none; } }
+
+@media(max-width:600px) { .bblocks-form-grid { grid-template-columns:minmax(0,1fr); } }
+
+@media(max-width:600px) { .bblocks-stack>.bblocks-heading>.bblocks-inline-actions { width:100%; justify-content:flex-end; } }
+
+/* White panels stay quiet; a light shadow separates them from the canvas. */
+.bblocks-panel,.bblocks-stat,.bblocks-task { box-shadow:var(--bui-shadow-surface); }
+
+/* A quieter application frame leaves more room for the actual work. */
+.bblocks-operations { padding:24px; border-radius:var(--bui-panel-radius); }
+.bblocks-operations-header { padding-bottom:16px; }
+.bblocks-operations-layout { margin-top:20px; gap:20px; }
+.bblocks-operations .bui-sidebar:not([data-collapsed]) { width:184px; }
+.bblocks-operations-layout .bblocks-operations-intro { padding:16px 0 20px; }
+.bblocks-operations-layout .bblocks-operations-intro h2 { font-size:28px; margin:8px 0; letter-spacing:-.035em; }
+.bblocks-operations .bblocks-panel { padding:24px; }
+.bblocks-operations .bblocks-heading { margin-bottom:20px; gap:16px; }
+.bblocks-operations .bblocks-heading h2 { font-size:20px; margin:6px 0; letter-spacing:-.025em; }
+.bblocks-operations .bblocks-heading>.bblocks-inline-actions { flex-shrink:0; }
+.bblocks-project-name { font-weight:550; }
+.bblocks-row-menu { opacity:.55; box-shadow:none; transition:opacity var(--bui-duration-fast) var(--bui-ease),background-color var(--bui-duration) var(--bui-ease); }
+.bui-table tr:is(:hover,:focus-within) .bblocks-row-menu,.bblocks-row-menu[data-popup-open] { opacity:1; }
+.bblocks-date { min-width:0; }
+.bblocks-date strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+.bblocks-resource-footer .bblocks-status:empty { min-height:0; margin:0; }
+.bblocks-resource-footer:has(.bblocks-status:empty):not(:has(button)) { display:none; }
+@media(pointer:coarse) { .bblocks-row-menu { opacity:1; } }
+@media(max-width:600px) {
+  .bblocks-operations { padding:16px; }
+  .bblocks-operations .bblocks-panel { padding:16px; }
+  .bblocks-operations-layout .bblocks-operations-intro h2 { font-size:24px; }
+}
+@media(prefers-reduced-motion:reduce) { .bblocks-row-menu { transition:none; } }

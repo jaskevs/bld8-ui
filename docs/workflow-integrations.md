@@ -16,6 +16,9 @@ defaults come from the source; a dash means no default at that boundary.
 
 ## Inline editing
 
+Select the displayed value, or focus it and press Enter or F2, to begin editing.
+Use non-interactive display content. Full-project editing is in the row action menu.
+
 EditableCell accepts text/date values or a list of select options, a validation
 callback and an abortable async save callback. It keeps the draft on errors,
 prevents duplicate saves and restores focus after save/cancel. It snapshots

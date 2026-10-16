@@ -30,7 +30,7 @@ export function MultiSelect({ label, options, value, defaultValue = [], onValueC
     <Combobox.Root multiple items={options.map(option => option.value)} value={selected} onValueChange={setSelected} itemToStringLabel={labelFor} {...props}>
       <Combobox.Chips className="bui-multi-input" data-invalid={!!error || undefined}>
         <Combobox.Value>{(values: string[]) => values.map(value => <Combobox.Chip key={value} className="bui-chip">
-          {labelFor(value)}<Combobox.ChipRemove aria-label={'Remove ' + labelFor(value)}><Icon name="close" size={14} /></Combobox.ChipRemove>
+          <span className="bui-chip-label" title={labelFor(value)}>{labelFor(value)}</span><Combobox.ChipRemove aria-label={'Remove ' + labelFor(value)}><Icon name="close" size={14} /></Combobox.ChipRemove>
         </Combobox.Chip>)}</Combobox.Value>
         <Combobox.Input ref={inputRef} onBlur={onBlur} id={id} aria-describedby={descriptions} aria-invalid={!!error || undefined} placeholder={selected.length ? 'Add another…' : placeholder} className="bui-chip-input" />
         <Combobox.Trigger className="bui-combobox-trigger" aria-label={'Show ' + label.toLowerCase() + ' options'}><Icon name="chevron" /></Combobox.Trigger>
@@ -38,7 +38,7 @@ export function MultiSelect({ label, options, value, defaultValue = [], onValueC
       <Combobox.Portal><Combobox.Positioner className="bui-positioner" sideOffset={6}><Combobox.Popup className="bui-popup bui-select-popup">
         <Combobox.Empty className="bui-combo-empty">No matching options.</Combobox.Empty>
         <Combobox.List>{(value: string) => <Combobox.Item key={value} value={value} disabled={options.find(option => option.value === value)?.disabled} className="bui-option">
-          {labelFor(value)}<Combobox.ItemIndicator><Icon name="check" /></Combobox.ItemIndicator>
+          <span className="bui-option-label">{labelFor(value)}</span><Combobox.ItemIndicator><Icon name="check" /></Combobox.ItemIndicator>
         </Combobox.Item>}</Combobox.List>
       </Combobox.Popup></Combobox.Positioner></Combobox.Portal>
     </Combobox.Root>

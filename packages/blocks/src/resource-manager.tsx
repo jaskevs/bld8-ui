@@ -12,10 +12,10 @@ const initial:ResourceRecord[]=[
   {id:'4',name:'Old checklist.txt',type:'TXT',size:2080,status:'Archived'},
 ];
 const columns:Column<ResourceRecord>[]=[
-  {key:'name',header:'File',hideable:false,sortValue:row=>row.name,cell:row=><span className="bblocks-date"><Icon icon={FileText} /><strong>{row.name}</strong></span>},
-  {key:'type',header:'Type',sortValue:row=>row.type,cell:row=><Badge>{row.type}</Badge>},
-  {key:'size',header:'Size',sortValue:row=>row.size,cell:row=><span>{(row.size/1024).toFixed(1)} KB</span>},
-  {key:'status',header:'Status',sortValue:row=>row.status,cell:row=><Badge tone={row.status==='Active' ? 'success' : 'neutral'}>{row.status}</Badge>},
+  {key:'name',header:'File',hideable:false,width:300,minWidth:220,flex:1,sortValue:row=>row.name,cell:row=><span className="bblocks-date"><Icon icon={FileText} /><strong>{row.name}</strong></span>},
+  {key:'type',header:'Type',width:96,minWidth:80,sortValue:row=>row.type,cell:row=><Badge>{row.type}</Badge>},
+  {key:'size',header:'Size',width:120,minWidth:104,align:'end',sortValue:row=>row.size,cell:row=><span>{(row.size/1024).toFixed(1)} KB</span>},
+  {key:'status',header:'Status',width:128,minWidth:112,sortValue:row=>row.status,cell:row=><Badge tone={row.status==='Active' ? 'success' : 'neutral'}>{row.status}</Badge>},
 ];
 function download(rows:ResourceRecord[]) {
   const blob=new Blob(['\uFEFF'+createTableCSV(rows,columns)],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);

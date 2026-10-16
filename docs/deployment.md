@@ -45,3 +45,35 @@ service and React Hook Form examples are verified locally. They have not been
 deployed in this batch. A source push updates GitHub; Git-to-Vercel deployment
 is still disconnected. A future direct release must include prepare-api.mjs and
 the canonical example sources; the documentation app imports these files.
+
+## 15 October 2026 release and CI preparation
+
+Commit c19f8ccc09a7e72317d5c891030b2f13e46a30f2 was published as
+`dpl_9XVADyQhjaseho24KprPZR2S2SwN`, READY, with ui.bld8.dev assigned. Public
+routes, expanded playground controls, prop tables, registry modules, integration
+starters and sample HTTP validation/failure/create requests passed verification.
+The following shared-control refinement remains local; it has not been deployed.
+
+Git-to-Vercel was still disconnected at verification. The new CI workflow and
+[connection guide](ci-and-vercel.md) prepare the build/type/browser-test gate.
+The workflow must be pushed and run before its checks can be selected in Vercel.
+
+## Local design pass - 15 October 2026
+
+The complete shared-control and subtle-elevation refinement is local and has not
+been released. Foundations includes the new Control states preview. The production
+deployment continues to serve the previously verified commit until the changes
+are approved for a release outside the protected work-time window.
+
+
+## Source validation - 16 October 2026
+
+The shared-control/material, Outline table and accessibility refinements are
+validated for source publication together with the GitHub validation workflow.
+Production build, workspace types and all 142 final browser cases pass. The
+registry consumer and all 13 generated source downloads match the final styles.
+
+A GitHub push publishes this source. Production delivery is a separate status:
+the existing Vercel Git connection and required checks must be verified using
+[the connection guide](ci-and-vercel.md). Earlier deployment IDs above describe
+their historical releases, not evidence that this source is already live.

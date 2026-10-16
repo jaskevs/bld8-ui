@@ -5,6 +5,7 @@ import { Popover as PrimitivePopover } from '@base-ui/react/popover';
 import { Tooltip as PrimitiveTooltip } from '@base-ui/react/tooltip';
 import { Menu as PrimitiveMenu } from '@base-ui/react/menu';
 import { Toast as PrimitiveToast } from '@base-ui/react/toast';
+import type { LucideIcon } from 'lucide-react';
 import { Button, Icon, cx } from './core.js';
 
 export interface DialogProps { trigger?: ReactElement; title: string; description?: string; children: ReactNode; open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; initialFocus?:RefObject<HTMLElement|null>; finalFocus?:RefObject<HTMLElement|null> }
@@ -20,8 +21,8 @@ export function Popover({ trigger, title, children }: { trigger: ReactElement; t
 export function Tooltip({ content, children }: { content: string; children: ReactElement }) {
   const id = useId(); const [open, setOpen] = useState(false); return <PrimitiveTooltip.Root open={open} onOpenChange={setOpen}><PrimitiveTooltip.Trigger render={children} delay={350} aria-describedby={open ? id : undefined} /><PrimitiveTooltip.Portal><PrimitiveTooltip.Positioner className="bui-positioner" sideOffset={8}><PrimitiveTooltip.Popup className="bui-tooltip" id={id} role="tooltip">{content}</PrimitiveTooltip.Popup></PrimitiveTooltip.Positioner></PrimitiveTooltip.Portal></PrimitiveTooltip.Root>;
 }
-export interface MenuItem { label: string; onSelect?: () => void; disabled?: boolean; destructive?: boolean }
-export function DropdownMenu({ trigger, items }: { trigger: ReactElement; items: MenuItem[] }) { return <PrimitiveMenu.Root><PrimitiveMenu.Trigger render={trigger} /><PrimitiveMenu.Portal><PrimitiveMenu.Positioner className="bui-positioner" align="end" sideOffset={8}><PrimitiveMenu.Popup className="bui-popup bui-menu">{items.map(item => <PrimitiveMenu.Item key={item.label} disabled={item.disabled} onClick={item.onSelect} className={cx('bui-option', item.destructive && 'bui-destructive')}>{item.label}</PrimitiveMenu.Item>)}</PrimitiveMenu.Popup></PrimitiveMenu.Positioner></PrimitiveMenu.Portal></PrimitiveMenu.Root>; }
+export interface MenuItem { label: string; onSelect?: () => void; disabled?: boolean; destructive?: boolean; icon?: LucideIcon; /** Display only; register shortcuts in your application. */ shortcut?: string }
+export function DropdownMenu({ trigger, items }: { trigger: ReactElement; items: MenuItem[] }) { return <PrimitiveMenu.Root><PrimitiveMenu.Trigger render={trigger} /><PrimitiveMenu.Portal><PrimitiveMenu.Positioner className="bui-positioner" align="end" sideOffset={8}><PrimitiveMenu.Popup className="bui-popup bui-menu">{items.map(item => <PrimitiveMenu.Item key={item.label} disabled={item.disabled} onClick={item.onSelect} className={cx('bui-option', item.destructive && 'bui-destructive')}>{item.icon && <Icon icon={item.icon} size={16} />}<span className="bui-menu-label">{item.label}</span>{item.shortcut && <kbd className="bui-menu-shortcut" aria-hidden="true">{item.shortcut}</kbd>}</PrimitiveMenu.Item>)}</PrimitiveMenu.Popup></PrimitiveMenu.Positioner></PrimitiveMenu.Portal></PrimitiveMenu.Root>; }
 function ToastViewport() {
   const { toasts } = PrimitiveToast.useToastManager();
   return <PrimitiveToast.Portal><PrimitiveToast.Viewport className="bui-toast-viewport">{toasts.map(toast => <PrimitiveToast.Root key={toast.id} toast={toast} className="bui-toast"><PrimitiveToast.Content className="bui-toast-content"><PrimitiveToast.Title className="bui-label" /><PrimitiveToast.Description className="bui-hint" /></PrimitiveToast.Content><PrimitiveToast.Close className="bui-toast-close" aria-label="Dismiss notification" aria-hidden={false}><Icon name="close" /></PrimitiveToast.Close></PrimitiveToast.Root>)}</PrimitiveToast.Viewport></PrimitiveToast.Portal>;
