@@ -4,9 +4,22 @@ The CI workflow builds production assets, checks all workspace types, and runs
 interaction/accessibility tests in Chromium. It runs from the repository root
 on pull requests and main pushes. It needs no Vercel token or custom secrets.
 PR and release check names are separate to avoid ambiguous check results.
-The workflow is active only after it is pushed to GitHub.
+The workflow is active. The 16 October source release passed
+[UI Release checks](https://github.com/jaskevs/bld8-ui/actions/runs/38880635433).
 
-## Connect the existing project
+## Current connection
+
+Verified on 16 October 2026: the personal Vercel project is linked to
+jaskevs/bld8-ui, with main as its production branch. A main push triggered a Git
+deployment. The project install command was corrected to include all workspaces
+and the repository root; the checked source then deployed successfully. These
+settings do not change company/global credentials. Required Deployment Checks
+have not been verified; use the release-gate instructions below when enabling
+that policy.
+
+## Connection and build settings
+
+The repository is already connected. If the connection ever needs restoring:
 
 1. In Brave, use the personal jaskevs GitHub account and the personal Vercel team.
 2. Open https://vercel.com/jaskevs-4920s-projects/bld8-ui/settings/git.

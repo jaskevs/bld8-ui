@@ -11,7 +11,7 @@ Canonical domain: https://ui.bld8.dev. The existing https://bld8-ui.vercel.app a
 - Install: `npm ci --include=dev --workspaces --include-workspace-root`.
 - Build: `npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/docs`.
 
-The repository is public at https://github.com/jaskevs/bld8-ui. Git-to-Vercel deployment is not connected; releases currently use direct deployment. npm publication is independent and remains disabled.
+The repository is public at https://github.com/jaskevs/bld8-ui. Vercel is connected to this repository with main as the production branch; pushes trigger deployment. The GitHub validation workflow is active and passed for the 16 October source release. Required Deployment Checks are a separate setting and have not been verified. npm publication is independent and remains disabled.
 
 ## Domain
 
@@ -77,3 +77,24 @@ A GitHub push publishes this source. Production delivery is a separate status:
 the existing Vercel Git connection and required checks must be verified using
 [the connection guide](ci-and-vercel.md). Earlier deployment IDs above describe
 their historical releases, not evidence that this source is already live.
+
+
+## Git deployment verified - 16 October 2026
+
+Source commit `e58ae152a25778383099f31d8e1387995955569e` is on GitHub main,
+owned by the personal jaskevs account. The production build, workspace types and
+all 142 browser cases pass locally. GitHub validation run
+https://github.com/jaskevs/bld8-ui/actions/runs/38880635433 also passed.
+
+The source push automatically triggered Vercel. Its first build failed because
+the project install command omitted root/workspace dependencies, leaving tsc
+unavailable. The project setting now uses
+`npm ci --include=dev --workspaces --include-workspace-root`. Retrying the exact
+Git commit produced `dpl_BTStPN2pGv6MegqNaoHidXVeN2iL`, READY, with both production
+domains assigned. Public pages and registry styles match the checked source.
+
+This supersedes earlier notes that Git was disconnected or that the shared
+control and Outline refinements were local only. Future main pushes deploy
+automatically using the corrected project settings. GitHub CI runs on each push;
+requiring its result before production promotion remains a separate configuration
+step described in [the connection guide](ci-and-vercel.md).
