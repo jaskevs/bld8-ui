@@ -32,6 +32,14 @@ jobs:
         run: npm run build
       - name: Check workspace types
         run: npm run typecheck
+      - name: Build independent Vite starter
+        run: npm run check:starter:vite
+      - name: Build independent issue workflow starter
+        run: npm run check:starter:vite -- issue-table
+      - name: Build independent task workspace starter
+        run: npm run check:starter:vite -- task-workspace
+      - name: Build independent session setup starter
+        run: npm run check:starter:vite -- session-setup
       - name: Install test browser
         run: npx playwright install --with-deps chromium
       - name: Run interaction and accessibility checks

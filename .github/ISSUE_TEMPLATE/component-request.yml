@@ -1,0 +1,28 @@
+name: Request a component or block
+description: Describe a workflow that the current library does not cover.
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What are you trying to build?
+      description: Explain the real task and which existing controls you have tried.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What would help?
+      options:
+        - A reusable component
+        - A workflow block
+        - A complete template
+        - Documentation or an integration example
+    validations:
+      required: true
+  - type: textarea
+    id: states
+    attributes:
+      label: Required behaviour and states
+      description: Include keyboard behaviour, loading, errors, empty content, mobile layout and service integration where relevant.
+    validations:
+      required: true

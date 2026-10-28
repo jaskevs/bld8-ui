@@ -19,7 +19,7 @@ function add(name, title, files, dependencies = [], registryDependencies = [], t
 }
 add('bld8-styles', 'BLD8 styles and licences', [
   ...['styles.css','tokens.css','tailwind.css'].map(name => file('registry/bld8/'+name, read('packages/ui/dist/'+name), '@ui/bld8/'+name, 'registry:file')),
-  ...['LICENSE','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','THIRD_PARTY_NOTICES.md'].map(name => file('registry/bld8/licenses/'+name, read('packages/ui/'+name), '@ui/bld8/licenses/'+name, 'registry:file')),
+  ...['LICENSE','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','THIRD_PARTY_NOTICES.md'].map(name => file('registry/bld8/licenses/'+name, read('packages/ui/'+name), '@ui/bld8/licenses/'+name, 'registry:file')),
 ]);
 const uiPackage=JSON.parse(read('packages/ui/package.json'));
 const dependencies = {...uiPackage.dependencies,'react-hook-form':uiPackage.devDependencies['react-hook-form']};
@@ -29,10 +29,12 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
     const source = read(folder+'/'+name);
     const local = [...source.matchAll(/(?:from\s+|import\s*)['"]\.\/([^'"]+)\.js['"]/g)].map(match => `bld8-${kind === 'block' ? 'block-' : ''}${match[1]}`);
     const external = Object.entries(dependencies).filter(([dependency]) => source.includes(`'${dependency}'`) || source.includes(`'${dependency}/`)).map(([dependency,version]) => `${dependency}@${version}`);
-    let content = source.replace(/(['"])\.\/([^'"]+)\.js\1/g, "'./$2'").replace(/(['"])@bld8\/ui\1/g, "'../index'");
+    let content = source.replace(/(['"])\.\/([^'"]+)\.js\1/g, "'./$2'").replace(/(['"])@bld8\/ui\1/g, "'../index'").replace(/(['"])@bld8\/ui\/filter-query\1/g, "'../filter-query'").replace(/(['"])@bld8\/ui\/time-options\1/g, "'../time-options'");
     if (name.endsWith('.tsx')) content = content.replace(/(['"])use client\1;/, "$&\nimport './styles.css';");
     const subdirectory = kind === 'block' ? 'blocks/' : '';
     if (kind === 'block' && source.includes('@bld8/ui')) local.push('bld8-index');
+    if (kind === 'block' && source.includes('@bld8/ui/filter-query')) local.push('bld8-filter-query');
+    if (kind === 'block' && source.includes('@bld8/ui/time-options')) local.push('bld8-time-options');
     if (kind === 'block') local.push('bld8-block-styles');
     add(`bld8-${kind === 'block' ? 'block-' : ''}${key}`, `BLD8 ${key} source`, [file('registry/bld8/'+subdirectory+name, content, '@ui/bld8/'+subdirectory+name)], external, [...new Set(['bld8-styles',...local])]);
   }
@@ -42,7 +44,7 @@ const groups = {
   core:['button','icon-button','input','textarea','checkbox','switch','radio','slider','badge','alert','progress','loading','empty','avatar','card','breadcrumb','pagination','input-group'],
   controls:['select','combobox','tabs','accordion'], overlays:['dialog','sheet','popover','tooltip','dropdown','toast'],
   'data-table':['table','advanced-table'], calendar:['calendar','date-picker','date-range'], icons:['icon'],
-  'multi-select':['multi-select'], command:['command'], 'file-upload':['file-upload'], drawer:['drawer'], 'context-menu':['context-menu'], sidebar:['sidebar'], form:['form'], 'editable-cell':['editable-cell'], 'react-hook-form':['react-hook-form'],
+  'number-field':['number-field'], 'time-options':['time-options'], 'time-picker':['time-picker'], stepper:['stepper'], kanban:['kanban'], 'kanban-state':['kanban-state'], 'filter-builder':['filter-builder'], 'filter-query':['filter-query'], timeline:['timeline'], 'multi-select':['multi-select'], command:['command'], 'file-upload':['file-upload'], drawer:['drawer'], 'context-menu':['context-menu'], sidebar:['sidebar'], form:['form'], 'editable-cell':['editable-cell'], 'react-hook-form':['react-hook-form'],
 };
 for (const [module,names] of Object.entries(groups)) {
   if (!items.some(item => item.name === `bld8-${module}`)) continue;

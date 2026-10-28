@@ -1,3 +1,303 @@
+## Setup controls and session workflow - 28 October 2026
+
+Added Stepper, NumberField and TimePicker, plus the SessionSetup block. The
+three-step workflow validates workspace details and session preferences before
+review, retains values on back navigation, and restores drafts/current steps and
+finished summaries from sessionStorage. A stable adapter or explicit page-only
+mode can replace tab storage. Unsupported data is not overwritten until the user
+edits; failed storage retains page values and explains the limitation.
+
+NumberField uses the installed Base UI primitive for locale parsing and bounded
+keyboard/button stepping. TimePicker uses shared Select behaviour, same-day
+inclusive bounds and explicit intervals. Localised labels remain separate from
+canonical HH:mm form values. Pure time-options and session-preferences subpaths
+can be evaluated by server code without React client boundaries.
+
+The optional save callback receives an AbortSignal and a requestId preserved for
+retries of unchanged values in the mounted form. Failed saves retain the review;
+cancellation ignores late completion. The host owns authenticated persistence,
+server validation and idempotency. This is a preference workflow, not a calendar
+reservation, availability service or date/DST resolver.
+
+Shared easing introduces steps and completion markers without blur or resizing
+hit areas. Desktop actions keep a stable position across steps; field heights and
+metadata align. Phones stack the sequence, fields and summary. System reduced-
+motion changes update the controls immediately. Recovery stays on quiet neutral
+surfaces in the direction approved for task errors.
+
+Validation:
+- Production build passed with 90 generated routes, 49 component guidance entries,
+  twelve blocks, three templates and 121 registry items. Workspace types passed.
+- The full isolated Edge suite passed all 227 cases without retries or skips.
+  After final storage-copy and native form-value assertions, all 30 affected
+  session/framework cases passed again. The 21 new session cases cover canonical
+  time/range/locale rules, safe draft parsing, numeric/keyboard limits, decimal
+  commas, disabled/read-only controls, unavailable slots, step navigation, field
+  focus, reload restoration, save retry identity, cancellation, storage failures,
+  both-theme automated axe checks, stable actions, live reduced motion and
+  1440/768/390/320 px containment. Existing controls and workflows remain green.
+- The actual shadcn CLI installed the new graph into two fresh consumers. Both
+  Next.js 16.3.8 and Vite 8.3.4/React 19.3.0 built independently; Vite used a custom
+  UI alias. Next evaluated time choices and session validation in a Server
+  Component. The final copy update was installed and both builds passed again.
+  Vite emitted its expected module-level use-client warnings.
+- A fresh session-setup-vite.zip extraction installed and built via the repeatable
+  starter check. Its isolated browser run preserved an unsaved draft through an
+  observed React Fast Refresh, restored the current step and finished summary
+  after reload, retained canonical native form time, reacted to live reduced
+  motion and stayed contained on a phone. No browser page errors were reported.
+- All 32 archives passed CRC, safe-path, licence, environment/runtime-file and
+  final-CSS audits. Internal registry dependencies resolve, targets respect UI
+  aliases and public dependency URLs retain the production host. No new runtime
+  dependencies or upstream source were added; existing notices remain intact.
+- Workspace, preferences, review, phone and dark views were captured and reviewed.
+  The desktop action row shared the same measured position across all three steps.
+  CI now builds the actual session Vite archive; remote CI has not run for these
+  uncommitted changes. Diff whitespace checks passed.
+
+The complete Vite session starter retains a roughly 559 kB minified entry chunk
+(183 kB gzip) and emits the unchanged size warning; code splitting is a follow-up.
+Automated Edge/axe checks do not replace manual assistive-technology or other-
+browser review. This is a local verified increment, not a published release.
+No commit, push, deployment, npm publication or company/global settings changed.
+Temporary registry/test/starter servers were stopped; the main development preview
+remains at http://127.0.0.1:3120/blocks/session-setup.
+
+## Task error-panel refinement - 28 October 2026
+
+Refined the task recovery notices shown in the user's screenshot. Neutral surfaces,
+dark headings, muted descriptions and a small error icon replace the broad red
+fill. Retry actions occupy a separate aligned column on desktop and sit below the
+copy on narrow screens. Shared easing adds a short entry transition; reduced
+motion removes it. This is scoped to task recovery notices and their layout.
+
+Production build and all 18 Kanban checks passed. Existing recovery, theme and
+responsive cases now also inspect the error panel, action spacing and both-theme
+automated accessibility. Desktop, phone and settled dark-mode captures were
+reviewed; retry restored the board and no page errors were reported. All 30
+archives passed the existing integrity/licence/final-CSS audit. The real shadcn
+CLI updated the isolated Vite consumer, which built independently. No dependencies
+or public component props changed. Diff whitespace checks passed.
+
+Local refinement only; no commit, push or deployment. The development preview
+remains at http://127.0.0.1:3120/blocks/task-workspace.
+
+## Kanban, backlog and save recovery - 28 October 2026
+
+Added a controlled Kanban primitive, the pure applyKanbanMove helper and a
+TaskWorkspace block. Board and Backlog share ordered tasks. Pointer and touch
+dragging use a dedicated handle; selecting that handle opens a keyboard-accessible
+destination/position dialog. Escape and outside drops restore the original order.
+Column limits reject overflowing moves, including pointer drops. The compact
+legacy ProjectBoard keeps its original select-based API.
+
+The block adds task creation and an abortable snapshot save callback with an
+expected board revision. Rejected moves restore the prior order and offer retry;
+rejected task creation retains the draft. Cancellation aborts the callback,
+restores local state and ignores late completion. Consumers must authenticate,
+authorise, validate limits and commit revisions atomically on their server. An
+aborted network request may already have committed remotely; reload authoritative
+state after an uncertain result. The default example is session-only memory.
+
+White cards sit on neutral column surfaces with restrained shadows. Sortable
+displacement and the drag overlay use shared easing; handles keep their size.
+Board/backlog metadata shares a grid and narrow containers stack in reading order.
+Focus returns to moved handles, including pointer moves. A shared motion preference
+hook now responds live to system changes in the Kanban, task, filter and issue
+interactions; reduced motion removes animated displacement and drop transitions.
+
+Validation:
+- Production build passed: 85 generated routes, 110 registry items, 46 component
+  guidance entries, eleven blocks and three templates. All workspace types passed.
+- The full isolated Edge suite passed all 206 cases without skips or retries.
+  After the final pointer-focus adjustment, a fresh build and all 18 Kanban cases
+  passed again. They cover immutable moves, stale anchors, capacity, mouse sorting,
+  empty destinations, touch events, Escape/outside cancellation, precise keyboard
+  positions, focus, save failure/retry/cancellation, draft recovery, loading/error/
+  empty states, both-theme axe scans, rigid overlays, live motion preferences,
+  aligned geometry and 1440/768/390/320 px containment.
+- Real shadcn CLI installs into two fresh consumers built independently: Next.js
+  16.3.8 and Vite 8.3.4 with React 19.3.0. The Vite app used a custom UI alias.
+  Next evaluated applyKanbanMove in a Server Component without a client boundary.
+  Vite emitted its module-level use-client warnings; its client build succeeded.
+- A fresh extraction of the final task-workspace-vite.zip installed and built via
+  npm run check:starter:vite -- task-workspace. Its isolated browser run moved a
+  task, retained the same order in Backlog, preserved a draft through an observed
+  React Fast Refresh, reacted to a live reduced-motion change and stayed contained
+  on a phone. Reload correctly reset sample tasks; no page errors were reported.
+- All 30 ZIPs passed CRC, path, licence, runtime/environment-file and final-CSS
+  audits. Registry dependency URLs resolve internally and retain production URLs;
+  source targets respect the configured UI alias. dnd-kit MIT notices are included
+  in packages, registry installs and archives; its three direct package licences
+  were checked and match the included common licence.
+- Desktop board/backlog, dark backlog and phone views were captured and visually
+  reviewed, with no browser page errors. CI now checks the actual task-workspace
+  Vite archive alongside Outline and IssueTable; remote CI has not run yet.
+
+The full Vite task starter retains a roughly 603 kB minified entry chunk (196 kB
+gzip) and emits Vite's size warning. Code splitting remains a later optimisation;
+the warning is not hidden. Manual assistive-technology and non-Chromium reviews
+remain separate from these automated checks. No hosted issue/task API, cloud
+persistence or collaboration is claimed.
+
+This increment remains local and uncommitted. No push, deployment, npm publication
+or company/global account settings changed. Temporary test/registry/starter servers
+were stopped; the main development preview remains on port 3120.
+
+## Issue filters, saved views and motion - 28 October 2026
+
+Added FilterBuilder, a pure validated query module and the complete IssueTable
+block. Rules cover text, multi-value choices, numeric comparisons/ranges and
+date-only ranges, in one all/any group. Draft conditions are applied explicitly.
+Saved views retain search, filters, sort, columns, density and page size; share
+links preserve unrelated host URL parameters and fragments. Storage failures keep
+the save draft, and Escape no longer silently clears MultiSelect selections.
+
+The table supports creation, inline title edits, selection across pages, bulk
+status changes and one-step revision-checked undo. Async repositories receive
+AbortSignals; stale reads are ignored and failed writes retain the edit draft.
+The default sample repository is in memory; only views persist in browser
+storage. The HTTP adapter is a reusable client contract, not a hosted service.
+The integration guide documents server ownership, validation and revision checks.
+
+Motion 14.7.1 supplies eased row entry/removal, panel expansion and the shared
+view indicator. Loading keeps existing table geometry stable. Exiting conditions
+are inert; focus moves to a nearby control after removal. Reduced-motion settings
+make those transitions immediate. The MIT licence travels with source installs.
+
+Validation:
+- Production build passed: 82 generated routes, 103 registry items, 45 component
+  guidance pages, ten blocks and three templates. All workspace types passed.
+- The full isolated Edge suite passed all 188 checks without retries or skips.
+  Eighteen new cases cover query validation/evaluation, real HTTP fixture requests,
+  atomic revision conflicts, cancellation, saved-view/link restoration, storage
+  failures, creation/editing, bulk undo, empty/error/retry states, keyboard focus,
+  frame-sampled normal animation, reduced motion, both-theme automated axe scans
+  and 1440/768/390/320 px containment. Existing controls/Outline remain green.
+- The actual shadcn CLI installed the new graph into two fresh consumers with no
+  preinstalled BLD8 source: Next.js 16.3.8 and Vite 8.3.4/React 19.3.0, the latter
+  using a custom UI alias. Both independent builds passed. Next also evaluated
+  the pure filter/issue modules in a Server Component. Vite emitted its expected
+  module-level use-client warnings; the client build succeeded.
+- The generated issue-table-vite.zip was independently extracted, installed and
+  built using npm run check:starter:vite -- issue-table. Its browser run restored
+  a saved view after reload, retained an unsaved draft through an observed React
+  Fast Refresh, stayed contained on a phone and reported no browser page errors.
+  The repeatable starter check is also added to CI; remote CI has not run yet.
+- All 28 ZIPs passed CRC, safe-path, final-CSS, runtime/environment-file and licence
+  checks, including Motion. Registry dependencies resolve internally, target the
+  configured UI folder and keep production URLs with no loopback dependencies.
+- Desktop, filtered desktop, phone and dark-mode screenshots were inspected. The
+  new preview reported no browser page errors.
+
+The complete Vite issue starter emits a warning for its roughly 648 kB minified
+entry chunk (209 kB gzip). Code splitting remains a follow-up; the warning has
+not been hidden. Automated axe and Edge coverage do not replace manual assistive-
+technology or non-Chromium review. This increment remains local and uncommitted;
+no push, deployment, npm publication or account/global settings changed. Preview:
+http://127.0.0.1:3120/blocks/issue-table.
+
+## Vite starter option - 28 October 2026
+
+Every catalogue block and template now has Next.js and React + Vite download
+choices: 12 Vite archives alongside the existing 14 Next.js archives. The two
+HTTP-backed integration ZIPs retain their Next.js sample API; the Vite catalogue
+starters remain client apps with no implied backend, authentication or router.
+The source manifests keep the legacy download field and add explicit framework
+download URLs. Both variants include the same editable BLD8 package source.
+
+The shared guide is /frameworks. Existing /react-nextjs bookmarks still render
+the guide with its canonical URL. Setup and migration guidance covers component
+reuse, server boundaries, routing/images, public environment values, storage
+origins and deployment. Download menus use the existing keyboard-aware Popover.
+
+Validation:
+- Production build and all workspace types passed; 79 generated routes and
+  96 registry items. All 39 relevant browser cases passed without retries,
+  covering downloads, the guide/legacy URL, both themes, keyboard focus,
+  catalogue flows and 1440/768/390/320 px layouts.
+- All 26 archives passed CRC, safe-path, licence, runtime/environment-file and
+  final-CSS audits. The 12 Vite variants have no Next.js dependency or app routes.
+- A fresh extraction of outline-vite.zip installed and built independently with
+  Vite 8.3.4, React 19.3.0 and @vitejs/plugin-react 6.1.2. Both BLD8 packages were
+  rebuilt from the included source and application types passed.
+- The isolated Vite dev app saved preferences across reload. Editing src/App.tsx
+  triggered React Fast Refresh without a page reload and preserved an unsaved
+  form draft. Its phone layout stayed contained, with no browser page errors.
+- Desktop/phone framework guides and the download chooser were captured and
+  reviewed. No browser page errors were reported.
+- npm run check:starter:vite independently extracts, installs and builds the
+  actual ZIP. It passed locally and is added to the existing CI workflow; that
+  remote workflow has not been run for these uncommitted changes.
+
+The full Outline example emits a Vite warning for its approximately 648 kB
+minified entry chunk (205 kB gzip). Code splitting is a follow-up optimisation;
+the warning threshold has not been raised or hidden. This is a functional
+compatibility check, not a performance or accessibility certification.
+
+Local changes only. No commit, push, deployment, npm publication or global/account
+settings changed. The showcase stays on Next.js at http://127.0.0.1:3120.
+
+## Timeline alignment review - 28 October 2026
+
+The Timeline detail preview now fills the panel content width instead of using
+the generic centred 420 px control frame. Marker and connector positions share
+one size token; the rail is centred on each marker, and the first title line
+shares its vertical centre. Title/time layout uses grid, with dates stacking
+according to the timeline's own container width. Logical positioning retains RTL.
+
+- Production build passed, with regenerated registry CSS and all 14 starters.
+- All 19 relevant browser cases passed, including eight geometry/containment
+  checks for panel edges, marker/title axes, rail centring and equal gaps,
+  1440/1104/768/390/320 px layouts, long wrapping titles, narrow containers,
+  RTL and the smaller catalogue preview. Activity-feed behaviour and both-theme
+  automated accessibility/reduced-motion checks passed in the same run.
+- Desktop, compact-desktop, phone and ActivityFeed views were captured; desktop,
+  phone and the reused activity layout were reviewed without browser page errors.
+- The installed Next.js and Vite consumers also built with the updated styles.
+  Registry dependency, archive CRC/path/licence and final-CSS audits passed again.
+
+Local correction only; no commit, push, deployment or global setting change.
+
+## Community library foundation - 28 October 2026
+
+Added a reusable Timeline control and an ActivityFeed block composed from it.
+The block has search, type filters, local reveal, explicit sample content and
+loading/error/empty/retry states. It accepts ordered host records; no backend,
+notification delivery, live subscription or server pagination is claimed.
+The catalogue now has 44 guidance entries, nine blocks and three templates.
+
+The React/Next.js guide covers the shared React foundation, source installation,
+custom aliases, client boundaries, styling and service integrations. Community
+guidance, bug/feature issue forms and a security policy support contributions.
+All collections remain free under MIT, with no account, checkout or licence key.
+The ordered backlog is in library-direction.md; planned controls are not shipped.
+
+Validation:
+- Final production build passed: 78 generated routes, 96 registry items and
+  14 runnable ZIP starters. All workspace TypeScript checks passed.
+- The initial 30 relevant browser cases passed 29; one existing multi-page
+  light-theme axe scan hit its 30-second timeout under concurrent install load.
+  Its isolated rerun passed in 9.2 seconds without changing its assertions.
+- After the final fluid card-width adjustment, all 11 new cases passed again.
+  These cover interaction, loading/retry/empty states, ordered timeline semantics,
+  both-theme axe checks, reduced motion and 1440/768/390/320 px containment.
+- Desktop and phone activity views and the framework/community pages were
+  captured and reviewed. The review reported no browser page errors.
+- The actual shadcn CLI installed Timeline and ActivityFeed into two fresh
+  consumers with no preinstalled BLD8 source: Next.js 16.3.8/React 19.3.0 and
+  Vite 8.3.4/React 19.3.0 with a custom UI alias. Both independent builds passed;
+  final block CSS was refreshed and both builds passed again. Vite emitted
+  its module-level use-client directive warnings; the client build succeeded.
+- Registry dependency URLs resolve internally and retain the production host.
+  All 14 ZIPs passed CRC, path, licence, runtime-file and final-CSS consistency
+  checks. The new source manifest remains MIT with price zero.
+
+This is a local verified increment, not a published release. No commit, push,
+deployment, npm publication or cloud/account setting was changed. Development
+preview: http://127.0.0.1:3120. Manual assistive-technology and non-Chromium review
+remain separate; automated axe checks do not establish accessibility certification.
+
 ## Source release validation - 16 October 2026
 
 - The production build, all workspace type checks and all 142 browser cases pass

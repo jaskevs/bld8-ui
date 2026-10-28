@@ -23,6 +23,14 @@
     "./outline-http": {
       "types": "./dist/outline-http.d.ts",
       "import": "./dist/outline-http.js"
+    },
+    "./issue-repository": {
+      "types": "./dist/issue-repository.d.ts",
+      "import": "./dist/issue-repository.js"
+    },
+    "./session-preferences": {
+      "types": "./dist/session-preferences.d.ts",
+      "import": "./dist/session-preferences.js"
     }
   },
   "sideEffects": [
@@ -37,6 +45,8 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@bld8/ui": "*"
+    "@bld8/ui": "*",
+    "lucide-react": "1.55.0",
+    "motion": "14.7.1"
   }
 }

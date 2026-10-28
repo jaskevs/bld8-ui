@@ -16,7 +16,7 @@ for(const name of ['index.ts','react-hook-form.tsx']){
   if(module)for(const symbol of checker.getExportsOfModule(module))symbols.set(symbol.name,symbol.flags & ts.SymbolFlags.Alias?checker.getAliasedSymbol(symbol):symbol);
 }
 const groups={
-  button:['Button'], 'icon-button':['IconButton'], icon:['Icon'], input:['Field','Input'], textarea:['Field','Textarea'], 'input-group':['InputGroup'],
+  'number-field':['NumberField'], 'time-picker':['TimePicker','TimeOptions'], stepper:['Stepper','StepperStep'], kanban:['Kanban','KanbanItem','KanbanColumn','KanbanMove'], 'filter-builder':['FilterBuilder','FilterField','FilterQuery','FilterRule'], timeline:['Timeline','TimelineItem'], button:['Button'], 'icon-button':['IconButton'], icon:['Icon'], input:['Field','Input'], textarea:['Field','Textarea'], 'input-group':['InputGroup'],
   checkbox:['Checkbox'], switch:['Switch'], radio:['RadioGroup','Option'], select:['Select','Option'], combobox:['Combobox'], slider:['Slider'],
   tabs:['Tabs'],accordion:['Accordion'],breadcrumb:['Breadcrumb'],pagination:['Pagination'],dialog:['Dialog','DialogClose'],sheet:['Sheet','DialogClose'],
   popover:['Popover'],tooltip:['Tooltip'],dropdown:['DropdownMenu','MenuItem'],toast:['UIProvider'],alert:['Alert'],badge:['Badge'],progress:['Progress'],

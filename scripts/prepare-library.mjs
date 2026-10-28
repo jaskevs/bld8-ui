@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 import { deflateRawSync } from 'node:zlib';
 import { blocks, templates } from './library-catalog.mjs';
+import { createViteStarter } from './vite-starter.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = name => readFileSync(join(root,name));
@@ -42,7 +43,7 @@ function packageFiles(folder) {
   return files;
 }
 const packages={...packageFiles('packages/ui'),...packageFiles('packages/blocks')};
-for(const name of ['THIRD_PARTY_NOTICES.md','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE']) packages['packages/ui/' + name] = read('packages/ui/' + name);
+for(const name of ['THIRD_PARTY_NOTICES.md','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE']) packages['packages/ui/' + name] = read('packages/ui/' + name);
 let outlineStarter;
 for(const item of entries) {
   const files={...packages,
@@ -54,7 +55,7 @@ for(const item of entries) {
     'app/globals.css':'* { box-sizing: border-box; } body { position:relative; margin:0; padding:clamp(1rem,4vw,3rem); font-family:Arial,sans-serif; background:var(--bui-canvas); color:var(--bui-ink); line-height:1.6; } main { isolation:isolate; max-width:1200px; margin:auto; } h1,h2,h3,h4,p { margin:0; } :focus-visible { outline:2px solid var(--bui-focus); outline-offset:4px; }',
     'tsconfig.json':JSON.stringify({compilerOptions:{target:'ES2020',lib:['dom','dom.iterable','esnext'],allowJs:true,skipLibCheck:true,strict:true,noEmit:true,esModuleInterop:true,module:'esnext',moduleResolution:'bundler',resolveJsonModule:true,isolatedModules:true,jsx:'react-jsx',plugins:[{name:'next'}]},include:['next-env.d.ts','**/*.ts','**/*.tsx','.next/types/**/*.ts'],exclude:['node_modules','packages']},null,2),
     '.gitignore':'node_modules/\n.next/\n.env*\n*.tsbuildinfo\n',
-    'README.md':`# ${item.name}\n\nA BLD8 UI frontend starter. Both Free and Premium collections use the MIT licence and cost $0.\n\nUse Node 22 and run:\n\n\`\`\`sh\nnpm install\nnpm run dev\n\`\`\`\n\nOpen http://localhost:3000. No backend or authentication service is included. Outline saves local data in browser storage; other starters keep in-memory sample state.\n\n${item.notes}\n\nEdit app/page.tsx and app/globals.css. Reusable source is included in packages/ui/src and packages/blocks/src; rebuild those packages if you edit them. The starter consumes the included compiled dist files. Run npm run build to rebuild both packages (including prefixed Tailwind CSS) and the app. For package edits during dev, run npm run build --workspace=@bld8/ui and npm run build --workspace=@bld8/blocks before refreshing.\n\nKeep LICENSE, SHADCN_LICENSE and all third-party notices when sharing the code. No BLD8 packages are fetched from npm; they are included as local workspaces.\n`,
+    'README.md':`# ${item.name}\n\nA BLD8 UI frontend starter. Both Free and Premium collections use the MIT licence and cost $0.\n\nUse Node 22 and run:\n\n\`\`\`sh\nnpm install\nnpm run dev\n\`\`\`\n\nOpen http://localhost:3000. No backend or authentication service is included. Storage behaviour varies by example; the notes below describe it.\n\n${item.notes}\n\nEdit app/page.tsx and app/globals.css. Reusable source is included in packages/ui/src and packages/blocks/src; rebuild those packages if you edit them. The starter consumes the included compiled dist files. Run npm run build to rebuild both packages (including prefixed Tailwind CSS) and the app. For package edits during dev, run npm run build --workspace=@bld8/ui and npm run build --workspace=@bld8/blocks before refreshing.\n\nKeep LICENSE, SHADCN_LICENSE and all third-party notices when sharing the code. No BLD8 packages are fetched from npm; they are included as local workspaces.\n`,
     'packages/ui/tsconfig.json':read('packages/ui/tsconfig.json'),
     'packages/blocks/tsconfig.json':read('packages/blocks/tsconfig.json'),
     'packages/ui/scripts/copy-styles.mjs':read('packages/ui/scripts/copy-styles.mjs'),
@@ -62,7 +63,8 @@ for(const item of entries) {
   };
   if(item.id==='outline')outlineStarter=files;
   write(`apps/docs/public/downloads/${item.id}.zip`,zip(files));
-  write(`apps/docs/public/sources/${item.id}.json`,JSON.stringify({schemaVersion:1,name:item.id,title:item.name,tier:item.tier,price:0,license:'MIT',framework:'React 19',dependencies:['@bld8/ui'],description:item.description,notes:item.notes,files:readdirSync(join(root,'packages/blocks/src')).filter(name => /\.(tsx?|css)$/.test(name)).map(name => ({path:'packages/blocks/src/' + name,content:read('packages/blocks/src/' + name).toString()})),download:`/downloads/${item.id}.zip`},null,2));
+  write(`apps/docs/public/downloads/${item.id}-vite.zip`,zip(createViteStarter(item,files)));
+  write(`apps/docs/public/sources/${item.id}.json`,JSON.stringify({schemaVersion:1,name:item.id,title:item.name,tier:item.tier,price:0,license:'MIT',framework:'React 19',dependencies:['@bld8/ui'],description:item.description,notes:item.notes,files:readdirSync(join(root,'packages/blocks/src')).filter(name => /\.(tsx?|css)$/.test(name)).map(name => ({path:'packages/blocks/src/' + name,content:read('packages/blocks/src/' + name).toString()})),download:`/downloads/${item.id}.zip`,downloads:{nextjs:`/downloads/${item.id}.zip`,vite:`/downloads/${item.id}-vite.zip`},frameworks:['React + Next.js','React + Vite']},null,2));
 }
 write('apps/docs/public/r/index.json',JSON.stringify({schemaVersion:1,license:'MIT',collections:{Free:0,Premium:0},items:entries.map(({id,name,tier}) => ({id,name,tier,url:`/sources/${id}.json`}))},null,2));
 console.log(`Prepared ${blocks.length} blocks and ${templates.length} templates with source manifests and ZIP starters.`);

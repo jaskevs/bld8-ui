@@ -1,0 +1,6 @@
+'use client';
+import {useRef,useState} from 'react';
+import {Select} from '@bld8/ui';
+import {SessionSetup,type CompleteSessionPreferences,type SessionSubmitContext} from '@bld8/blocks';
+export function SessionSetupDemo(){const[mode,setMode]=useState('sample'),rejected=useRef(false);async function save(_values:CompleteSessionPreferences,{signal}:SessionSubmitContext){await new Promise<void>((resolve,reject)=>{const cancel=()=>{clearTimeout(timer);reject(new DOMException('Cancelled','AbortError'));};const timer=setTimeout(()=>{signal.removeEventListener('abort',cancel);resolve();},mode==='slow'?2500:250);if(signal.aborted)cancel();else signal.addEventListener('abort',cancel,{once:true});});if(mode==='rejected'&&!rejected.current){rejected.current=true;throw new Error('Example rejection.');}}
+return <div className="bblocks-stack"><Select label="Session preview state" value={mode} onValueChange={value=>{setMode(value??'sample');rejected.current=false;}} options={[{value:'sample',label:'Sample data'},{value:'rejected',label:'Rejected save'},{value:'slow',label:'Slow save'},{value:'memory',label:'Page-only draft'}]}/><SessionSetup key={mode} storage={mode==='sample'?undefined:null} storageKey="bld8-session-setup-example-v1" onSave={mode==='rejected'||mode==='slow'?save:undefined}/></div>;}

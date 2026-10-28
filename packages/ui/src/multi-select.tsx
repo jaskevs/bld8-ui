@@ -27,7 +27,7 @@ export function MultiSelect({ label, options, value, defaultValue = [], onValueC
   const descriptions = [hint && id + '-hint', error && id + '-error'].filter(Boolean).join(' ') || undefined;
   return <div className="bui-field">
     <label htmlFor={id} className="bui-label">{label}{props.required && <span aria-hidden="true"> *</span>}</label>
-    <Combobox.Root multiple items={options.map(option => option.value)} value={selected} onValueChange={setSelected} itemToStringLabel={labelFor} {...props}>
+    <Combobox.Root multiple items={options.map(option => option.value)} value={selected} onValueChange={(values,details)=>{if(details.reason==='escape-key'){details.cancel();return;}setSelected(values);}} itemToStringLabel={labelFor} {...props}>
       <Combobox.Chips className="bui-multi-input" data-invalid={!!error || undefined}>
         <Combobox.Value>{(values: string[]) => values.map(value => <Combobox.Chip key={value} className="bui-chip">
           <span className="bui-chip-label" title={labelFor(value)}>{labelFor(value)}</span><Combobox.ChipRemove aria-label={'Remove ' + labelFor(value)}><Icon name="close" size={14} /></Combobox.ChipRemove>

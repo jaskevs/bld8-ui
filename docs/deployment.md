@@ -98,3 +98,27 @@ control and Outline refinements were local only. Future main pushes deploy
 automatically using the corrected project settings. GitHub CI runs on each push;
 requiring its result before production promotion remains a separate configuration
 step described in [the connection guide](ci-and-vercel.md).
+
+
+## Workflow source release - 29 October 2026
+
+This release brings Timeline/ActivityFeed, React/Vite guidance and starters,
+advanced issue filters and saved views, Kanban with a task workspace, and
+Stepper/NumberField/TimePicker with SessionSetup into the source distribution.
+The task recovery notices retain the approved quiet neutral treatment. All
+collections remain free under MIT; packages remain unpublished to npm.
+
+Local verification passed the production build, all workspace types and the
+227-case Edge suite. Real registry consumers built independently with Next.js
+and Vite. All 32 starter archives and 121 registry entries passed the recorded
+artifact checks. Detailed evidence and limitations are in verification.md.
+
+The owner explicitly authorised a one-time work-hours exception for this source
+publication on 29 October. Commits use the actual current timestamp and personal
+Jaison identity. The ordinary workspace guards and company/global settings stay
+unchanged; the exception retains identity and push-destination checks.
+
+The existing main-to-Vercel connection handles deployment from the source push.
+Check the exact revision in GitHub Actions and Vercel before treating the new
+workflows as published. Local verification alone does not establish a successful
+remote build, production promotion gate or live release.

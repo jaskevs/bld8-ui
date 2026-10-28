@@ -3,14 +3,20 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "workspaces": ["packages/*", "apps/*"],
-  "engines": { "node": "22.x" },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/docs",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "playwright test",
-    "pack:ui": "npm pack --workspace=@bld8/ui"
+    "pack:ui": "npm pack --workspace=@bld8/ui",
+    "check:starter:vite": "node scripts/check-vite-starter.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

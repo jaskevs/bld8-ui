@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Icon, IconButton, Tooltip } from '@bld8/ui';
 import { LibrarySearch } from './library-search';
 
-const links = [['/components', 'Components'], ['/blocks', 'Blocks'], ['/templates', 'Templates'], ['/icons', 'Icons'], ['/playground', 'Playground'], ['/getting-started', 'Start here']];
+const links = [['/components', 'Components'], ['/blocks', 'Blocks'], ['/templates', 'Templates'], ['/icons', 'Icons'], ['/playground', 'Playground'], ['/frameworks', 'React setups']];
 
 export function SiteHeader() {
   const path = usePathname();
@@ -43,7 +43,7 @@ export function SiteHeader() {
   return <header ref={header} className="site-header" data-scrolled={scrolled}>
     <Link href="/" className="brand" aria-label="BLD8 UI home" onClick={() => setMenuOpen(false)}><span className="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M5.6 18.4 18.4 5.6" /></svg></span> BLD8 <span>/ ui</span></Link>
     <nav id="main-navigation" aria-label="Main navigation" data-open={menuOpen} inert={mobile && !menuOpen}>
-      {links.map(([href, label]) => <Link key={href} href={href} aria-current={path.startsWith(href) ? 'page' : undefined} onClick={() => setMenuOpen(false)}>{label}<span className="nav-marker" aria-hidden="true" /></Link>)}
+      {links.map(([href, label]) => <Link key={href} href={href} aria-current={(path.startsWith(href) || (href === '/frameworks' && path === '/react-nextjs')) ? 'page' : undefined} onClick={() => setMenuOpen(false)}>{label}<span className="nav-marker" aria-hidden="true" /></Link>)}
     </nav>
     <div className="header-actions">
       <LibrarySearch />

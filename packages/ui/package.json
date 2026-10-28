@@ -11,7 +11,9 @@
     "LUCIDE_LICENSE",
     "DAY_PICKER_LICENSE",
     "THIRD_PARTY_NOTICES.md",
-    "SHADCN_LICENSE"
+    "SHADCN_LICENSE",
+    "MOTION_LICENSE",
+    "DND_KIT_LICENSE"
   ],
   "exports": {
     ".": {
@@ -23,6 +25,18 @@
     "./react-hook-form": {
       "types": "./dist/react-hook-form.d.ts",
       "import": "./dist/react-hook-form.js"
+    },
+    "./filter-query": {
+      "types": "./dist/filter-query.d.ts",
+      "import": "./dist/filter-query.js"
+    },
+    "./kanban-state": {
+      "types": "./dist/kanban-state.d.ts",
+      "import": "./dist/kanban-state.js"
+    },
+    "./time-options": {
+      "types": "./dist/time-options.d.ts",
+      "import": "./dist/time-options.js"
     }
   },
   "sideEffects": [
@@ -39,9 +53,13 @@
   },
   "dependencies": {
     "@base-ui/react": "1.8.0",
+    "@dnd-kit/core": "6.3.1",
+    "@dnd-kit/sortable": "10.0.0",
+    "@dnd-kit/utilities": "3.2.2",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.55.0",
+    "motion": "14.7.1",
     "react-day-picker": "10.0.2",
     "tailwind-merge": "3.7.0"
   },

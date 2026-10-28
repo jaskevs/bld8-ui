@@ -1,10 +1,13 @@
 'use client';
 import { EditableCellDemo, RHFNativeDemo } from './workflow-demos';
 import { FormDemo } from './form-demo';
+import {NumberFieldDemo,TimePickerDemo,StepperDemo} from './session-demos';
+import {KanbanDemo} from './kanban-demo';
+import {FilterBuilderDemo} from './filter-builder-demo';
 import { useState } from 'react';
 import { SidebarDemo, DrawerDemo, ContextMenuDemo } from './navigation-demos';
 import { Camera, Mail, Save, Search, X, ArrowRight } from 'lucide-react';
-import { InputGroup } from '@bld8/ui';
+import { InputGroup, Timeline } from '@bld8/ui';
 import { Accordion, Alert, Avatar, Badge, Breadcrumb, Button, Card, Checkbox, Combobox, DataTable, Dialog, DialogClose, DropdownMenu, EmptyState, Field, Icon, IconButton, Input, Pagination, Popover, Progress, RadioGroup, Separator, Sheet, Skeleton, Slider, Spinner, Switch, Tabs, Textarea, Tooltip, useToast, type Column } from '@bld8/ui';
 
 const visibility = [{ value: 'private', label: 'Private' }, { value: 'team', label: 'Team' }, { value: 'public', label: 'Public' }];
@@ -33,6 +36,12 @@ export const projectColumns: Column<ProjectRow>[] = [
 export function ComponentDemo({ id }: { id: string }) {
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch(id) {
+    case 'number-field': return <NumberFieldDemo/>;
+    case 'time-picker': return <TimePickerDemo/>;
+    case 'stepper': return <StepperDemo/>;
+    case 'kanban': return <KanbanDemo/>;
+    case 'filter-builder': return <FilterBuilderDemo/>;
+    case 'timeline': return <Timeline label="Release steps" items={[{id:'prepare',title:'Prepare the source',description:'Keep the useful details together.',state:'complete',dateTime:'2026-10-28T09:00:00+11:00',time:'28 Oct · 09:00'},{id:'review',title:'Review the interface',description:'Check the keyboard flow, spacing and empty states.',state:'current'},{id:'share',title:'Share the update',description:'Publish when the checks pass.',state:'pending'}]} />;
     case 'editable-cell': return <EditableCellDemo />;
     case 'react-hook-form': return <RHFNativeDemo />;
     case 'form': return <FormDemo />;

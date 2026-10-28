@@ -45,6 +45,8 @@ export interface DataTableProps<T> {
   server?:{query:TableQuery; onQueryChange:(query:TableQuery)=>void; totalRows:number};
   renderSelectedActions?:(keys:string[])=>ReactNode;
   resizableColumns?:boolean;
+  /** Custom empty feedback for composed filter workflows. */
+  emptyState?:ReactNode;
 }
 /** Export explicit scalar values. Formula-leading strings are escaped for spreadsheets. */
 export function createTableCSV<T>(rows:T[], columns:Column<T>[]) {
@@ -62,7 +64,7 @@ function SelectionCheckbox({label, checked, mixed, onChange}:{label:string;check
 }
 export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageSize = 5, filters = [], columnVisibility = false,
   visibleColumnKeys, defaultVisibleColumnKeys, onVisibleColumnKeysChange, selectable = false, rowLabel = rowKey,
-  selectedKeys, defaultSelectedKeys = [], onSelectedKeysChange, renderBulkActions, density = 'comfortable', loading, error, onRetry, server, renderSelectedActions, resizableColumns=false, viewOptions }: DataTableProps<T>) {
+  selectedKeys, defaultSelectedKeys = [], onSelectedKeysChange, renderBulkActions, density = 'comfortable', loading, error, onRetry, server, renderSelectedActions, resizableColumns=false, viewOptions, emptyState }: DataTableProps<T>) {
   const id=useId();
   const [local,setLocal]=useState<TableQuery>({...defaultTableQuery,pageSize});
   const state=server?.query ?? {...local,pageSize};
@@ -123,7 +125,7 @@ export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageS
         {selectable && <td className="bui-table-check"><SelectionCheckbox label={'Select ' + rowLabel(row)} checked={selectedSet.has(rowKey(row))} onChange={()=>toggle([rowKey(row)])} /></td>}
         {displayedColumns.map(column=><td key={column.key} data-pinned={column.pinned} data-align={column.align ?? 'start'} style={columnStyle(column)}><div className="bui-table-cell">{column.cell(row)}</div></td>)}
       </tr>)}</tbody></table></div>
-      {visible.length===0 && <EmptyState title={!query && !Object.values(facets).some(Boolean) ? 'No records yet' : 'No matching records'} action={query || Object.values(facets).some(Boolean) ? <Button variant="secondary" size="sm" onClick={()=>{changeQuery({search:'',filters:{},page:1});}}>Clear filter</Button> : undefined}>{!query && !Object.values(facets).some(Boolean) ? 'Records will appear here when they are added.' : 'Try another search or filter.'}</EmptyState>}
+      {visible.length===0 && (emptyState ?? <EmptyState title={!query && !Object.values(facets).some(Boolean) ? 'No records yet' : 'No matching records'} action={query || Object.values(facets).some(Boolean) ? <Button variant="secondary" size="sm" onClick={()=>{changeQuery({search:'',filters:{},page:1});}}>Clear filter</Button> : undefined}>{!query && !Object.values(facets).some(Boolean) ? 'Records will appear here when they are added.' : 'Try another search or filter.'}</EmptyState>)}
       {fixedLayout && viewportWidth>0 && viewportWidth<baseTotal && <p className="bui-table-scroll-hint bui-hint">Scroll horizontally to see every column.</p>}
       <div className="bui-table-footer"><span className="bui-table-feedback bui-hint" role="status">{loading?<><Spinner /> Updating records…</>:total?`${(activePage-1)*size+1}–${Math.min(activePage*size,total)} of ${total}`:'0 records'}</span><Pagination page={activePage} totalPages={pages} onPageChange={page=>changeQuery({page})} /></div>
     </>}

@@ -44,3 +44,11 @@ Tailwind CSS 4.3.0 and its CLI are build dependencies (MIT). clsx, class-varianc
 ## React Hook Form
 
 React Hook Form 7.90.0 is an optional MIT dependency for the adapter and examples. Its package includes the original licence. No upstream source is vendored. https://github.com/react-hook-form/react-hook-form
+
+## Motion
+
+Motion 14.7.1 supplies layout and presence animation as an installed MIT dependency. Its full licence is included in MOTION_LICENSE. https://github.com/motiondivision/motion
+
+## dnd-kit
+
+@dnd-kit/core 6.3.1, @dnd-kit/sortable 10.0.0 and @dnd-kit/utilities 3.2.2 are installed MIT dependencies. Their common licence is included in DND_KIT_LICENSE. https://github.com/clauderic/dnd-kit

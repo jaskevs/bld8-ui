@@ -2,7 +2,7 @@
 
 React components, reusable blocks and complete interface examples. Built with Base UI, selected shadcn/ui compositions, Tailwind and original BLD8 styles. Both collections are free under MIT.
 
-[Showcase](https://ui.bld8.dev) · [Registry](https://ui.bld8.dev/registry) · [Playground](https://ui.bld8.dev/playground) · [Outline](https://ui.bld8.dev/templates/outline)
+[React, Vite & Next.js guide](https://ui.bld8.dev/frameworks) · [Community](https://ui.bld8.dev/community) · [Showcase](https://ui.bld8.dev) · [Registry](https://ui.bld8.dev/registry) · [Playground](https://ui.bld8.dev/playground) · [Outline](https://ui.bld8.dev/templates/outline)
 
 ## Install source
 
@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/bld8/button';
 
 Wrap overlays in `UIProvider` from `bld8/overlays` and set `body { position: relative; }` in global CSS. Review overwrite prompts when updating customised source. Read [registry details](docs/registry.md).
 
-Alternatively, download any block or template starter from the showcase, unzip, run `npm install` and `npm run dev`. The ZIP includes local workspace packages; no BLD8 npm package is required.
+Alternatively, choose Next.js or React + Vite for any block or template, unzip the starter, then run `npm install` and `npm run dev`. Next.js opens on port 3000; Vite opens on 5173, or the available port printed by the server. The ZIP includes local workspace packages; no BLD8 npm package is required.
 
 ## Develop locally
 
@@ -39,6 +39,7 @@ Open http://127.0.0.1:3120. UI source, blocks and styles rebuild on save.
 ```sh
 npm run build
 npm run typecheck
+npm run check:starter:vite
 npm test
 ```
 
@@ -46,13 +47,15 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 43 component guidance entries, eight blocks and three templates.
+- 49 component guidance entries, twelve blocks and three templates.
 - 1,877 canonical Lucide icons with consistent defaults and downloadable licensed SVGs.
 - A playground for fourteen controls, including dialogs, drawers, multi-selects, calendars, dates and tables, with validated shareable URLs and complete client-component code.
-- A shadcn-compatible registry, source manifests and thirteen runnable ZIP starters.
+- A shadcn-compatible registry, source manifests and 32 runnable ZIP starters: 17 Next.js and 15 React + Vite.
 - Light/dark tokens, smooth shared easing, keyboard focus and reduced-motion behaviour.
 - Form state with async validation, field/service errors, dirty state, abortable submission and stale-result protection.
 - Tables with local or externally controlled queries, selection across pages, facets, visible columns, resizing, pinned columns and CSV export.
+- A reusable Kanban control and task workspace with Board/Backlog views, pointer/touch sorting, keyboard moves, column limits, rollback, retry and an abortable save callback.
+- Stepper, locale-aware numeric entry and a time picker, combined in a validated session setup with tab drafts and recoverable saves.
 
 Outline is the complete local reference application. It saves projects, resource metadata and preferences in browser storage. Project workflows cover creation, editing, filtering, sorting, paging, bulk changes, deletion, duplicate validation and unsaved-draft confirmation. The HTTP adapter and runnable sample API demonstrate the same flows over a service connection. Production authentication, database persistence and file storage belong to the host application. Other templates use in-memory sample data.
 
@@ -72,7 +75,7 @@ Outline is the complete local reference application. It saves projects, resource
 
 White panels on neutral-grey backgrounds, near-black primary actions and warm yellow accents. Tailwind utilities use the `bui:` prefix without Preflight; packages and registry items include compiled CSS. Existing components can be used without a Tailwind build. Add ordinary CSS or your own Tailwind setup for new utility classes.
 
-All original source uses MIT. Keep the included notices for Base UI, shadcn/ui, Lucide and React DayPicker. [Upstream records](docs/upstream.json) identify adapted source. Package names remain private/unpublished on npm; source installation is available through the registry and starters.
+All original source uses MIT. Keep the included notices for Base UI, shadcn/ui, Lucide, React DayPicker, Motion and dnd-kit. [Upstream records](docs/upstream.json) identify adapted source. Package names remain private/unpublished on npm; source installation is available through the registry and starters.
 
 Source: [jaskevs/bld8-ui](https://github.com/jaskevs/bld8-ui). [Deployment](docs/deployment.md) and [verification](docs/verification.md) record the current release setup.
 
@@ -94,3 +97,16 @@ Outline supports inline name, date and status editing. EditableCell validates,
 preserves failed drafts and captures the edit-start revision so newer writes
 cannot be silently overwritten. Enter saves and Escape cancels. See
 `docs/workflow-integrations.md` for the integration boundaries.
+
+## Library direction
+
+All components, blocks and templates remain free under MIT. React is the shared
+foundation; Next.js guidance covers application integration. Read
+[the ordered expansion plan](docs/library-direction.md) for the next workflow
+increments and their release requirements. The ActivityFeed block composes the
+Timeline control with search, type filters, local reveal and service states.
+
+The reusable packages are independent of the app framework. Vite starters include
+React Fast Refresh, TypeScript and a static build; the two HTTP-backed integration
+ZIPs currently retain their Next.js sample API. See the framework guide before
+moving routing, server functions, environment wiring or data between applications.

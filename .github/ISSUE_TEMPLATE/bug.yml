@@ -1,0 +1,29 @@
+name: Report a bug
+description: A reproducible problem with a component, block or installation.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the affected component and what you expected. Keep credentials and private data out of the report.
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: A public example or repository, if available.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include mouse or keyboard steps and any relevant screen-reader behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Versions and environment
+      description: BLD8 source revision, React/framework version, browser and operating system.
+    validations:
+      required: true
