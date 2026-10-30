@@ -87,6 +87,9 @@ jobs:
       - name: Build production assets
         run: npm run build
       - name: Compare approved visuals and check browser interactions
+        env:
+          # The image runs as root; Firefox needs that user's own home directory.
+          HOME: /root
         run: npm run test:quality
       - name: Save quality reports
         if: failure()

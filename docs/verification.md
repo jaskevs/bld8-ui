@@ -1,3 +1,21 @@
+## GitHub quality-container recovery — 30 October 2026
+
+Source 795996b passed GitHub core validation, including the production build,
+workspace types, independent Vite starters, clean Next.js/Vite registry consumers
+and interaction/accessibility tests. All twenty visual comparisons and the
+Chromium/WebKit workflows passed in the quality job. Its 32 Firefox cases failed
+at browser launch because the root process inherited /github/home, owned by
+pwuser. Run 41034870087 failed the aggregate, and the public domain retained the
+previous release. This is not evidence of failed application assertions.
+
+The correction scopes HOME=/root to the quality-test step in the pinned root
+container. It does not skip browsers/tests, regenerate baselines, relax image
+checks or change application source. A disposable-container probe reproduces the
+original ownership failure, then verifies launch and input interaction with the
+container user's existing home. See .local/firefox-home-proof.json and the CI
+guide. The remote jobs and live release must be verified after the corrective
+push; the earlier complete local evidence remains separately recorded below.
+
 ## Source release preparation — 30 October 2026
 
 The owner authorised check-in and push of the BLD8 UI changes after the protected

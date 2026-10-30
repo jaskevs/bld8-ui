@@ -28,8 +28,19 @@ Linux environment. See [visual quality](visual-quality.md) and
 
 The personal Vercel project bld8-ui is linked to jaskevs/bld8-ui with main as its
 production branch. The 29 October source release 6d839e3 passed its then-current
-GitHub release checks and deployed automatically. The quality expansion described
-above remains a local source change until separately committed and pushed.
+GitHub release checks and deployed automatically. The 30 October release 795996b
+introduced the expanded checks. Its core validation passed, but Firefox could not
+launch in GitHub's root container with a home owned by pwuser. All 32 Firefox
+cases failed before test execution; the other 84 quality cases passed. The
+production gate held ui.bld8.dev on the previous release as intended.
+
+The browser-quality test step sets HOME to /root, the existing home of the
+container's root user. The setting is scoped to that step and does not alter
+Windows, local shells, npm installation, checkout, browser coverage or tolerances.
+A probe in the pinned image reproduces the ownership failure with /github/home,
+then launches Firefox and exercises an input with /root. Local evidence is
+.local/firefox-home-proof.json. This correction must still pass the remote jobs
+and production check before the new source is treated as live.
 
 On 29 October 2026 the project's production gate was configured and read back
 through Vercel's API. Check chk_31529cb7-fbb0-4a03-a047-a8edc0aecb54 requires the
@@ -37,10 +48,9 @@ GitHub check **UI Release checks**, starts when the build is ready, and blocks
 production-domain aliasing. Its timeout is 3,600 seconds. Automatic production
 aliasing remains enabled, and no unrelated project setting or check was changed.
 
-Configuration is verified; a new deployment's actual hold and promotion have not
-yet been observed for this gate. The next authorised source release must verify
-that ui.bld8.dev stays on its prior deployment while checks are pending, that a
-failed/cancelled check does not promote, and that success permits promotion.
+The 30 October failure verifies that a failed aggregate does not replace the
+production domain. Successful promotion for the corrected source still needs
+verification against its exact pushed revision and the live domain.
 Do not force-promote to bypass a failed check as part of normal release work.
 
 GitHub branch rules are separate. A main-branch ruleset can require **UI PR
