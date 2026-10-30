@@ -31,6 +31,10 @@
     "./session-preferences": {
       "types": "./dist/session-preferences.d.ts",
       "import": "./dist/session-preferences.js"
+    },
+    "./analytics-state": {
+      "import": "./dist/analytics-state.js",
+      "types": "./dist/analytics-state.d.ts"
     }
   },
   "sideEffects": [

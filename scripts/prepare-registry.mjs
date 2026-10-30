@@ -30,6 +30,8 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
     const local = [...source.matchAll(/(?:from\s+|import\s*)['"]\.\/([^'"]+)\.js['"]/g)].map(match => `bld8-${kind === 'block' ? 'block-' : ''}${match[1]}`);
     const external = Object.entries(dependencies).filter(([dependency]) => source.includes(`'${dependency}'`) || source.includes(`'${dependency}/`)).map(([dependency,version]) => `${dependency}@${version}`);
     let content = source.replace(/(['"])\.\/([^'"]+)\.js\1/g, "'./$2'").replace(/(['"])@bld8\/ui\1/g, "'../index'").replace(/(['"])@bld8\/ui\/filter-query\1/g, "'../filter-query'").replace(/(['"])@bld8\/ui\/time-options\1/g, "'../time-options'");
+    content = content.replace(/(['"])@bld8\/ui\/schedule-state\1/g, "'../schedule-state'");
+    if (kind === 'block' && source.includes('@bld8/ui/schedule-state')) local.push('bld8-schedule-state');
     if (name.endsWith('.tsx')) content = content.replace(/(['"])use client\1;/, "$&\nimport './styles.css';");
     const subdirectory = kind === 'block' ? 'blocks/' : '';
     if (kind === 'block' && source.includes('@bld8/ui')) local.push('bld8-index');
@@ -41,10 +43,14 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
 }
 add('bld8-block-styles', 'BLD8 block styles', [file('registry/bld8/blocks/styles.css', read('packages/blocks/src/styles.css'), '@ui/bld8/blocks/styles.css','registry:file')],[],['bld8-styles']);
 const groups = {
+  'day-agenda':['day-agenda'], 'schedule-state':['schedule-state'],
+  'windowed-table':['windowed-table'], 'table-grouping':['table-grouping'],
+  chart:['chart'],
+  tree:['tree'],
   core:['button','icon-button','input','textarea','checkbox','switch','radio','slider','badge','alert','progress','loading','empty','avatar','card','breadcrumb','pagination','input-group'],
   controls:['select','combobox','tabs','accordion'], overlays:['dialog','sheet','popover','tooltip','dropdown','toast'],
   'data-table':['table','advanced-table'], calendar:['calendar','date-picker','date-range'], icons:['icon'],
-  'number-field':['number-field'], 'time-options':['time-options'], 'time-picker':['time-picker'], stepper:['stepper'], kanban:['kanban'], 'kanban-state':['kanban-state'], 'filter-builder':['filter-builder'], 'filter-query':['filter-query'], timeline:['timeline'], 'multi-select':['multi-select'], command:['command'], 'file-upload':['file-upload'], drawer:['drawer'], 'context-menu':['context-menu'], sidebar:['sidebar'], form:['form'], 'editable-cell':['editable-cell'], 'react-hook-form':['react-hook-form'],
+  'theme-config':['theme-config'], 'number-field':['number-field'], 'time-options':['time-options'], 'time-picker':['time-picker'], stepper:['stepper'], kanban:['kanban'], 'kanban-state':['kanban-state'], 'filter-builder':['filter-builder'], 'filter-query':['filter-query'], timeline:['timeline'], 'multi-select':['multi-select'], command:['command'], 'file-upload':['file-upload'], drawer:['drawer'], 'context-menu':['context-menu'], sidebar:['sidebar'], form:['form'], 'editable-cell':['editable-cell'], 'react-hook-form':['react-hook-form'],
 };
 for (const [module,names] of Object.entries(groups)) {
   if (!items.some(item => item.name === `bld8-${module}`)) continue;

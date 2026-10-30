@@ -16,8 +16,8 @@ for (const width of [1440, 390]) test('floating navigation stays visible at ' + 
   }
 });
 
-test('mobile navigation closes with Escape and an outside click', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 900 });
+for (const width of [390, 768, 1024]) test('mobile navigation closes with Escape and an outside click at ' + width + 'px', async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   const menu = page.getByRole('button', { name: 'Menu', exact: true });
@@ -29,7 +29,12 @@ test('mobile navigation closes with Escape and an outside click', async ({ page 
   await expect(menu).toBeFocused();
   await expect(navigation).not.toBeVisible();
   await menu.click();
-  await page.locator('.hero-copy .lead').click();
+  await expect(navigation).toBeVisible();
+  // Navigation can cover page copy. The exposed page gutter is outside the
+  // header regardless of the number of menu links or their wrapping.
+  const bounds = (await page.locator('.site-header').boundingBox())!;
+  expect(bounds.x).toBeGreaterThan(1);
+  await page.mouse.click(Math.floor(bounds.x / 2), bounds.y + bounds.height + 12);
   await expect(menu).toHaveAttribute('aria-expanded', 'false');
   await expect(navigation).not.toBeVisible();
 });

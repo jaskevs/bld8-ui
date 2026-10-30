@@ -16,7 +16,12 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "playwright test",
     "pack:ui": "npm pack --workspace=@bld8/ui",
-    "check:starter:vite": "node scripts/check-vite-starter.mjs"
+    "check:starter:vite": "node scripts/check-vite-starter.mjs",
+    "check:registry:consumers": "node scripts/check-registry-consumers.mjs",
+    "test:quality": "playwright test --config=playwright.quality.config.ts",
+    "test:quality:smoke": "playwright test --config=playwright.quality.config.ts --project=\"smoke-*\"",
+    "test:quality:update": "playwright test --config=playwright.quality.config.ts --project=\"visual-*\" --update-snapshots=changed",
+    "typecheck:quality": "tsc -p tsconfig.quality.json"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

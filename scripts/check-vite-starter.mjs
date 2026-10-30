@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const starter=process.argv[2]??'outline';
-assert.ok(['outline','issue-table','task-workspace','session-setup'].includes(starter),'Choose outline, issue-table, task-workspace or session-setup.');
+assert.ok(['outline','issue-table','task-workspace','session-setup','file-browser','analytics-dashboard','large-issue-table','schedule-planner'].includes(starter),'Choose outline, issue-table, task-workspace, session-setup, file-browser, analytics-dashboard large-issue-table or schedule-planner.');
 const target=mkdtempSync(join(tmpdir(),'bld8-vite-'+starter+'-'));
 const archive=readFileSync(join(root,'apps/docs/public/downloads/'+starter+'-vite.zip'));
 console.log('Checking independent '+starter+' Vite starter at '+target);

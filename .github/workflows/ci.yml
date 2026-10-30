@@ -15,9 +15,9 @@ concurrency:
 
 jobs:
   validate:
-    name: ${{ github.event_name == 'pull_request' && 'UI PR checks' || 'UI Release checks' }}
+    name: UI core validation
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
@@ -40,8 +40,18 @@ jobs:
         run: npm run check:starter:vite -- task-workspace
       - name: Build independent session setup starter
         run: npm run check:starter:vite -- session-setup
+      - name: Build independent file browser starter
+        run: npm run check:starter:vite -- file-browser
+      - name: Build independent analytics dashboard starter
+        run: npm run check:starter:vite -- analytics-dashboard
+      - name: Build independent large issue starter
+        run: npm run check:starter:vite -- large-issue-table
+      - name: Build independent schedule planner starter
+        run: npm run check:starter:vite -- schedule-planner
       - name: Install test browser
         run: npx playwright install --with-deps chromium
+      - name: Install registry into clean Next.js and Vite consumers
+        run: npm run check:registry:consumers
       - name: Run interaction and accessibility checks
         run: npm test -- --workers=2
       - name: Save failure reports
@@ -54,3 +64,59 @@ jobs:
             test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  quality:
+    name: UI browser quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check quality-suite types
+        run: npm run typecheck:quality
+      - name: Build production assets
+        run: npm run build
+      - name: Compare approved visuals and check browser interactions
+        run: npm run test:quality
+      - name: Save quality reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ui-quality-results-${{ github.run_id }}
+          path: |
+            playwright-report/quality/
+            test-results/quality/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  release-checks:
+    name: ${{ github.event_name == 'pull_request' && 'UI PR checks' || 'UI Release checks' }}
+    needs: [validate, quality]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require both validation jobs
+        env:
+          CORE_RESULT: ${{ needs.validate.result }}
+          QUALITY_RESULT: ${{ needs.quality.result }}
+        run: |
+          if [ "$CORE_RESULT" != "success" ]; then
+            echo "::error::Core validation did not succeed ($CORE_RESULT)."
+            exit 1
+          fi
+          if [ "$QUALITY_RESULT" != "success" ]; then
+            echo "::error::Browser quality did not succeed ($QUALITY_RESULT)."
+            exit 1
+          fi
+          echo "Core validation and browser quality passed."

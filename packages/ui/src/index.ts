@@ -27,3 +27,16 @@ export * from './number-field.js';
 export * from './time-options.js';
 export * from './time-picker.js';
 export * from './stepper.js';
+
+export * from './theme-config.js';
+
+export * from './tree.js';
+export * from './chart.js';
+export * from './chart-state.js';
+
+export * from './table-grouping.js';
+export * from './windowed-table.js';
+
+export * from './schedule-state.js';
+
+export * from './day-agenda.js';

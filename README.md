@@ -36,10 +36,13 @@ npm run dev
 
 Open http://127.0.0.1:3120. UI source, blocks and styles rebuild on save.
 
+[Current handoff](docs/handoff.md) records the local review, publication state and next slice.
+
 ```sh
 npm run build
 npm run typecheck
 npm run check:starter:vite
+npm run check:registry:consumers
 npm test
 ```
 
@@ -47,14 +50,18 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 49 component guidance entries, twelve blocks and three templates.
+- 53 component guidance entries, sixteen blocks and three templates.
 - 1,877 canonical Lucide icons with consistent defaults and downloadable licensed SVGs.
 - A playground for fourteen controls, including dialogs, drawers, multi-selects, calendars, dates and tables, with validated shareable URLs and complete client-component code.
-- A shadcn-compatible registry, source manifests and 32 runnable ZIP starters: 17 Next.js and 15 React + Vite.
+- A shadcn-compatible registry, source manifests and 40 runnable ZIP starters: 21 Next.js and 19 React + Vite.
 - Light/dark tokens, smooth shared easing, keyboard focus and reduced-motion behaviour.
+- A theme lab with three presets, isolated interactive previews, contrast checks, shareable URLs and portable CSS export. See [theme setup](docs/theme-lab.md).
 - Form state with async validation, field/service errors, dirty state, abortable submission and stale-result protection.
-- Tables with local or externally controlled queries, selection across pages, facets, visible columns, resizing, pinned columns and CSV export.
+- Tables with local or externally controlled queries, selection across pages, facets, visible columns, resizing, pinned columns and CSV export. Grouped pages and a separate bounded scrolling table share column APIs; a 10,000-record issue workspace demonstrates external detail drafts. See [large tables](docs/large-tables.md).
 - A reusable Kanban control and task workspace with Board/Backlog views, pointer/touch sorting, keyboard moves, column limits, rollback, retry and an abortable save callback.
+- Bounded line/bar/area charts with keyboard exploration, missing-value gaps and exact data tables, composed in an analytics dashboard with abortable reports and CSV export. See [charts and analytics](docs/charts-and-analytics.md).
+- A keyboard-friendly Tree and file-browser block with folder navigation, metadata inspection, abortable lazy loading and recoverable failures. See [the service contract](docs/file-browser.md).
+- A day agenda and schedule planner with supplied UTC availability, explicit offsets, revision-checked booking callbacks and recoverable drafts. See [scheduling](docs/scheduling.md).
 - Stepper, locale-aware numeric entry and a time picker, combined in a validated session setup with tab drafts and recoverable saves.
 
 Outline is the complete local reference application. It saves projects, resource metadata and preferences in browser storage. Project workflows cover creation, editing, filtering, sorting, paging, bulk changes, deletion, duplicate validation and unsaved-draft confirmation. The HTTP adapter and runnable sample API demonstrate the same flows over a service connection. Production authentication, database persistence and file storage belong to the host application. Other templates use in-memory sample data.
@@ -73,7 +80,7 @@ Outline is the complete local reference application. It saves projects, resource
 
 ## Styling and ownership
 
-White panels on neutral-grey backgrounds, near-black primary actions and warm yellow accents. Tailwind utilities use the `bui:` prefix without Preflight; packages and registry items include compiled CSS. Existing components can be used without a Tailwind build. Add ordinary CSS or your own Tailwind setup for new utility classes.
+White panels on warm light-grey backgrounds, near-black primary actions and golden yellow accents. Champagne selection surfaces and related evergreen and mint chart shades complement the accent. Forest-green success and warm-brick error pairs keep status clear while geometry and motion stay consistent. See [selection styling](docs/selection-style.md). Tailwind utilities use the `bui:` prefix without Preflight; packages and registry items include compiled CSS. Existing components can be used without a Tailwind build. Add ordinary CSS or your own Tailwind setup for new utility classes.
 
 All original source uses MIT. Keep the included notices for Base UI, shadcn/ui, Lucide, React DayPicker, Motion and dnd-kit. [Upstream records](docs/upstream.json) identify adapted source. Package names remain private/unpublished on npm; source installation is available through the registry and starters.
 
@@ -110,3 +117,14 @@ The reusable packages are independent of the app framework. Vite starters includ
 React Fast Refresh, TypeScript and a static build; the two HTTP-backed integration
 ZIPs currently retain their Next.js sample API. See the framework guide before
 moving routing, server functions, environment wiring or data between applications.
+
+
+## Visual and browser quality
+
+The separate quality suite compares approved Linux screenshots and checks focused
+normal-motion workflows in Chromium, Firefox and WebKit. Run npm run test:quality
+in the pinned environment described in [visual quality](docs/visual-quality.md).
+Missing or changed baselines fail; CI never updates them automatically. See
+[clean registry consumers](docs/registry-consumer-checks.md) for independent
+source installation and [release checks](docs/ci-and-vercel.md) for the aggregate
+production gate. WebKit coverage is not a claim of real-device Safari testing.

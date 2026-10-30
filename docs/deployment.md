@@ -122,3 +122,21 @@ The existing main-to-Vercel connection handles deployment from the source push.
 Check the exact revision in GitHub Actions and Vercel before treating the new
 workflows as published. Local verification alone does not establish a successful
 remote build, production promotion gate or live release.
+
+
+## UI source release — 30 October 2026
+
+The owner authorised publication of the accumulated BLD8 UI source changes:
+theme customisation, chart/analytics and file workflows, grouped/windowed tables,
+the day agenda and schedule planner, and the final touch-input/vector-mark fixes.
+#FFD900 and the free MIT collections remain unchanged; no npm publication is part
+of this release. The source includes pinned visual and cross-browser checks,
+registry-consumer checks and an aggregate CI release check.
+
+See verification.md for the completed local checks and handoff.md for device
+acceptance. Commit and push use the ordinary personal identity, SSH destination
+and time guards after 17:00 Melbourne; no one-time exception or timestamp override
+is needed. The existing main-to-Vercel connection handles the source push.
+Verify the exact pushed revision in GitHub Actions and Vercel before calling the
+new release live. Recheck input focus/blur, pinch zoom and marks on the reporting
+iPhone after deployment; desktop WebKit does not reproduce its native keyboard.

@@ -1,0 +1,2 @@
+/* Keep a floating site header from covering a scrolled component specimen. */
+.site-header, .skip-link { visibility: hidden !important; }

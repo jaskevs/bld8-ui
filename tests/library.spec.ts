@@ -81,13 +81,11 @@ test('project example creates a real in-memory record', async ({ page }) => {
 test('profile example validates the email and confirms saving', async ({ page }) => {
   await page.goto('/examples'); const email = page.getByLabel('Email address', {exact:true}); await email.fill('invalid'); await page.getByRole('button', { name: 'Save changes' }).click(); await expect(page.getByRole('alert').filter({ hasText: 'Enter a valid email address.' })).toHaveText('Enter a valid email address.'); await email.fill('test@example.com'); await page.getByRole('button', { name: 'Save changes' }).click(); await expect(page.getByText('Saved for this session.')).toBeVisible();
 });
-for (const theme of ['light', 'dark']) test('accessible catalog, examples and overlays in ' + theme + ' theme', async ({ page }) => {
-  for (const route of ['/components', '/examples', '/foundations', '/motion', '/components/dialog']) {
-    await page.goto(route); if (theme === 'dark') await page.getByRole('button', {name:'Switch to dark theme'}).click();
-    if (route.endsWith('/dialog')) await page.getByRole('button', {name:'New project'}).click();
-    const results = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
-    expect(results.violations.map(item => ({id:item.id, nodes:item.nodes.map(node => node.target)}))).toEqual([]);
-  }
+for (const theme of ['light', 'dark']) for (const route of ['/components', '/examples', '/foundations', '/motion', '/components/dialog']) test('accessible catalog, examples and overlays in ' + theme + ' theme at ' + route, async ({ page }) => {
+  await page.goto(route); if (theme === 'dark') await page.getByRole('button', {name:'Switch to dark theme'}).click();
+  if (route.endsWith('/dialog')) await page.getByRole('button', {name:'New project'}).click();
+  const results = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(results.violations.map(item => ({id:item.id, nodes:item.nodes.map(node => node.target)}))).toEqual([]);
 });
 for (const width of [1440, 768, 390, 320]) test('responsive layouts at ' + width + 'px', async ({ page }) => {
   await page.setViewportSize({width,height:1000}); const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));

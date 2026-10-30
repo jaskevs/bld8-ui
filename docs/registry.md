@@ -1,25 +1,64 @@
-# Current scope
+# Source registry
 
-43 component guidance entries, eight reusable blocks, three templates, the Lucide directory, component playground, shadcn registry and thirteen ZIP starters are implemented.
+The registry installs editable component, block and template source through the
+shadcn CLI. Shared modules, compiled styles and third-party notices are resolved
+through the same dependency graph. No account, licence key or BLD8 npm package
+is required. All original library source is free under MIT.
 
-The library includes native forms, Base UI selection/navigation/overlays, command search, date/range fields, file selection and upload callbacks, feedback, tables, drawer, context menus and responsive sidebar. Source and both collection tiers are free under MIT.
+## Install
 
-The playground configures fourteen representative controls and supports validated shareable URLs. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
+Initialise shadcn in your React application, then run:
 
-Outline is the browser-persisted reference application for forms and tables. Its project flows include validation, recovery, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
+```sh
+npx shadcn@latest add https://ui.bld8.dev/r/button.json
+npx shadcn@latest add https://ui.bld8.dev/r/session-setup.json
+```
 
-Tables support externally controlled queries, resizing and pinned columns, but not virtualization. The form adapter does not replace schema validation or a server's validation rules. Browser storage is suitable for this example, not shared multi-user persistence. The repository interface is the integration boundary for a real service.
+The default UI alias installs source under components/ui/bld8. Custom aliases
+are supported; each registry target uses @ui/bld8 instead of assuming a particular
+source folder. Import from the installed files, not from unpublished @bld8 npm
+packages. The framework guide covers Next.js client boundaries and React/Vite.
 
-Automated accessibility and browser checks cover the included examples. Manual assistive-technology and broader cross-browser review remain necessary before making certification claims. The npm packages are still private and unpublished; use the registry or source starters.
+Wrap overlays in UIProvider from the installed bld8/overlays module. Keep
+body { position: relative; } in the host stylesheet. Installed compiled BLD8 CSS
+includes the shipped prefixed Tailwind utilities without Preflight. Edit the
+supplied CSS or configure your own Tailwind build for new utility classes.
 
+## Installation contract
 
-The current extension adds complete TypeScript-derived prop tables, inline table
-editing, a typed Outline HTTP adapter, a runnable session-scoped API example and
-optional React Hook Form bindings. The two integration starters include the
-sample API. Production authentication and database storage are application work.
+The representative SessionSetup graph includes its controls, server-safe time
+and validation helpers, compiled styles, and required notices. A Next.js Server
+Component can evaluate the pure helpers; interactive controls retain their client
+boundary. The independent Vite consumer verifies a custom ~/ui alias. The actual
+CLI installation and build procedure is in registry-consumer-checks.md and is
+part of the prepared release workflow.
 
-Optional integration items include `react-hook-form`, `react-hook-form-example`,
-`editable-cell` and `outline-http`. The form adapter adds React Hook Form only
-when explicitly installed. The form example includes client bindings and its
-HTTP adapter; the standalone HTTP/form starters supply a runnable reference
-server. Use the service contract to connect a different backend.
+The current local build contains 147 registry items, including shared dependencies
+and the pure theme-config helper. The published release still contains 121 items
+until this increment is separately released.
+Component guidance counts and item counts describe different things; see scope.md
+for the current catalogue. Generated output is built from the checked source and
+must retain production dependency URLs. Local consumer checks rewrite dependency
+URLs in memory only and verify that generated public files remain unchanged.
+
+## Integrations and service boundaries
+
+Optional items include react-hook-form, react-hook-form-example, editable-cell
+and outline-http. React Hook Form is added only when explicitly installed. The
+HTTP/form starters supply a runnable reference API; Vite catalogue starters are
+client applications and need a separate backend for service behaviour.
+
+Examples distinguish browser storage, session memory and callback-based saves.
+Authentication, authorised ownership, durable data and uploaded file storage
+belong to the host application. An installed frontend block does not supply a
+production service by itself.
+
+## Updating copied source
+
+Commit your own changes before an update. Inspect the CLI overwrite prompts and
+review the resulting diff before replacing customised files. The current public
+URLs track the published release; immutable release URLs and a formal migration
+feed remain future adoption work. Preserve the included dependency notices.
+
+Source ZIPs are an alternative to registry installation. See /frameworks for
+Next.js and Vite setup and /registry on the showcase for item discovery.

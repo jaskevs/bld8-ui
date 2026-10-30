@@ -33,3 +33,15 @@ archives independently as well. Keep source and registry license files in sync.
 The session workflow is checked with `npm run check:starter:vite -- session-setup`
 as well. Its same-day time preferences do not supply calendar availability or
 daylight-saving resolution; keep those service boundaries explicit.
+
+
+The release aggregate now requires both core validation and the separate browser-
+quality job. Run npm run check:registry:consumers after building registry artifacts.
+Review intentional screenshot updates in the pinned Linux environment; normal CI
+comparison must fail on missing or changed baselines. See docs/visual-quality.md
+and docs/registry-consumer-checks.md for reproducible commands and boundaries.
+
+Use the shared --bui-selected-* and --bui-shadow-selected tokens for selected
+surfaces and navigation markers. Keep selection distinct from hover, keyboard
+focus, errors and Boolean-on states. Preserve system colours in forced-colour
+mode and steady text/icon alignment. See docs/selection-style.md.

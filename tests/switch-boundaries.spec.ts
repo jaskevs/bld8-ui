@@ -51,6 +51,12 @@ for(const theme of ['light','dark'])test('recessed switch keeps a rigid thumb an
   const toggle=specimen.getByRole('switch',{name:'Weekly digest',exact:true});
   await toggle.uncheck();await settle(toggle);
   const off=await geometry(toggle);
+  const accentColour=await toggle.evaluate(el=>{
+    const token=getComputedStyle(el).getPropertyValue('--bui-accent').trim(),probe=document.createElement('span');
+    probe.style.color=token;document.body.append(probe);
+    const colour=getComputedStyle(probe).color;probe.remove();
+    return {token,colour};
+  });expect(accentColour.token).not.toBe('');
   expect(off.thumbColour).toBe(theme==='dark'?'rgb(244, 242, 237)':'rgb(23, 23, 23)');
   expect(off.background).not.toBe(off.thumbColour);
   for(const on of [true,false]){
@@ -73,7 +79,7 @@ for(const theme of ['light','dark'])test('recessed switch keeps a rigid thumb an
     expect(shape.thumbColour).toBe(on?'rgb(23, 23, 23)':off.thumbColour);
     expect(shape.top).toBeCloseTo((shape.height-shape.thumbHeight)/2,1);
     expect(on?shape.width-shape.left-shape.thumbWidth:shape.left).toBeCloseTo(shape.top,1);
-    if(on)expect(shape.background).toBe('rgb(255, 226, 74)');
+    if(on)expect(shape.background).toBe(accentColour.colour);
   }
   // A press changes the lighting, never the shape or endpoint.
   for(const on of [false,true]){

@@ -31,7 +31,12 @@ test('styled native choices retain keyboard behaviour and slider progress',async
 
 test('dropdown and context menus share geometry and preserve destructive states',async({page})=>{
   await page.goto('/foundations');const specimen=page.getByRole('region',{name:'Control standards'});await specimen.getByRole('button',{name:'More actions',exact:true}).click();const option=page.getByRole('menuitem',{name:'Open note',exact:true});const dropdown=await option.evaluate(el=>({height:el.getBoundingClientRect().height,padding:getComputedStyle(el).padding,font:getComputedStyle(el).fontSize,radius:getComputedStyle(el.closest('.bui-popup')!).borderRadius}));
-  const destructive=page.getByRole('menuitem',{name:'Archive note',exact:true});await destructive.focus();expect(await destructive.evaluate(el=>getComputedStyle(el).color)).toBe('rgb(180, 35, 24)');await page.keyboard.press('Escape');
+  const destructive=page.getByRole('menuitem',{name:'Archive note',exact:true});await destructive.focus();const destructiveColours=await destructive.evaluate(el=>{
+    const style=getComputedStyle(el),token=style.getPropertyValue('--bui-danger').trim(),probe=document.createElement('span');
+    probe.style.color=token;document.body.append(probe);
+    const expected=getComputedStyle(probe).color;probe.remove();
+    return {actual:style.color,expected,token};
+  });expect(destructiveColours.token).not.toBe('');expect(destructiveColours.actual).toBe(destructiveColours.expected);await page.keyboard.press('Escape');
   await page.goto('/components/context-menu');await page.getByLabel('Interface notes actions').click({button:'right'});const context=await page.getByRole('menuitem',{name:'Open note',exact:true}).evaluate(el=>({height:el.getBoundingClientRect().height,padding:getComputedStyle(el).padding,font:getComputedStyle(el).fontSize,radius:getComputedStyle(el.closest('.bui-context-menu')!).borderRadius}));expect(context).toEqual(dropdown);await page.keyboard.press('Escape');
 });
 

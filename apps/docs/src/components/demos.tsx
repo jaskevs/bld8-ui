@@ -1,4 +1,8 @@
 'use client';
+import {DayAgendaDemo} from './schedule-demos';
+import {WindowedTableDemo} from './windowed-table-demo';
+import {TreeDemo} from './tree-demo';
+import {ChartDemo} from './chart-demo';
 import { EditableCellDemo, RHFNativeDemo } from './workflow-demos';
 import { FormDemo } from './form-demo';
 import {NumberFieldDemo,TimePickerDemo,StepperDemo} from './session-demos';
@@ -36,6 +40,8 @@ export const projectColumns: Column<ProjectRow>[] = [
 export function ComponentDemo({ id }: { id: string }) {
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch(id) {
+    case 'chart': return <ChartDemo/>;
+    case 'tree': return <TreeDemo/>;
     case 'number-field': return <NumberFieldDemo/>;
     case 'time-picker': return <TimePickerDemo/>;
     case 'stepper': return <StepperDemo/>;
@@ -54,6 +60,8 @@ export function ComponentDemo({ id }: { id: string }) {
     case 'date-picker': return <DatePickerDemo />;
     case 'date-range': return <DateRangeDemo />;
     case 'file-upload': return <FileUploadDemo />;
+    case 'day-agenda': return <DayAgendaDemo/>;
+    case 'windowed-table': return <WindowedTableDemo />;
     case 'advanced-table': return <AdvancedTableDemo />;
     case 'icon': return <div className="stack"><div className="actions"><Icon icon={Camera} size={24} label="Camera" /><Icon icon={Mail} size={24} label="Email" /><Icon name="arrow" size={24} label="BLD8 dotted arrow" /><Icon name="check" size={24} label="Completed" /></div><div className="actions"><Button leadingIcon={Save} onClick={() => toast.add({title:'Note saved',description:'An in-memory action demo.'})}>Save note</Button><Button variant="secondary" trailingIcon={ArrowRight}>Continue</Button><IconButton icon={Camera} label="Open camera" variant="ghost" onClick={() => toast.add({title:'Camera action selected'})} /></div><p className="demo-copy">Named Lucide imports, with consistent sizing and stroke. Icon-only actions keep their own accessible label.</p></div>;
     case 'input-group': return <div className="stack"><Field label="Search library" hint="A labelled search field with a clear action."><InputGroup leading={<Icon icon={Search} />} trailing={<IconButton icon={X} label="Clear search" variant="ghost" size="sm" disabled={!email} onClick={() => setEmail('')} />}><Input type="search" value={email} onChange={event => setEmail(event.target.value)} placeholder="Find a component…" /></InputGroup></Field><Field label="Budget" hint="Text prefixes share the field boundary."><InputGroup leading="$" trailing="AUD"><Input type="number" min="0" placeholder="0.00" /></InputGroup></Field><Field label="Account reference" error="Check the reference before continuing."><InputGroup leading={<Icon icon={Mail} />}><Input defaultValue="example" /></InputGroup></Field></div>;

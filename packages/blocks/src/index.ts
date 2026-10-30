@@ -21,3 +21,11 @@ export * from './task-workspace.js';
 
 export * from './session-preferences.js';
 export * from './session-setup.js';
+
+export * from './file-browser.js';
+export * from './analytics-dashboard.js';
+export * from './analytics-state.js';
+
+export * from './large-issue-table.js';
+
+export * from './schedule-planner.js';

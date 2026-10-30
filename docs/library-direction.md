@@ -1,6 +1,6 @@
 # Community library direction
 
-Updated 28 October 2026. This is the UI library's ordered backlog, not a claim of
+Updated 30 October 2026. This is the UI library's ordered backlog, not a claim of
 feature parity, a dated delivery promise or a change to the master roadmap's hours.
 The user requested a free community library with deeper components and blocks,
 and first-class React/Next.js adoption. Keep the existing Workbench milestone and
@@ -26,12 +26,13 @@ React Native and Angular need separate implementations and are outside this slic
 - Registry installation, a 14-control playground, React Hook Form and the Outline
   HTTP example exist. Packages are not published to npm.
 - Tables support editing, selection, column controls and externally fetched data.
-  Virtualisation and row grouping are not implemented. The filter builder now
+  The separate bounded windowed view and row grouping are documented below. The filter builder now
   supplies a typed flat all/any query group; nested groups remain future work.
 - The compact legacy ProjectBoard retains its status-select API. The new Kanban
   control and TaskWorkspace provide pointer/touch sorting and keyboard moves.
-- Calendar/date fields are not a scheduling product. Charts are illustrative bar
-  compositions, not a general chart library. Templates do not supply production auth.
+- Calendar/date fields are not a scheduling product. The early metrics overview
+  retains its illustrative bars. The new Chart is a bounded categorical comparison
+  component, not a general charting engine. Templates do not supply production auth.
 - This first expansion adds a Timeline component, an ActivityFeed block, React/Next
   and community guides, issue forms and installable source. Verification is recorded
   separately in verification.md; do not infer that subsequent backlog items shipped.
@@ -43,9 +44,11 @@ React Native and Angular need separate implementations and are outside this slic
 | 1 · Implemented locally | Filter rules, multi-value facets and saved query state | Complete issue table | Typed query contract, URL round trip, empty/error recovery and HTTP/server-query guidance; verified below |
 | 2 · Implemented locally | Reusable Kanban and sortable interactions | Task workspace with board and backlog views | Pointer/touch drag, keyboard move dialog, atomic-order save callback, rollback, retry and cancellation; no drag-only actions |
 | 3 · Implemented locally | Stepper, number field and time picker | Session setup with workspace details, time preferences and review | Step validation, back navigation, tab-draft restoration, locale-aware values, limits, abortable save/retry and pending/error behaviour |
-| 4 | Tree and richer file metadata presentation | File browser and workspace navigation | Roving focus, expand/collapse, lazy-loading contract, selection and empty/error states |
-| 5 | Chart primitives and table virtualisation/grouping | Analytics dashboard and large issue table | Real accessible summaries, measured representative datasets and documented limitations |
-| 6 | Calendar scheduling and a narrow rich-text integration | Schedule and comment composer | Timezone/locale and sanitisation boundaries, keyboard flows, dependency/license review |
+| 4 · Implemented locally | Tree and richer file metadata presentation | File browser and workspace navigation | Roving focus, expand/collapse, lazy-loading contract, selection and empty/error states |
+| 5a · Implemented locally | Bounded chart primitives | Analytics dashboard | Exact data, keyboard exploration, null gaps, report recovery and measured representative data; verification recorded below |
+| 5b · Implemented locally | Table virtualisation/grouping | Large issue table | Measured representative datasets, stable keyboard/selection behaviour and documented limitations |
+| 6a · Implemented locally | Day agenda and bounded UTC availability | Schedule planner | Timezone/locale, repeated-hour labels, abortable booking/retry and host revision/overlap boundaries |
+| 6b | Narrow rich-text integration | Comment composer | Sanitisation boundaries, keyboard flows and dependency/licence review |
 
 Add authentication layouts, team/access settings, notification preferences, command
 search and empty/error states as the earlier components expose reusable gaps. Then
@@ -155,3 +158,93 @@ The catalogue now has 49 component guidance entries, twelve blocks and three
 templates, with 121 registry items and 32 ZIPs (17 Next.js, 15 Vite). The next
 ordered increment remains Tree/file-browser/navigation; scheduling, rich text,
 virtualisation and later work are not claimed complete.
+
+
+## Release-quality foundation - 29 October 2026
+
+The locally prepared workflow now requires clean Next.js/Vite registry consumers
+and a separate pinned Linux visual/cross-browser suite behind one aggregate
+release check. The Vercel production gate is configured; its next-deployment hold
+and promotion remain to be observed. See verification.md and ci-and-vercel.md for
+evidence and publication status. This does not complete the planned theme lab,
+Tree/file-browser increment or any Workbench milestone, and it does not change
+the fixed roadmap allocation.
+
+## Theme lab - 29 October 2026
+
+The local theme lab now implements three starting presets, colour and typography
+choices, density, corner radius, shadows, isolated light/dark previews, shareable
+URLs and portable CSS export. It uses the existing UI controls and theme tokens;
+a pure helper is available to source and registry consumers without the lab.
+Contrast, mobile geometry, reduced motion and themed body portals are checked.
+See theme-lab.md for integration and verification.md for evidence.
+
+This adds two routes and two registry entries, bringing the build to 92 routes
+and 123 registry items. The 49 guidance entries, twelve blocks, three templates
+and 32 starters remain. Tree/file-browser/navigation is the next ordered control
+increment. Scheduling, rich text, virtualisation and Workbench remain separate
+work; this increment does not change the fixed roadmap allocation.
+
+## Tree and file metadata increment - 29 October 2026
+
+Tree now supplies roving focus, explicit selection, keyboard/typeahead traversal,
+controlled lazy-loading requests and smooth accessible expansion. FileBrowser
+proves the API through folder navigation, breadcrumbs, local search/sort and a
+metadata inspector. Its abortable loader rejects stale and invalid responses,
+retains successful child data and provides quiet per-folder retry. It does not
+read, host or transfer actual files. See file-browser.md and verification.md.
+
+The local build now contains 50 guidance entries, thirteen blocks, three templates,
+129 registry items and 34 starters (18 Next.js, 16 Vite). This does not mark
+Workbench or roadmap milestones complete or change the fixed allocation. The
+next ordered increment is accessible chart foundations and measured large-table
+work; scheduling and rich text remain later work. No publication is implied.
+
+## Charts and analytics increment - 29 October 2026
+
+Chart adds line/bar/area views over the same labelled series, with signed values,
+explicit null gaps, patterns, roving point focus and an exact data table. The
+AnalyticsDashboard composition provides reporting periods, three derived metrics,
+abortable source-scoped loading/retry and formula-safe CSV export. Its records
+are illustrative until the host supplies loadReport; collection, aggregation,
+permissions and time boundaries remain application responsibilities.
+
+The rendered comparison is bounded to 366 observations and six series. It does
+not interpolate dates, stream, stack or downsample larger data. Dense-data
+measurements and validation are recorded in verification.md. Table virtualisation
+and grouping remain the separate next increment, with scheduling/rich text later.
+The catalogue contains 51 guidance entries, fourteen blocks and three templates;
+135 registry items and 36 ZIP starters carry the same source (19 Next.js,17 Vite).
+This source remains local until an authorised release.
+
+
+## Grouped and large tables - 30 October 2026
+
+DataTable now accepts optional row grouping. WindowedTable is a separate native
+table view for complete bounded datasets, with fixed single-line rows, logical
+keyboard navigation and supplied-record selection. LargeIssueTable composes
+both reading views with shared selection and a parent-owned detail editor.
+The existing paged IssueRepository protocol and inline editor remain compatible.
+See large-tables.md for limits, group-count scope and callback ownership.
+
+Representative 10,000/20,000-record checks and source installation evidence are
+recorded in verification.md. Scheduling and rich text remain the next ordered
+increment; this does not change Workbench milestones or the fixed allocation.
+
+
+## Day agenda and availability - 30 October 2026
+
+DayAgenda displays supplied windows and appointments using explicit UTC offsets.
+SchedulePlanner combines date, zone and duration controls with a retained booking
+draft and abortable callbacks. Host-supplied UTC instants avoid guessing how local
+clock times map to instants; the pure model checks revisions, bounds and overlaps.
+The host must make its authorisation and revision/overlap write atomic.
+
+The day view is bounded to 200 availability windows and 500 appointments, each
+at most 24 hours. Whole-minute source instants and 15–120 elapsed-minute bookings
+are explicit limits. This adds no new dependency. Recurrence, resource scheduling,
+calendar sync and rich text remain future work; the fixed allocation is unchanged.
+
+The preceding mobile-preview fix changes the issue workspace to size itself from
+its own container. Embedded narrow previews are now tested as well as actual
+phone viewports; audit evidence and workflow checks are in verification.md.

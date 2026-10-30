@@ -1,3 +1,618 @@
+## Source release preparation — 30 October 2026
+
+The owner authorised check-in and push of the BLD8 UI changes after the protected
+08:00–17:00 Australia/Melbourne window. This release includes the theme lab,
+shared selection/colour refinements, charts/analytics, Tree/file browsing,
+grouped/windowed tables, day agenda/scheduling and the mobile Safari fixes.
+The personal Jaison identity, isolated SSH and shared hooks are preserved.
+
+The verified evidence below remains applicable: the complete 406-case regression
+and 116-case pinned quality runs, followed by the final theme-only build, 18
+theme cases and 12 expanded touch cases. All 40 archives include the final styles
+and vector marks. Documentation changes for source publication do not change
+runtime code. Remote CI and production deployment are separate checks against
+the actual pushed revision; local success does not establish either result.
+
+## Final polish and mobile Safari fixes — 30 October 2026
+
+Closed the session with small presentation changes and the reported iPhone bugs.
+Agenda cards show each start once and describe the end through aria-describedby.
+Overnight booking review includes the complete end date. Recovery/footer copy is
+shorter. Scheduling calculations and callback contracts are unchanged.
+
+Touch inputs previously used 13–14px text. Shared native editable input, textarea,
+numeric and multi-select fields now use max(16px, the control text token) when a
+coarse pointer is available, including compact density. Desktop sizing and larger
+custom fonts are retained. No maximum-scale/user-scalable restriction or script
+to force the viewport scale was introduced. Colour emoji marks were replaced by
+the header's vector path through the additive Icon name="mark" option in artwork,
+Outline, Studio and Gather. The dotted arrow and #FFD900 palette are unchanged.
+
+The production build/types pass (104 routes). All 406 domain/browser
+cases pass (6.0m) using isolated Edge. All 116 pinned Linux checks
+pass (5.5m) with snapshot updates disabled: twenty existing images,
+84 normal-motion workflow cases and twelve new touch cases. They cover native
+focus/blur, readable grouped/compact/numeric/multiple/textarea inputs, larger
+custom text, unrestricted viewport metadata and consistent vector marks in both
+themes across Chromium, Firefox and WebKit. A separate capture confirms 16px touch
+search, unchanged 13px desktop compact text and the dark-on-yellow vector mark.
+
+The complete runs preceded a final touch-only theme-editor override correction.
+Its shared-link recovery input also uses 16px text, and colour editors have 44px
+touch targets. After that narrow correction the final build, all 18 theme
+checks (20.7s) and twelve expanded pinned touch cases (44.3s)
+pass. The expanded cases now exercise blocked-clipboard recovery, readable theme
+links and the colour-editor target. Fine-pointer styles/images were unaffected;
+the complete regression and image suites were not repeated for this last rule.
+
+Four agenda images were refreshed and individually reviewed for the final wording;
+all sixteen other references retain their bytes. Hash/export proof and mobile
+captures are under .local. All forty freshly generated starters pass CRC, safe
+path, licence and module checks, including compiled/source touch styles and marks.
+Earlier clean Next.js/Vite consumer installations remain recorded below; their
+dependency graph was not reinstalled for these presentation fixes.
+
+Evidence: .local/mobile-final-build.log, mobile-regression.log, mobile-quality.log,
+mobile-final-themes.log, mobile-final-touch.log,
+mobile-archive-audit.json, mobile-capture-proof.json and close-quality-proof.json.
+The initial host regression attempt was stopped because the default bundled
+Chromium revision was unavailable; the successful complete run explicitly used
+the installed Edge channel and a temporary profile. No browser settings changed.
+
+These checks do not emulate an iPhone's native keyboard or certify that actual
+device's focus zoom. The reporting phone must be rechecked after publication.
+Physical assistive-technology review remains separate from automated axe checks.
+The local preview is restored on port 3120; docs/handoff.md records the next slice.
+No commit, push, deployment, npm publication or follow-up was scheduled. The live
+domain still serves the previous release.
+
+## Embedded mobile fix and day agenda - 30 October 2026
+
+Fixed the reported large-issue Mobile preview on a wide browser. Its toolbar,
+actions and summaries now respond to the panel's named size container rather
+than the browser viewport. Container-based padding and heading sizing keep the
+narrow preview coherent. Body-portalled dialog layout retains viewport rules.
+No overflow clipping is used to conceal controls. Three embedded-preview cases
+and stronger real-phone geometry assertions guard the failure. All 15 preceding
+block previews were audited at 390px inside a desktop viewport; no other visible
+controls escaped their frame. The new planner is checked in both contexts too.
+
+Continued with increment 6a: DayAgenda and SchedulePlanner. Availability windows
+and appointments use supplied UTC instants. A pure model validates/clones source,
+projects calendar days, samples elapsed-time starts and checks bounds, revisions
+and overlaps. Explicit offsets distinguish repeated hours; historical second
+offsets and exact half-open day boundaries are covered. The date-free TimePicker
+is unchanged and no wall-clock-to-UTC resolver is invented.
+
+SchedulePlanner adds date/zone/duration controls, a retained booking draft,
+appointment details and abortable source/write callbacks. Retry preserves its
+request identity; replaced/cancelled completions cannot overwrite current state.
+Custom cancellation requires reload and returns focus to the heading when its
+origin becomes disabled. Rejected writes say success could not be confirmed.
+Overnight options show the following date, and appointments remain visible on
+both overlapping days. Shared easing carries hover/selection and a small day fade;
+reduced motion removes decorative animation. #FFD900 remains unchanged.
+
+The host owns authentication, idempotency and atomic revision/overlap writes.
+Maximum source is 200 availability windows / 500 appointments; intervals last
+at most 24 hours. Source instants have whole-minute precision and bookings use
+15–120 elapsed minutes, in 15-minute steps. Default fixtures and edits live in
+this page; Reload restores the sample. This is not a live booking service.
+Recurrence, resources, calendar sync and the comment composer remain separate.
+See scheduling.md and /integrations/scheduling.
+
+Validation:
+
+- Final production build/types pass: 104 routes, 53 guidance entries, 16 blocks,
+  3 templates, 147 registry items and 40 starters (21 Next.js / 19 Vite).
+- All 406 domain/browser cases pass in the complete production run. The focused
+  source runs passed 14 pure scheduling cases, 13 workflow cases and 13 issue
+  cases; the later overnight case is included in the full run. New coverage
+  includes New York/Melbourne gaps/repeats, historical offsets, source limits,
+  UTC identity, retained drafts, cancellation reconciliation/focus, source
+  recovery, fields aligned on a baseline, live reduced motion and phone axe.
+- The pinned Linux runner passed 20 intentional image updates, then all 104
+  ordinary comparisons/workflow checks with updating disabled (3.4 minutes).
+  All 16 earlier images are byte-identical with unchanged dimensions. Four
+  agenda references are new: 1200×968 desktop and 318×1523 phone in both themes.
+  Reviewed all four; final copies match candidate and container-export hashes.
+  No masks, thresholds or screenshot policy were relaxed. Chromium, Firefox
+  and WebKit also exercise the original embedded Mobile regression.
+- Real shadcn 4.21.4 installs pass independently in Next.js and Vite: 59-item
+  graph, types/builds, server-side pure helpers and light/dark interactions.
+  New checks book an appointment, inspect its normalized UTC instants and
+  retain existing theme, portal, file, chart and table checks. Temporary apps
+  are removed; generated registry bytes stay unchanged during the run.
+- The downloadable SchedulePlanner Vite starter independently installs/builds.
+  All 40 final archives pass CRC, safe-path, licence and new-module checks.
+  Existing visible Vite fixture directive/chunk warnings are not suppressed.
+- Reviewed desktop, embedded 390px and actual phone-width planner captures:
+  zero page/frame overflow and no uncaught errors. Final whitespace check passes.
+  Automated checks do not replace manual assistive-technology review.
+
+Evidence is ignored under .local: mobile-preview-all.log,
+embedded-mobile-audit.json, schedule-state.log, schedule-planner-focused.log,
+schedule-build-final.log, schedule-regression.log, schedule-consumers.log,
+schedule-quality.log, schedule-vite.log and schedule-archive-audit.json.
+The accepted Linux export is .local/quality-linux/
+76d1adf8-0ef8-4f5e-a887-4b560a2f3900/ with final PNG hash proof in
+.local/schedule-quality-review/. Captures are recorded in schedule-review.json.
+
+The local preview is restored on http://127.0.0.1:3120. No commit, push,
+deployment, package publication or change to the fixed roadmap allocation was
+performed. The next ordered slice is the comment composer and sanitisation
+boundary review.
+
+## Grouped tables and large issue workspace - 30 October 2026
+
+DataTable now has optional supplied-record grouping and guarded collapse during
+an inline edit. Its ungrouped defaults and paged service protocol remain intact.
+WindowedTable is a separate native table over complete bounded records, sharing
+Column<T>, selection keys and grouping helpers. It supports fixed single-line
+rows, logical keyboard navigation, a retained focus target and explicit external
+sorting. LargeIssueTable composes Scroll/Pages over 10,000 illustrative issues,
+with shared selection, selected CSV export and a parent-owned detail draft.
+See large-tables.md and /integrations/large-tables for limits and callback scope.
+
+The host still owns authentication, authorisation, persistence and atomic
+revision checks. No production issue API, variable-height windowing, infinite
+loading or inline editor inside a windowed row is supplied. Maximum complete
+data is 20,000 records / 40,000 flattened entries. Ordinary pages remain the
+sequential-reading alternative. This does not change Workbench or the roadmap.
+
+Interaction fixes include revealing repaired focus after a host filter, retaining
+the detail draft on rejected saves, ignoring cancelled/stale results, and moving
+focus to the workspace heading when a save removes its trigger. Collapsing a
+group containing an active EditableCell retains and focuses that draft. The
+showcase's project-name demo now exercises save, validation and cancellation.
+Native scrolling stays immediate; shared easing handles hover, disclosures and
+the view indicator. Reduced motion removes decorative travel. The approved
+accent remains exactly #FFD900; geometry and inset choice styling are preserved.
+
+Validation:
+
+- Final production build and TypeScript pass: 101 routes, 52 guidance entries,
+  15 blocks, 3 templates, 141 registry items and 38 starters (20 Next.js,18 Vite).
+- All 375 domain/browser cases pass in the final complete run. The earlier run
+  found one collection-label contrast cascade in both themes and three outdated
+  hardcoded palette expectations. The cascade is corrected; the assertions now
+  resolve semantic tokens while retaining motion and geometry checks.
+- Representative 10,000/20,000-record views mount at most 24 model rows in the
+  checked viewport, including a retained focus row. Rows keep exact 52px/56px
+  geometry and share header edges. The default issue specimen measured 13
+  mounted entries and a 560,268px extent (10,004 logical entries plus header),
+  with no page overflow or browser errors. This is structural evidence, not a
+  universal frame-rate or hardware performance claim.
+- Full-group selection/export covers all 2,500 supplied In review issues;
+  filtering and Scroll/Pages preserve selected IDs. Tests cover keyboard
+  endpoints, focus repair/retention, collapse, failed-save retry, cancellation,
+  malformed/empty/loading sources and phone light/dark axe checks.
+- The pinned Linux runner passes 16 intentional image updates, followed by all
+  88 comparisons/normal-motion workflow checks with updates disabled. Chromium,
+  Firefox and WebKit cover both themes and viewport sizes. Eight palette images
+  changed, four table references are new and four session images are byte-identical.
+  Existing image dimensions, thresholds and masks are unchanged. All candidates
+  were reviewed; copied hashes match the successful container export.
+- Actual shadcn 4.21.4 installation passes in independent Next.js and Vite apps:
+  53-item graph, custom alias, styles/licences, builds, pure Server Component
+  helper evaluation and light/dark keyboard/group/selection/detail editing.
+  Consumers are removed and generated registry bytes stayed unchanged during
+  the check. This preceded a text-only footer simplification; the final build,
+  archive audit and complete regression run cover that final wording.
+- The large issue Vite archive independently installs and builds. All 38 final
+  archives pass CRC, safe-path, licence and final-table-module checks. The
+  consumer fixture retains its existing visible Vite directive/chunk warnings.
+- Reviewed final 1440px/390px issue views in both themes with no page overflow
+  or uncaught errors. Final whitespace checks pass. Manual assistive-technology
+  review remains separate; automated scans do not certify accessibility.
+
+Evidence is ignored under .local: large-tables-build-final.log,
+large-tables-regression-final.log, large-tables-consumers.log,
+large-tables-quality.log, large-tables-archive-audit.json and
+large-tables-final-review.json. The accepted Linux export is
+.local/quality-linux/bf438bc5-d12d-4a5e-bb78-64c1063c3eb7/; PNG review and
+hash proof are in .local/large-tables-quality-review/. The interrupted earlier
+quality run is retained separately and is not acceptance evidence.
+
+The local preview is http://127.0.0.1:3120. No commit, push, deployment or npm
+publication was performed. The next ordered increment remains scheduling and
+a narrow comment composer; source release requires separate authorisation.
+
+## Yellow restoration and supporting palette - 30 October 2026
+
+Current local direction: user-selected yellow #ffd900 (confirmed 30 October
+2026), dark primary actions, white panels and the original warm-grey
+canvas. Champagne selection and focus complement the accent. Evergreen and
+mint data shades provide supporting colour; forest success and brick errors
+retain separate semantic meaning. Existing geometry, inset depth, easing,
+keyboard targets and reduced-motion behaviour remain unchanged. The iris
+trial below is historical and is no longer the default.
+
+Historical supporting-palette validation at the interim #f2d32e value (before
+the final one-token #FFD900 choice):
+
+- All 27 focused cases passed against the live source preview: theme contracts,
+  readable text/status/chart colours, CSS export parity, theme customisation,
+  keyboard selection, forced colours, choice/slider motion and the composed
+  Interface study. The checked-thumb assertion now follows accent foreground.
+- Pure proof covers 228 configurations in both modes (456 combinations and
+  15,048 assertions). Shared text contrast remains at least 4.5004:1; chart
+  contrast on panels/surfaces remains at least 3.2000:1. Static/generated CSS
+  matches for 103 non-font tokens per mode, retaining the two font exceptions.
+- Reviewed desktop and 390px phone views in light/dark plus the bar chart.
+  No page overflow or uncaught browser errors in those captures. Evidence is
+  ignored under .local/yellow-review and .local/yellow-token-proof.json.
+- The local source watchers compile the UI and blocks with no errors. Git
+  whitespace checking passes with CRLF treated as line endings.
+
+The live preview remains on http://127.0.0.1:3120. At that palette-only checkpoint, a fresh production build and
+the full pinned visual suite had not been rerun; the
+existing production-build evidence below belongs to its recorded version.
+Review/update pinned colour references before the next authorised release.
+No commit, push, deployment or package publication was performed.
+
+## Shared iris theme trial - 29 October 2026
+
+Historical trial, superseded by the yellow restoration above. It used iris actions with related pale surfaces for hover,
+selection and supporting feedback. Charts use six related shades from the same
+theme family. White/light-grey panels and canvas stay neutral; success, warning
+and error retain their semantic pairs. Presets and custom accents derive matching
+info, progress and chart colours. Factory actions use solid fills to preserve
+foreground contrast; existing inset choices, geometry and easing remain.
+
+Generic icon backgrounds and catalogue labels are neutral again. Chart examples
+use the original primary/accent/muted tone roles. The Theme lab preview now has
+an Interface study tab combining fields, choices, actions, a chart and selectable
+project table. Preview data and changes remain local to that frame.
+
+Validation:
+
+- Final production build and TypeScript passed: 98 routes, 51 component guidance
+  entries, 14 blocks, 3 templates, 135 registry items and 36 ZIP starters.
+- The focused 45-case selection/theme/motion set covered all cases successfully
+  across the initial run and bounded correction run. Initial run: 43 passed;
+  two stale test assumptions were corrected (old action sheen and an out-of-scope
+  palette variable). Both corrected cases passed separately without application
+  changes. Includes light/dark automated accessibility scans for all presets,
+  keyboard/focus, forced colours, reduced motion, custom exports and phone layouts.
+- Pure checks covered 228 configurations in both modes (456 combinations,
+  15,048 assertions). Minimum shared text/focus contrast was 4.50016:1; chart
+  contrast on panels/surfaces was 3.20014:1. Default static/generated values match
+  for 103 non-font tokens per mode; the existing portable-font exceptions remain.
+- Legend tint review covered 2,736 series/theme/mode paints. The final 3% normal
+  and 5% hover fills keep graphical contrast above 3:1. Existing 9%/14% fills were
+  reduced after this check.
+- Reviewed integrated desktop/390px phone captures in light/dark, plus the bar
+  chart. No page overflow or uncaught browser errors. Evidence is ignored under
+  .local/iris-review; pure proof is .local/iris-token-proof.json.
+- Git whitespace check passed with Windows CRLF treated as line endings.
+
+This is an unpublished local trial. The pinned screenshot references remain at
+the previously reviewed palette; this entry does not claim an updated full Linux
+visual run. Review/update those references before the next authorised release.
+No commit, push, deployment or package publication was performed.
+
+
+## Bounded charts and analytics - 29 October 2026
+
+Added Chart with categorical line/bar/area views, signed values, explicit null
+gaps, six series patterns, keyboard/pointer exploration and an exact data table.
+Pure validation, domains, geometry and summaries also have a server-safe package
+subpath. API guidance, installation and the preview ship with the component.
+
+AnalyticsDashboard composes period selection, three derived metrics, chart views,
+abortable reports, guarded retry focus and formula-safe CSV export. Default data
+is deterministic and illustrative. Loader/request identity rejects cancelled or
+stale results; reports are cloned and checked before display or export. The host
+owns collection, date boundaries, permissions and persistence.
+
+Manual review corrected grouped-bar marker positions and crowded narrow labels.
+The chart keeps full labels and values in the keyboard/data paths. Loading now
+retains the natural report base height, excluding an expanded table; responsive
+initial floors and consistent KPI value/copy reserves keep the toolbar steady.
+Shared easing, immediate inert exits and live reduced motion remain in place.
+
+Validation:
+- Production build passed with 98 routes, 51 guidance entries, fourteen blocks,
+  three templates, 135 registry items and 36 ZIPs (19 Next.js, 17 Vite).
+  Final workspace and strict quality-test types passed. No runtime dependency or
+  lockfile change was introduced.
+- The final complete Edge run passed all 333 cases in 6.7 minutes with the CI
+  worker count and no retries/skips. The focused 29 chart/report cases passed
+  separately in 35.6 seconds. These cover geometry, keyboard/focus, nulls, finite
+  extremes, safe totals, exact CSV, recovery, cancellation, mobile containment,
+  both-theme axe, axis-label spacing and report/table loading geometry.
+- Earlier long five-page accessibility sweeps exhausted their combined 30-second
+  budget without a reported violation. They are now ten page/theme cases with
+  identical URLs, tags and assertions, unchanged timeouts and no retries. A menu
+  test now opens by keyboard and waits for popup focus before End. Initial traces
+  remain in ignored .local/charts-axe-timeout-evidence/ and
+  .local/charts-menu-focus-timeout-evidence/; the complete final run is green.
+- The pinned Linux runner passed clean install, strict quality types, a fresh
+  build, twelve explicit changed-only image update checks and all 72 ordinary
+  image/browser checks in 3.4 minutes, without retries or skips. Ordinary image
+  comparison had updates disabled. Chromium, Firefox and WebKit cover both themes
+  and desktop/phone sizes. Four new Chart references were reviewed; the eight
+  preceding image hashes are unchanged, with no mask/tolerance widening.
+  Reports: .local/quality-linux/d7a5e8ee-d8f7-4097-91b1-587458838730/.
+- Actual shadcn 4.21.4 installed the 46-item graph into clean Next.js 16.3.8 and
+  Vite 8.3.4 consumers. Both built independently. Four light/dark contexts checked
+  exported themes, real control geometry, focus, body portals, lazy files and
+  analytics/chart exploration. Next prerender evaluated installed pure chart and
+  report helpers. Native package server subpaths were checked separately too.
+  Temporary consumers were removed; producer registry bytes stayed unchanged.
+- The extracted analytics Vite ZIP independently installed and built. Its entry
+  is 574.03 kB minified / 187.64 kB gzip; the normal large-chunk and client-directive
+  warnings remain visible. This increment claims no bundle-size improvement.
+  The exact owned temporary starter was verified and removed.
+- All 36 ZIPs passed CRC, safe paths, licence retention, runtime/environment
+  exclusion and exact shared-style checks. All 135 registry dependencies resolve
+  through the expected production URL graph. Actionlint, all sixteen release
+  aggregate combinations and diff whitespace passed.
+- The representative 366-observation/six-series case exposed all 2,196 values,
+  366 keyboard point buttons and 366 exact table rows. Its chart contained
+  3448 DOM elements; the local load/explore/table sequence measured
+  1339 ms in that final run. This is a local observation, not a universal
+  frame-rate or large-data performance guarantee.
+- Desktop/tablet/phone captures were reviewed at 1440/768/390/320 in both themes.
+  Final eight-capture review on the editing preview confirms marker alignment,
+  contained nonoverlapping phone labels, zero page errors and no horizontal
+  overflow. Ready/loading report heights are 704/704px at 320 and 640/640px at390;
+  toolbar movement is zero. See .local/charts-review/final/review.json.
+
+Primary logs: .local/charts-final-build.log, charts-final-types.log,
+charts-final-quality-types.log, charts-complete.log, charts-quality.log,
+charts-consumers.log, charts-vite.log and charts-final-review.log. The local
+editing preview is restored on port 3120 with type/style watchers. Isolated test
+servers and the quality container are stopped; temporary installers are removed.
+
+No commit, push, deployment or npm publication was performed. Public installation
+still serves the preceding release. Table virtualisation/grouping remains a
+separate next increment. Automated evidence does not establish manual assistive-
+technology or real-device certification. See charts-and-analytics.md.
+
+## File browser interaction polish - 29 October 2026
+
+Focused folder buttons, breadcrumbs and Up now hand focus to the persistent
+folder heading. Load/Retry folder use the same destination; clearing a search
+returns to its input. Tree selection and sorting retain their own focus. A
+one-shot source-scoped intent prevents async completion or replacement data from
+taking focus. The showcase also preserves a focused workspace retry across its
+keyed remount; application hosts own that boundary in their own integrations.
+
+Results, loading and recovery states enter with a short eased opacity/position
+transition. Replaced interactive content is removed immediately. The heading
+and toolbar remain steady, with an understated underline for heading focus.
+Reduced motion removes travel. Failed folder counts now read Unavailable rather
+than suggesting that the failed folder contains zero items. Public APIs and
+runtime dependencies are unchanged.
+
+Validation:
+- Production build passed after the showcase retry fix and guide updates.
+  Workspace and strict quality-test types passed. Catalogue counts remain
+  95 routes, 50 guidance entries, thirteen blocks, three templates, 129 registry
+  items and 34 starters. The final heading underline is a CSS-only refinement
+  reviewed in the live editing preview after that build.
+- All 26 focused Edge cases passed in 27.6 seconds: eight new focus cases plus
+  the existing Tree/file-browser and selection-style cases. Coverage includes
+  normal/reduced motion, folder and workspace recovery, no async focus stealing,
+  heading geometry, narrow layouts, both-theme axe and forced-colour selection.
+  Logs: .local/file-browser-polish-final-tests.log and .local/file-browser-polish-final-build.log.
+- The pinned Linux runner passed clean install, strict quality types, a fresh
+  production build and all 56 ordinary visual/browser cases in 2.5 minutes,
+  with no retries, skips or baseline updates. The expanded Tree/FileBrowser case
+  checks navigation/search focus under normal motion in Chromium, Firefox and
+  WebKit, both themes and desktop/phone viewports. Reports are retained under
+  .local/quality-linux/7c51fb43-2f52-4743-84c9-bc8076887a5c/.
+  That source snapshot preceded the final showcase-only remount handoff; the
+  final host build and eight focus cases separately verify that adjustment.
+- All 34 regenerated starter archives passed CRC, path, licence, excluded-runtime
+  and exact shared-style checks. All registry dependencies resolve locally through
+  the expected production URL graph. No lockfile change was made.
+- Settled desktop 1440px and phone 390px captures were reviewed in both themes
+  with normal motion. Navigation/search/workspace-retry handoffs worked, with no
+  page errors or horizontal overflow. The local editing preview is restored on
+  port 3120 with type/style watchers; isolated test servers are stopped.
+
+No commit, push, deployment or package publication was performed. Manual
+assistive-technology and real-device review remain outside these automated
+checks. Earlier full-suite and install-consumer evidence is retained below;
+this focused pass is not a new run of that complete regression suite.
+
+## Tree, file browser and shared selection - 29 October 2026
+
+Added a single-selection Tree with roving focus, keyboard/typeahead traversal,
+controlled expansion, disabled subtrees, lazy-load requests and focus repair.
+Presence groups ease their height/opacity, become inert immediately on exit,
+and react to live reduced-motion changes. Public types, API tables, registry
+source and the component demo ship together.
+
+FileBrowser composes the Tree with folder breadcrumbs, search/sort, aligned file
+metadata and a details inspector. Its default entries and abortable Archive
+loader are illustrative. External loaders receive AbortSignal; source/request
+identity guards ignore cancelled or stale results, successful child data is
+cached, and per-folder failures retain other data and provide retry. Complete
+merged data is validated for unique IDs, structure and bounded depth/size before
+applying. No filesystem access, file contents or storage service is supplied.
+
+At the user's request, selection styling now uses a shared neutral backplate,
+readable foreground and soft inset definition. Tree/sidebar markers are short,
+rounded and inset from the edge. Menus, tabs, tables, moving view indicators,
+catalogue navigation and scoped preview controls follow the same treatment.
+Focus remains distinct, destructive actions retain their error colours, and
+forced-colour selection uses system colours. Yellow accent actions, Boolean-on
+fills, date endpoints and the existing smooth motion remain. Five shared tokens
+also appear in exported themes; contrast reporting now covers nine text pairs.
+
+Validation:
+- Production build passed with 95 routes, 50 guidance entries, thirteen blocks,
+  three templates, 129 registry items and 34 starters (18 Next.js, 16 Vite).
+  Workspace and strict quality types passed. No runtime dependency/lockfile change.
+- The final complete Edge run passed all 288 cases. The 29 Tree/file-browser cases
+  and three selection-style cases cover keyboard focus vs selection, collapse and
+  removal repair, async cancellation/retry/invalid data, mobile containment,
+  aligned metadata, both-theme axe, flat custom themes, forced colours and stable
+  selected geometry. Earlier test-only corrections handle transparent RGBA in
+  forced colours and wait for actual portal focus before keyboard traversal.
+- Real shadcn 4.21.4 installed the 40-item graph into clean Next.js 16.3.8 and Vite
+  8.3.4 consumers. Both built independently and passed four fresh light/dark style,
+  focus, portal and lazy file-inspection contexts using exported custom CSS.
+  Production registry bytes were unchanged and temporary consumers were removed.
+- The independently extracted file-browser Vite archive installed and built.
+  Its entry is about 572 kB minified / 187 kB gzip and retains the visible large-
+  chunk warning; this increment makes no bundle-size improvement claim.
+- All 34 archives passed CRC, path, licence, environment/runtime exclusion and
+  exact shared-style checks. All registry dependencies resolve through production
+  URLs. Existing third-party notices are retained. Actionlint, all sixteen release
+  aggregate result combinations and diff whitespace passed.
+- Desktop, tablet, phone 390/320 and dark file/Tree captures were reviewed without
+  page errors or document overflow. Tree, file and integration guides document
+  the host/data boundary and local publication status.
+
+The final pinned Linux run passed clean install, strict quality types and a fresh
+production build, followed by eight explicit changed-only visual update checks
+and all 56 ordinary checks in 1.9 minutes without retries or skips. Only the four
+control references changed; all four session references remain byte-identical.
+Canvas dimensions are unchanged. The phone reference includes a deterministic
+paint-phase correction from fractional locator cropping; fixed integer clips
+and an uncounted warmup produced twelve byte-identical probe captures, with
+strict before/after CSS-box equality. Pixel tolerances and masks were not widened.
+The ordinary comparison ran with updates disabled. Final reports are retained in
+.local/quality-linux/a6b648de-631b-4a0f-9625-3678aacb331b/ and the final status
+file is zero. Dedicated test containers and temporary consumers were removed.
+See visual-quality.md for the exact bounds and capture policy.
+
+The local editing preview on port 3120 was checked for neutral Tree selection,
+the updated foundations copy, working FileBrowser and nine contrast pairs in a
+3-by-3 desktop grid or a two-column phone grid with the final row spanning both
+columns. The browser review found no page errors. The copy and final grid rule
+were manually checked after the 288-case suite and included in the final Linux
+production build. Temporary production/test previews are stopped.
+No source commit, push, deployment or npm publication was performed. The public
+registry remains the preceding release. Source and CI changes require an
+authorised release; the configured Vercel gate still needs its first observed
+hold/promotion cycle. Automated checks do not establish manual assistive-
+technology, physical-device or real Safari coverage. See file-browser.md and
+selection-style.md for the current public contracts.
+
+## Theme lab and portable themes - 29 October 2026
+
+Added /themes with BLD8, Cobalt and Sage presets; accent and primary colours;
+typography, radius, density and shadows; isolated light/dark and phone previews;
+contrast reporting; shareable history-aware URLs; CSS copy/download and manual
+recovery. The real preview includes menus, choices, a project dialog and local
+actions. It acknowledges applied settings and validates message origin/source.
+Its noindex /themes/preview document themes html so body portals inherit tokens
+without recolouring the editor or site. Settings are URL state, not local storage.
+
+The pure theme-config subpath normalises/validates versioned settings and exports
+complete tokens and ordinary CSS for both modes. Next server components and Vite
+can use it without the lab. Named fonts require host loading; system fallbacks
+are included. Custom action fills and dark accent surfaces derive readable text,
+including hover states. Seven unrounded contrast pairs use the 4.5:1 threshold.
+The matching shared stylesheet consumes density/radius tokens while preserving
+factory visuals. Fine-pointer compact controls align at 40px, and coarse-pointer
+field/action/choice rows keep their larger target treatment.
+
+Validation:
+- Final production build passed: 92 routes, 49 guidance entries, twelve blocks,
+  three templates, 123 registry items and 32 starters. All workspace types and
+  strict quality types passed. No runtime dependency or lockfile change.
+- The earlier full 254-case Edge run passed 253 cases; the sole failure was an
+  old outside-click test whose paragraph was now covered by the expanded tablet
+  menu. The test now clicks exposed space outside the header and checks three
+  phone/tablet widths. On final source all 32 affected model/theme/navigation
+  cases passed, including all three presets in both-theme automated axe scans,
+  URL history and hostile input, exact density, scoped portals, export files and
+  failure recovery, missed early-ready messages, live reduced motion and coarse
+  pointer targets. The current full suite contains 256 cases; it was not rerun
+  as one combined run after the targeted correction.
+- A fresh isolated pinned Linux runner passed clean npm ci, quality types, a
+  production build and all 44 quality cases without retries/skips. All eight
+  original screenshot baselines matched unchanged. The 36 normal-motion cases
+  exercise Chromium, Firefox and WebKit in both themes and viewport sizes,
+  including theme scope, keyboard dialog actions, CSS download and URL reload.
+- Final real shadcn 4.21.4 installations into clean Next.js 16.3.8 and Vite 8.3.4
+  consumers passed independently. Each installed the 35-item graph/42 files.
+  Next prerender evaluated the pure helpers, Vite used its custom UI alias, and
+  four fresh light/dark contexts checked actual 40px heights, fills, radius,
+  system fonts, flat shadows, focus and body-portalled dialogs. Production
+  registry bytes were unchanged; temporary apps/servers were removed.
+- All 32 ZIPs passed CRC, safe-path, licence, runtime/environment exclusion and
+  final-style checks. Each includes the exact theme helper source, compiled JS,
+  declarations and public subpath export. All 123 registry dependencies resolve
+  through production URLs. Existing third-party notices remain intact.
+- Reviewed desktop/default, dark Cobalt, phone 320/390 and dialog captures.
+  Mobile labels and project metadata remain contained. Actual header measurements
+  at 1040/1041/1080/1120/1121/1200/1440 show no overlap or horizontal overflow.
+- The final workflow passes actionlint 1.7.12; all sixteen aggregate dependency
+  result combinations reject anything except both-success. Diff whitespace passes.
+
+The final Linux report is in local ignored quality diagnostics under run
+bbf97203-fcdc-4190-a7b6-35ff4e7684bb. Final targeted and consumer logs are
+.local/theme-lab-final-validation.log and .local/registry-consumers-final-check.log.
+No source commit, push, deployment or npm publication was performed. The live
+registry remains the preceding 121-item release; the configured Vercel gate still
+needs its first observed hold/promotion cycle. WebKit does not establish real
+Safari/device coverage or manual assistive-technology certification. See
+[theme integration](theme-lab.md) for font, host and stylesheet requirements.
+
+## Release and browser quality - 29 October 2026
+
+Prepared a split CI workflow with core validation, pinned browser quality and a
+final aggregate retaining the UI PR checks / UI Release checks names. Core
+validation now installs the actual registry into clean Next.js and Vite apps in
+addition to building the four existing Vite archives. The aggregate can succeed
+only when both dependency jobs succeed; failed, cancelled and skipped results
+are rejected. The ordinary source commit/push guards remain active.
+
+The personal Vercel project's production gate was created and read back: GitHub
+UI Release checks is required after build-ready and blocks production-domain
+aliasing, with a 3,600-second timeout. Automatic aliasing remains enabled. No
+existing unrelated check or project setting was changed. The current public
+site still returns HTTP 200. This verifies configuration, not an observed future
+deployment hold/failure/promotion cycle; that remains a next-release check.
+
+New quality coverage includes eight reviewed Linux Chromium baselines for shared
+controls and SessionSetup preferences, light/dark at 1440 and 390 px. Twenty-four
+normal-motion cases cover keyboard choices, interrupted dialog entry, focus
+restoration, canonical numeric/time values and restored drafts across Chromium,
+Firefox and WebKit. Fixed Date, locale, timezone and bundled fonts stabilise the
+images; real month navigation refreshes the calendar's prerendered today marker.
+Missing or changed baselines fail normal runs; CI never approves replacements.
+
+Validation:
+- All 32 new quality cases passed without retries in the pinned Linux image.
+- An intentional spacing regression in the disposable copy failed comparison:
+  179,850 pixels differed and the control region height changed. The style was
+  restored and ordinary comparisons passed. Authoritative application source
+  and shared styles were not changed for that probe.
+- The documented Docker runner passed from a fresh isolated container: allowlisted
+  source copy, checksum-verified Node 22.22.0, npm ci, strict quality types, a new
+  production build and all 32 ordinary comparisons. Host dependencies/generated
+  output were excluded. Eight baselines were visually reviewed.
+- Actual shadcn 4.21.4 installs and independent builds passed on both Windows and
+  Linux for Next.js 16.3.8 and Vite 8.3.4. Each fetched the 33-item SessionSetup
+  graph and created 41 source/style/notice files. Next prerender evaluated pure
+  server helpers; Vite used the custom ~/ui alias. Temporary consumers were
+  removed and production registry bytes preserved. Expected Vite directive and
+  bundle-size warnings remain visible; this slice does not claim smaller bundles.
+- Quality test/configuration types passed. Checksum-verified actionlint 1.7.12
+  passed the workflow. All 16 aggregate success/failure/cancelled/skipped
+  combinations were checked; only both-success passed. Diff whitespace passed.
+
+The existing 227-case Chromium interaction suite remains intact and last passed
+for the preceding source release. It was not repeated for these test/docs/CI-only
+changes; the new workflow still requires it on every future release. No new
+runtime dependency or package-lock change was introduced. Scope/registry notes
+now describe the current 49 guidance entries, twelve blocks and 32 starters.
+
+WebKit engine coverage is not real macOS/iOS Safari or physical-device review.
+Manual assistive-technology testing, broader visual coverage and the real
+promotion-cycle observation remain open. No new source commit, push, deployment
+or npm publication was performed. The CI expansion remains local until an
+authorised source release; the Vercel gate configuration is already active.
+
 ## Setup controls and session workflow - 28 October 2026
 
 Added Stepper, NumberField and TimePicker, plus the SessionSetup block. The
@@ -860,3 +1475,8 @@ behaviour test and eight affected accessibility/responsive checks passed after
 rebuilding the catalogue. The suite now contains 93 checks. The local development
 preview is available on port 3120; temporary registry and production-preview
 servers were stopped.
+
+The final local editing preview was restored on port 3120. Both theme routes
+return HTTP 200; the development browser confirms a live dark Cobalt frame, seven
+contrast rows, an unchanged yellow parent theme and no page errors. UI, block and
+style watchers are active. Temporary test/consumer/quality servers are stopped.

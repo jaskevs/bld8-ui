@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { CalendarDays, FolderOpen, Search, Settings2, Sparkle } from 'lucide-react';
-import { Alert, Badge, Button, CommandPalette, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, SidebarProvider, Sidebar, SidebarHeader, SidebarGroup, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarTrigger } from '@bld8/ui';
+import { Alert, Badge, Button, Icon, CommandPalette, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, SidebarProvider, Sidebar, SidebarHeader, SidebarGroup, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarTrigger } from '@bld8/ui';
 import { OutlineProjects } from './outline-projects.js';
 import { createOutlineRepository, type OutlineRepository } from './outline-repository.js';
 import type { ResourceRecord } from './resource-manager.js';
@@ -21,7 +21,7 @@ export function OperationsTemplate({repository:provided}:{repository?:OutlineRep
   const [view,setView]=useState('Planning');const heading=useRef<HTMLHeadingElement>(null);
   function navigate(next:string) {setView(next);requestAnimationFrame(()=>heading.current?.focus());}
   return <div className="bblocks-operations">
-    <header className="bblocks-operations-header"><span className="bblocks-wordmark"><span aria-hidden="true">✳</span> Outline</span><Badge tone="accent">Example application</Badge><CommandPalette title="Outline navigation" trigger={<Button variant="secondary" size="sm" leadingIcon={Search}>Find a view</Button>} items={views.map(item=>({id:item.id,label:'Open '+item.id.toLowerCase(),category:'Navigate',icon:item.icon,onSelect:()=>navigate(item.id)}))} /></header>
+    <header className="bblocks-operations-header"><span className="bblocks-wordmark"><span aria-hidden="true"><Icon name="mark" size={18} strokeWidth={1.6} /></span> Outline</span><Badge tone="accent">Example application</Badge><CommandPalette title="Outline navigation" trigger={<Button variant="secondary" size="sm" leadingIcon={Search}>Find a view</Button>} items={views.map(item=>({id:item.id,label:'Open '+item.id.toLowerCase(),category:'Navigate',icon:item.icon,onSelect:()=>navigate(item.id)}))} /></header>
     <SidebarProvider className="bblocks-operations-layout">
       <Sidebar label="Outline views">
         <SidebarHeader><Sparkle size={18} strokeWidth={1.75} aria-hidden="true" /><span className="bui-sidebar-label">Your workspace</span></SidebarHeader>

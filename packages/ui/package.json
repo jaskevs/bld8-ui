@@ -37,6 +37,22 @@
     "./time-options": {
       "types": "./dist/time-options.d.ts",
       "import": "./dist/time-options.js"
+    },
+    "./theme-config": {
+      "types": "./dist/theme-config.d.ts",
+      "import": "./dist/theme-config.js"
+    },
+    "./chart-state": {
+      "types": "./dist/chart-state.d.ts",
+      "import": "./dist/chart-state.js"
+    },
+    "./table-grouping": {
+      "types": "./dist/table-grouping.d.ts",
+      "import": "./dist/table-grouping.js"
+    },
+    "./schedule-state": {
+      "types": "./dist/schedule-state.d.ts",
+      "import": "./dist/schedule-state.js"
     }
   },
   "sideEffects": [
