@@ -1,22 +1,16 @@
 # Next work
 
 The owner requested the first four adoption priorities together on 9 November.
-The combined implementation is under release verification; exact local and hosted
+The combined implementation is published; exact local and hosted
 outcomes belong in handoff.md, verification.md and deployment.md.
 
-## Current combined release
+## Delivered combined release
 
-- Refresh the existing personal Vercel Git link and prove an ordinary source push
-  creates a deployment that waits for UI Release checks.
-- Capture clean-install receipts, distinguish CLI transformations from local edits,
-  support custom UI directories and several baselines, and never overwrite source.
-- Publish 0.2.0 as a native immutable GitHub release from a clean reviewed revision.
-  Retain exact asset URLs and dependencies across subsequent deployments.
-- Expand the existing playground to Kanban, Tree and Chart with real public APIs,
-  validated links, matching source and keyboard/loading/recovery examples.
-
-Do not infer hosted completion from a local build. Record the exact pushed
-revision, passing CI, immutable flag, production alias and real consumer checks.
+The first four adoption priorities are implemented and source 0.2.0 is published:
+clean-install receipts, retained immutable assets, Kanban/Tree/Chart playgrounds
+and native Git deployment behind the required aggregate. See handoff.md for the
+exact reviewed source, CI run, release and production deployment evidence.
+Current development uses 0.3.0/unreleased and keeps 0.2.0 assets unchanged.
 
 ## Next bounded improvements
 

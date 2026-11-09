@@ -9,8 +9,8 @@ and 135-hour baseline remain unchanged. Float0 is excluded.
 
 - The existing personal Vercel Git link was disconnected and reconnected to the
   same jaskevs/bld8-ui repository. Project settings, domains and the required UI
-  Release checks production gate are preserved. The next ordinary source push
-  must prove automatic deployment events are repaired.
+  Release checks production gate are preserved. The ordinary source push created a native source:git deployment after an
+  initial event delay. The owner confirmed bld8-ui is included in app access.
 - Clean-install receipts retain both upstream identity and actual installed text.
   The read-only updater distinguishes CLI transforms, later edits, upstream
   changes and conflicts. Custom UI paths and several source baselines work;
@@ -46,15 +46,33 @@ The new flow now uses the actual component selector and explicit URL assertions;
 page-error checks remain enabled. The fresh complete 200-case pinned Linux quality run passes without retries or
 baseline updates.
 
-## Publication acceptance still to record
+## Published source and production
 
-Follow the normal authorised push through core validation, browser quality,
-Retained source release and UI Release checks. Verify the native immutable flag,
-tag/source SHA, exact artifact inventory, production alias and anonymous URLs.
-After promotion, run BLD8_PUBLISHED_VERSION=0.2.0 with check:registry:consumers to
-install the real version URLs in clean Next.js/Vite consumers. Verify the retained
-bytes again after the next useful deployment. Do not claim local candidate
-preparation is hosted publication. See updating-source.md and next-work.md.
+Implementation f7c8998aaf4042f2e3433a276089dbf872a7b581 is pushed with personal
+Jaison author/committer ownership at actual 22:09 Melbourne time. GitHub run
+42606719082 passed core validation, browser quality, Retained source release and
+UI Release checks. The complete CI suite contains 522 regression cases and 200
+quality cases.
+
+Native GitHub release v0.2.0 is public and immutable, ID 439042520, with that exact
+source SHA. All 220 retained public artifacts, their byte digests and pinned
+registry dependencies are verified; snapshot
+1322400af0b09f884e9812b9be0b9a7b544e37996d0cf6485ba9ac433e3c1d7f.
+Versioned installation URLs are available under /releases/0.2.0/r/.
+
+Automatic Git deployment dpl_GJYozSCEncASDfuTHy6gR3sXuY43 is READY and assigned
+to ui.bld8.dev after the required aggregate succeeded. The earlier explicit
+same-SHA build was preparatory; the subsequent source:git build confirms native
+event delivery. No force promotion or gate removal was used. Public routes,
+checker tools, static/themed Vite ZIPs and all three new playground interactions
+pass desktop/phone acceptance with no page errors.
+
+Current development manifests use 0.3.0/unreleased, separate from retained 0.2.0.
+Publication intent continues to verify 0.2.0 without replacing it. For a new
+version, follow updating-source.md; keep every existing catalogue entry.
+Use BLD8_PUBLISHED_VERSION=0.2.0 with check:registry:consumers for clean public-
+URL Next.js/Vite acceptance. Later deployments must retain every frozen byte.
+See verification.md, deployment.md and next-work.md for evidence and boundaries.
 
 The local preview belongs on http://127.0.0.1:3120. Native iPhone focus/blur,
 keyboard zoom and marks remain a physical-device check; desktop WebKit does not

@@ -30,7 +30,7 @@ Immediately after a clean CLI install, before editing:
 
 ```sh
 mkdir receipts
-node tools/capture-installation.mjs --manifest bld8-source.json --item button --ui-dir src/components/ui --output receipts/button.json
+node tools/capture-installation.mjs --manifest manifest.json --item button --ui-dir src/components/ui --output receipts/button.json
 ```
 
 The receipt records the upstream manifest, selected dependency graph and digests

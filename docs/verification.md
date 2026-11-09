@@ -1,3 +1,28 @@
+## Hosted combined adoption release - 9 November 2026
+
+Implementation f7c8998aaf4042f2e3433a276089dbf872a7b581 passed GitHub run
+42606719082: core, browser quality, retained publication and UI Release checks.
+The current CI suite has 522 regression and 200 pinned quality cases.
+
+Native release v0.2.0 is immutable and targets that source SHA (release 439042520).
+Anonymous production acceptance verified all **220 artifacts** byte-for-byte,
+152 registry items, exact tag identity and same-version dependency URLs. Frozen
+snapshot: 1322400af0b09f884e9812b9be0b9a7b544e37996d0cf6485ba9ac433e3c1d7f.
+All public source routes, three standalone receipt/checker modules and static
+and themed Vite ZIPs pass. Live Kanban moves/downloads, Tree retry/selection and
+Chart keyboard/missing-data flows pass at 1440 and 390 pixels without page errors.
+
+The native source:git deployment dpl_GJYozSCEncASDfuTHy6gR3sXuY43 is READY,
+aliasAssigned true for ui.bld8.dev, after the unchanged required aggregate passed.
+An initially missing event arrived later; owner app access is confirmed included.
+Do not infer a provider latency guarantee from this one event. Development now
+uses 0.3.0/unreleased while publication intent verifies the existing 0.2.0 release.
+Keep retained bytes unchanged on every later deployment. The direct public-URL
+consumer check is documented in updating-source.md. Native iPhone acceptance
+remains a separate manual check.
+
+---
+
 ## Combined adoption release preflight - 9 November 2026
 
 The owner authorised all four priorities together. Implemented clean-install

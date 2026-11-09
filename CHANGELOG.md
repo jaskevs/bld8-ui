@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 - Unreleased
+
+Development manifests now use the next planning version. Retained 0.2.0 assets
+and their dependencies stay unchanged. This does not publish another version.
+
 ## 0.2.0 — Source release
 
 Publication is identified by the immutable v0.2.0 GitHub release and its source

@@ -1,3 +1,27 @@
+# Latest production evidence - 9 November 2026
+
+Implementation f7c8998aaf4042f2e3433a276089dbf872a7b581 is live at ui.bld8.dev.
+GitHub run 42606719082 passed core validation, browser quality, native retained
+source publication and UI Release checks. GitHub release v0.2.0 is immutable;
+its 220 public artifacts and exact source/tag identity are verified.
+
+The normal source push eventually created deployment
+**dpl_GJYozSCEncASDfuTHy6gR3sXuY43**, marked source:git. It is READY and its
+production aliases were assigned only after the existing required aggregate
+succeeded. A prior explicit same-SHA build was started while event delivery was
+unconfirmed. No local source upload, force promotion or gate change was used.
+The existing personal Git link was refreshed; the owner confirmed bld8-ui in
+Vercel GitHub-app access. Other repository selections were preserved.
+
+Future main pushes retain the same project, production branch, build settings,
+GitHub validation and required UI Release checks alias gate. Retained source
+verification is part of that aggregate. The moving development manifest is
+0.3.0/unreleased; frozen /releases/0.2.0 URLs remain fixed GitHub release assets.
+No npm package or paid service was introduced. Company/global settings remain
+unchanged. See handoff.md, verification.md and updating-source.md.
+
+---
+
 # Showcase deployment
 
 Canonical domain: https://ui.bld8.dev. The existing https://bld8-ui.vercel.app address also serves the project.
