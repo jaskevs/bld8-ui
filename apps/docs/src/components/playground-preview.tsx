@@ -5,6 +5,10 @@ import {Accordion,Alert,Badge,Button,Calendar,Checkbox,DatePicker,DateRangePicke
 import {localDate,type PlaygroundSettings} from '@/lib/playground-state';
 import {playgroundDisclosures} from '@/lib/playground-data';
 import {PlaygroundTable} from './playground-table';
+import {KanbanExample} from '@/examples/playground-kanban';
+import {TreeExample} from '@/examples/playground-tree';
+import {ChartExample} from '@/examples/playground-chart';
+import {kanbanExampleConfig,treeExampleConfig,chartExampleConfig} from '@/lib/playground-workflow-config';
 
 export const disciplineOptions=[{value:'design',label:'Design'},{value:'engineering',label:'Engineering'},{value:'research',label:'Research'},{value:'documentation',label:'Documentation'}];
 
@@ -15,6 +19,9 @@ export function PlaygroundPreview({settings,update,onMessage}:{settings:Playgrou
   const disabled=settings.state==='Disabled',loading=settings.state==='Loading',invalid=settings.state==='Error';
   const bounds={minDate:localDate(settings.minDate),maxDate:localDate(settings.maxDate),defaultMonth:localDate(settings.date) ?? new Date(2026,9,1)};
   const date=localDate(settings.date),end=localDate(settings.endDate);
+  if(settings.component==='Kanban')return <KanbanExample config={kanbanExampleConfig(settings)} onChange={update}/>;
+  if(settings.component==='Tree')return <TreeExample config={treeExampleConfig(settings)} onChange={update}/>;
+  if(settings.component==='Chart')return <ChartExample config={chartExampleConfig(settings)} onChange={update}/>;
   if(settings.component==='Button')return <Button variant={settings.variant} size={settings.size} disabled={disabled} loading={loading} trailingIcon={settings.icon?ArrowUpRight:undefined} onClick={()=>onMessage('Button activated.')}>{settings.label || 'Save changes'}</Button>;
   if(settings.component==='Input')return <Field label="Project name" hint={invalid?undefined:'A short, useful name.'} error={invalid?'Enter a project name.':undefined}><Input value={text} onChange={event=>setText(event.target.value)} disabled={disabled} density={settings.density} /></Field>;
   if(settings.component==='Checkbox')return <Checkbox ref={checkbox} label="Include archived" description="Keep earlier work within reach." checked={settings.checked} aria-checked={settings.mixed?'mixed':settings.checked} onChange={event=>update({checked:event.target.checked,mixed:false})} disabled={disabled}/>;

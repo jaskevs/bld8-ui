@@ -11,6 +11,7 @@ const fail = message => {throw Error('Invalid source manifest: '+message);};
 export function validateManifest(value) {
   if(!value || value.schemaVersion!==1 || typeof value.version!=='string' || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value.version) || !['unreleased','released'].includes(value.status))fail('version');
   if(typeof value.registryBase!=='string'||!/^https:\/\/[^\s?#]+$/.test(value.registryBase))fail('registry URL');
+  if(value.sourceRevision!==undefined&&(typeof value.sourceRevision!=='string'||!/^[a-f0-9]{40}$/.test(value.sourceRevision)))fail('source revision');
   if(!Array.isArray(value.items)||!value.items.length||value.items.length>1000||!Array.isArray(value.artifacts)||value.artifacts.length>2000)fail('catalogue size');
   const names=new Set(),paths=new Map(),hash=/^[a-f0-9]{64}$/;
   for(const item of value.items){
@@ -32,7 +33,7 @@ export function validateManifest(value) {
   return value;
 }
 
-export function createManifest({version,status='unreleased',registryBase,items,artifacts}) {
+export function createManifest({version,status='unreleased',registryBase,items,artifacts,sourceRevision}) {
   const manifest={schemaVersion:1,version,status,registryBase,
     items:items.map(item=>({name:item.name,dependencies:[...item.dependencies??[]].sort(),registryDependencies:(item.registryDependencies??[]).map(url=>{
       if(!url.startsWith(registryBase+'/'))throw Error('Registry dependency leaves release: '+item.name);
@@ -42,6 +43,7 @@ export function createManifest({version,status='unreleased',registryBase,items,a
       return {path:file.target.slice(4),sha256:sourceHash(file.content)};
     }).sort((a,b)=>a.path.localeCompare(b.path))})).sort((a,b)=>a.name.localeCompare(b.name)),
     artifacts:Object.entries(artifacts).map(([path,bytes])=>({path,sha256:byteHash(bytes),bytes:Buffer.byteLength(bytes)})).sort((a,b)=>a.path.localeCompare(b.path))};
+  if(sourceRevision!==undefined)manifest.sourceRevision=sourceRevision;
   manifest.snapshot=manifestHash(manifest);return validateManifest(manifest);
 }
 
@@ -52,22 +54,54 @@ export function selectedSource(manifest,selected) {
 }
 
 /** Local reads are supplied by the CLI; this planner never changes source. */
-export function planUpdate(from,to,selected,readLocal) {
+export function planUpdate(from,to,selected,readLocal,installedFiles) {
   validateManifest(from);validateManifest(to);
   if(!selected.length||selected.some(name=>!from.items.some(item=>item.name===name)&&!to.items.some(item=>item.name===name)))throw Error('Choose an item present in either source manifest.');
   const before=selectedSource(from,selected),after=selectedSource(to,selected),files=[];
   for(const path of [...new Set([...before.files.keys(),...after.files.keys()])].sort()){
-    const previous=before.files.get(path),next=after.files.get(path),local=readLocal?readLocal(path):undefined;
+    const previous=before.files.get(path),next=after.files.get(path),local=readLocal?readLocal(path):undefined,installed=installedFiles?.get(path)??previous;
     let status;
     if(!readLocal)status=previous===next?'unchanged':!previous?'added':!next?'removed':'changed';
     else if(local===next&&next)status='current';
     else if(!previous)status=local===null?'add':'collision';
-    else if(!next)status=local===null?'already-absent':local===previous?'removal-review':'removal-conflict';
+    else if(!next)status=local===null?'already-absent':local===installed?'removal-review':'removal-conflict';
     else if(local===null)status='missing';
-    else if(previous===next)status='local-only';
-    else status=local===previous?'update-available':'conflict';
-    files.push({path,status,previous:previous??null,next:next??null,...(readLocal?{local}: {})});
+    else if(previous===next)status=local===installed?'current':'local-only';
+    else status=local===installed?'update-available':'conflict';
+    files.push({path,status,previous:previous??null,next:next??null,...(readLocal?{local}: {}),...(installedFiles?{installed:installed??null}:{})});
   }
   const dependencies={added:[...after.dependencies].filter(value=>!before.dependencies.has(value)).sort(),removed:[...before.dependencies].filter(value=>!after.dependencies.has(value)).sort()};
   return {schemaVersion:1,from:{version:from.version,snapshot:from.snapshot},to:{version:to.version,snapshot:to.snapshot},items:selected,mode:readLocal?'local-source':'catalogue',files,dependencies,reviewRequired:files.some(file=>!['unchanged','current','local-only','already-absent'].includes(file.status))||dependencies.added.length>0||dependencies.removed.length>0};
+}
+
+const receiptDigest=value=>byteHash(canonical(Object.fromEntries(Object.entries(value).filter(([key])=>key!=='receiptHash'))));
+export function validateReceipt(value){
+  if(!value||value.kind!=='bld8-installation'||value.schemaVersion!==1||value.assurance!=='local-capture')throw Error('Invalid installation receipt.');
+  validateManifest(value.source);
+  if(!Array.isArray(value.items)||!value.items.length||value.items.length>1000||new Set(value.items).size!==value.items.length||value.items.some(name=>typeof name!=='string'||!value.source.items.some(item=>item.name===name)))throw Error('Invalid receipt selection.');
+  const expected=selectedSource(value.source,value.items).files,seen=new Set();
+  if(!Array.isArray(value.files)||value.files.length!==expected.size||value.files.length>5000)throw Error('Invalid receipt inventory.');
+  for(const file of value.files){if(!file||!expected.has(file.path)||seen.has(file.path)||typeof file.sha256!=='string'||!/^[a-f0-9]{64}$/.test(file.sha256))throw Error('Invalid receipt file.');seen.add(file.path);}
+  if(typeof value.receiptHash!=='string'||receiptDigest(value)!==value.receiptHash)throw Error('Installation receipt digest mismatch.');
+  return value;
+}
+export function createReceipt(source,items,readLocal){
+  validateManifest(source);const selected=[...new Set(items)].sort();
+  if(!selected.length||selected.some(name=>!source.items.some(item=>item.name===name)))throw Error('Choose installed items from the source manifest.');
+  const files=[...selectedSource(source,selected).files.keys()].sort().map(path=>{const sha256=readLocal(path);if(sha256===null)throw Error('Cannot capture a missing source file: '+path);return {path,sha256};});
+  const receipt={schemaVersion:1,kind:'bld8-installation',assurance:'local-capture',source,items:selected,files};receipt.receiptHash=receiptDigest(receipt);return validateReceipt(receipt);
+}
+export function planReceiptUpdate(receipt,to,readLocal,items=receipt.items){
+  validateReceipt(receipt);if(!readLocal)throw Error('Receipt comparison requires a UI directory.');
+  if(items.some(name=>!receipt.items.includes(name)))throw Error('An item was not captured in this receipt.');
+  const report=planUpdate(receipt.source,to,items,readLocal,new Map(receipt.files.map(file=>[file.path,file.sha256])));
+  return {...report,mode:'installation-receipt',receiptHash:receipt.receiptHash,assurance:receipt.assurance};
+}
+export function mergeReceiptReports(reports){
+  const baselines=new Map(),conflicts=new Set();
+  for(const report of reports)for(const file of report.files){
+    const identity=JSON.stringify([file.previous,file.installed]);
+    if(baselines.has(file.path)&&baselines.get(file.path)!==identity)conflicts.add(file.path);else baselines.set(file.path,identity);
+  }
+  return {schemaVersion:1,mode:'multiple-receipts',reports,sharedBaselineConflicts:[...conflicts].sort(),reviewRequired:conflicts.size>0||reports.some(report=>report.reviewRequired)};
 }

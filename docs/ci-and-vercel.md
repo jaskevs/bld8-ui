@@ -83,3 +83,18 @@ did not authorise future commits or deployments.
 
 References: https://vercel.com/docs/deployment-checks and
 https://vercel.com/docs/git/vercel-for-github.
+
+## Retained source releases
+
+Retained source release runs after core and browser-quality success for main
+pushes and main-branch manual validation. It is the only job with contents:write and uses its own repository-scoped
+Actions token. The final UI Release checks also require this job to succeed (or
+be intentionally skipped on PR/non-main validation). GitHub repository release
+immutability must be enabled by the owner. Version routes retain GitHub assets;
+see updating-source.md for draft recovery, collision handling and publication.
+
+A successful Vercel build alone cannot advance production. Keep UI Release checks
+as a required production alias check, including source publication. A Git-link
+repair must reconnect only jaskevs/bld8-ui and preserve the existing project,
+domains, settings, checks and personal isolated authentication. Verify the next
+ordinary source push creates the deployment before considering events repaired.

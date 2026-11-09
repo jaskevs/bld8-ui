@@ -67,7 +67,7 @@ test('source reads reject a directory link that escapes the configured UI root',
 });
 
 test('the actual candidate pins every dependency and refuses altered existing output',()=>{
-  const {manifest,destination}=prepareSourceRelease({bundle:true});expect(manifest.status).toBe('unreleased');expect(manifest.items).toHaveLength(151);
+  const {manifest,destination}=prepareSourceRelease({bundle:true});expect(manifest.status).toBe('unreleased');expect(manifest.items).toHaveLength(152);
   for(const item of manifest.items){const json=JSON.parse(readFileSync(join(destination,'r',item.name+'.json'),'utf8'));for(const url of json.registryDependencies)expect(url).toMatch(new RegExp('^https://ui\\.bld8\\.dev/releases/'+manifest.version.replaceAll('.','\\.')+'/r/[a-z0-9-]+\\.json$'));}
   for(const file of manifest.artifacts)expect(byteHash(readFileSync(join(destination,file.path))),file.path).toBe(file.sha256);
   expect(manifest.artifacts.filter(file=>file.path.startsWith('downloads/'))).toHaveLength(40);
@@ -79,10 +79,10 @@ test('the actual candidate pins every dependency and refuses altered existing ou
 test('the build manifest and downloaded checker match the actual served registry',async({page,request},testInfo)=>{
   const response=await request.get('/releases/current.json');expect(response.ok()).toBe(true);const manifest=validateManifest(await response.json());expect(manifest.status).toBe('unreleased');
   const item=await (await request.get('/r/bld8-core.json')).json();for(const file of item.files)expect(manifest.items.find(item=>item.name==='bld8-core')!.files.find(entry=>entry.path===file.target.slice(4))!.sha256).toBe(sourceHash(file.content));
-  await page.goto('/releases');await expect(page.getByRole('heading',{name:'0.2.0 · Unreleased'})).toBeVisible();
-  const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Download source manifest'}).click();const download=await downloadPromise;const path=await download.path();expect(JSON.parse(readFileSync(path!,'utf8')).snapshot).toBe(manifest.snapshot);
-  for(const name of ['check-source-updates.mjs','source-release.mjs']){const tool=await request.get('/releases/'+name);expect(tool.ok()).toBe(true);expect(await tool.body()).toEqual(readFileSync(join(root,'scripts',name)));}
-  expect((await request.get('/releases/0.2.0/r/button.json')).status()).toBe(404);
+  await page.goto('/releases');await expect(page.getByRole('heading',{name:'Current development build'})).toBeVisible();
+  const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'development manifest'}).click();const download=await downloadPromise;const path=await download.path();expect(JSON.parse(readFileSync(path!,'utf8')).snapshot).toBe(manifest.snapshot);
+  for(const name of ['check-source-updates.mjs','source-release.mjs','capture-installation.mjs']){const tool=await request.get('/releases/'+name);expect(tool.ok()).toBe(true);expect(await tool.body()).toEqual(readFileSync(join(root,'scripts',name)));}
+  expect((await request.get('/releases/0.2.0/r/button.json',{maxRedirects:0})).status()).toBe(308);
   for(const mode of ['light','dark'])for(const width of [1440,390]){
     await page.setViewportSize({width,height:width===390?844:1050});await page.goto('/releases');await page.evaluate(value=>{document.documentElement.dataset.uiTheme=value;},mode);await expect(page.locator('html')).toHaveAttribute('data-ui-theme',mode);await page.evaluate(()=>document.fonts.ready);
     await expect(page.getByRole('heading',{name:'Keep the parts you made yours.'})).toBeVisible();

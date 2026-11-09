@@ -78,4 +78,5 @@ for(const kind of ['outline-http','react-hook-form']) {
   write(`apps/docs/public/downloads/${kind}.zip`,zip(files));
 }
 
+execFileSync(process.execPath,['scripts/prepare-playground.mjs'],{cwd:root,stdio:'inherit'});
 execFileSync(process.execPath,['scripts/prepare-source-release.mjs'],{cwd:root,stdio:'inherit'});

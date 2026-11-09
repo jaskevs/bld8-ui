@@ -1,10 +1,10 @@
 # Current scope
 
-The current library contains 53 component guidance entries, sixteen reusable blocks, three templates, the Lucide directory, an eighteen-control playground, a theme lab, 151 generated registry items and 40 ZIP starters (21 Next.js and 19 Vite). Registry items include shared dependencies; they are not a count of independent controls.
+The current library contains 53 component guidance entries, sixteen reusable blocks, three templates, the Lucide directory, an 21-control playground, a theme lab, 152 generated registry items and 40 ZIP starters (21 Next.js and 19 Vite). Registry items include shared dependencies; they are not a count of independent controls.
 
 The library includes native forms, Base UI selection/navigation/overlays, command search, date/range fields, file selection and upload callbacks, feedback, tables, drawer, context menus and responsive sidebar. Source and both collection tiers are free under MIT.
 
-The playground configures eighteen representative controls, including native choices, disclosures and table/filter workflows, and supports validated shareable URLs with downloadable source examples. See playground.md for configuration and sample-state boundaries. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
+The playground configures 21 representative controls, including native choices, disclosures, Kanban, Tree, Chart and table/filter workflows, and supports validated shareable URLs with downloadable source examples. See playground.md for configuration and sample-state boundaries. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
 
 Outline is the browser-persisted reference application for forms and tables. Its project flows include a detail drawer with tab-local drafts, explicit version-conflict review, validation, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. See [project details](outline-details.md). Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
 

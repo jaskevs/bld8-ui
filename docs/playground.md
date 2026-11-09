@@ -1,8 +1,8 @@
 # Component playground
 
-The playground covers 18 existing controls: Button, Input, Checkbox, RadioGroup,
+The playground covers 21 existing controls: Button, Input, Checkbox, RadioGroup,
 Switch, Badge, Progress, Select, Tabs, Accordion, Dialog, Drawer, MultiSelect,
-Calendar, DatePicker, DateRangePicker, DataTable and FilterBuilder. These are
+Calendar, DatePicker, DateRangePicker, DataTable, FilterBuilder, Kanban, Tree and Chart. These are
 configured examples of the public library, not additional catalogue components.
 
 Choose a control, change its options and use the actual preview. Keyboard guidance
@@ -20,7 +20,7 @@ version 1 links still work. Unknown versions and unsupported values fall back to
 valid defaults. Rules use allowlisted fields/operators and bounded values; only
 complete validated conditions reach the result evaluator.
 
-Links preserve configuration rather than modified sample data. Input text, row
+Links preserve configuration, confirmed board order, tree expansion/selection and loaded sample assets. They do not preserve modified table sample data. Input text, row
 edits, resized column widths, pending actions and their messages reset on reload.
 The browser address updates to the latest shareable configuration. If the encoded
 query exceeds 8,000 characters, the address stops updating and Copy configuration
@@ -62,9 +62,35 @@ Preview width and dark mode belong to the showcase; examples inherit the host
 application's styles and theme. Follow the registry's provider setup for overlays.
 
 `tests/playground-code.spec.ts` extracts actual generated registry files into an
-isolated alias fixture and strictly type-checks 52 configured source variants.
+isolated alias fixture and strictly type-checks the configured source variants.
 Dependency resolution uses the workspace's installed packages. Behaviour tests
 exercise URL recovery, native keys, selection, filter drafts, pending-action
 changes, downloads, mobile navigation and automated accessibility. Separate pinned
 Linux checks run the new workflows in Chromium, Firefox and WebKit, both themes
 and viewport sizes. See verification.md for observed results and limits.
+
+## Boards, files and charts
+
+Kanban preserves Board/Backlog layout, column limit and confirmed sample order.
+Its 500 ms simulated save supports optimistic movement, rollback and successful
+retry. Configuration changes and unmount abort unfinished work. Keyboard Move
+opens the actual destination/position dialog; pointer and touch use the same API.
+Pending moves, error messages and drag position are transient. Loading, empty,
+error and disabled examples compose the existing control.
+
+Tree preserves expansion, selection and the loaded sample assets. Focus remains
+separate from selection. Expand assets to try an abortable 500 ms load; optionally
+reject the first attempt and use the native retry action. Collapsing the folder
+cancels loading. Restored expanded links load any missing sample children.
+Keyboard navigation skips disabled nodes. Loading, error and empty previews have
+explicit recovery actions.
+
+Chart preserves type, seven/fourteen-day period, supplied series, height and a
+missing observation. The actual Chart handles keyboard exploration, interactive
+legends and an exact data table; those transient exploration states stay local.
+Loading, error and empty examples recover to the sample. No colour is hardcoded:
+all three workflows inherit library theme tokens and reduced-motion behaviour.
+
+These live workflows and their downloaded source are generated from the same
+public-API example files. They use local sample data and simulated responses;
+persistence and production concurrency belong to the host application.

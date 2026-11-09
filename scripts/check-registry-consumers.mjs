@@ -8,7 +8,8 @@ import {tmpdir} from 'node:os';
 import {basename, dirname, isAbsolute, join, relative, sep} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
-import {validateManifest,byteHash} from './source-release.mjs';
+import {validateManifest,byteHash,createReceipt,planReceiptUpdate,manifestHash,sourceHash} from './source-release.mjs';
+import {localReader} from './check-source-updates.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(join(root, 'package.json'));
@@ -27,18 +28,29 @@ const sharedDependencies = Object.fromEntries(['react', 'react-dom'].map(name =>
 const sharedDevDependencies = Object.fromEntries(['typescript', '@types/node', '@types/react', '@types/react-dom'].map(name => [name, installedVersion(name)]));
 const {chromium, expect} = require('@playwright/test');
 const typescript = require('typescript');
-// A prepared candidate can be checked without changing or publishing public URLs.
-const releaseManifest=process.env.BLD8_SOURCE_RELEASE ? validateManifest(JSON.parse(await readFile(process.env.BLD8_SOURCE_RELEASE,'utf8'))) : undefined;
+// Published checks use the real retained URLs without a loopback rewrite.
+// Prepared candidates remain independently testable before publication.
+const publishedVersion=process.env.BLD8_PUBLISHED_VERSION;
+if(publishedVersion&&(!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(publishedVersion)||process.env.BLD8_SOURCE_RELEASE))throw Error('Choose one valid published version or a local candidate.');
+async function publishedBytes(path){
+  const response=await fetch(`https://ui.bld8.dev/releases/${publishedVersion}/${path}`,{headers:{'Cache-Control':'no-cache'},signal:AbortSignal.timeout(60000)});
+  assert.ok(response.ok,'Published artifact must be available: '+path);const bytes=Buffer.from(await response.arrayBuffer());assert.ok(bytes.length<=16*1024*1024,'Published artifact exceeds the check bound.');return bytes;
+}
+const releaseManifest=publishedVersion?validateManifest(JSON.parse((await publishedBytes('manifest.json')).toString('utf8'))):process.env.BLD8_SOURCE_RELEASE ? validateManifest(JSON.parse(await readFile(process.env.BLD8_SOURCE_RELEASE,'utf8'))) : undefined;
+if(publishedVersion)assert.ok(releaseManifest.status==='released'&&releaseManifest.version===publishedVersion&&releaseManifest.registryBase===`https://ui.bld8.dev/releases/${publishedVersion}/r`,'Published manifest must identify that exact fixed version.');
 const productionPrefix = releaseManifest ? releaseManifest.registryBase+'/' : 'https://ui.bld8.dev/r/';
-const registryDirectory = releaseManifest ? join(dirname(await realpath(process.env.BLD8_SOURCE_RELEASE)),'r') : join(root, 'apps/docs/public/r');
+const registryDirectory = publishedVersion?undefined:releaseManifest ? join(dirname(await realpath(process.env.BLD8_SOURCE_RELEASE)),'r') : join(root, 'apps/docs/public/r');
 const originals = new Map();
-for (const name of await readdir(registryDirectory).catch(() => {throw new Error('Generated registry missing. Run npm run build before this check.');})) {
+const registryNames=publishedVersion?releaseManifest.items.map(item=>item.name+'.json'):await readdir(registryDirectory).catch(() => {throw new Error('Generated registry missing. Run npm run build before this check.');});
+async function readRegistryItem(name){
   if (/^[a-z0-9-]+\.json$/.test(name)) {
-    const bytes=await readFile(join(registryDirectory,name));
+    const bytes=publishedVersion?await publishedBytes('r/'+name):await readFile(join(registryDirectory,name));
     if(releaseManifest)assert.equal(byteHash(bytes),releaseManifest.artifacts.find(file=>file.path==='r/'+name)?.sha256,'Candidate registry artifact digest: '+name);
     originals.set(name,bytes);
   }
 }
+if(publishedVersion){for(let offset=0;offset<registryNames.length;offset+=8)await Promise.all(registryNames.slice(offset,offset+8).map(readRegistryItem));}
+else for(const name of registryNames)await readRegistryItem(name);
 assert.ok(originals.has('session-setup.json'), 'Build the current registry before checking consumers.');
 const graph = new Set();
 function visit(name) {
@@ -73,7 +85,7 @@ console.log(`Checking ${frameworks.join(' + ')} registry consumers in ${workspac
 const env = {...process.env};
 const cache = Object.entries(env).find(([name]) => name.toLowerCase() === 'npm_config_cache')?.[1];
 for (const name of Object.keys(env)) {
-  if (/^npm_config_/i.test(name) || /^(NPM_TOKEN|NODE_AUTH_TOKEN)$/i.test(name)) delete env[name];
+  if (/^npm_config_/i.test(name) || /^(NPM_TOKEN|NODE_AUTH_TOKEN|GH_TOKEN|GITHUB_TOKEN|BLD8_RELEASE_TOKEN)$/i.test(name)) delete env[name];
 }
 Object.assign(env, {
   npm_config_userconfig: join(workspace, 'user.npmrc'),
@@ -99,6 +111,7 @@ async function write(folder, name, content) {
 
 const requests = new Set();
 let origin;
+const installOrigin=()=>publishedVersion?`https://ui.bld8.dev/releases/${publishedVersion}`:origin;
 const server = createServer((request, response) => {
   const path = new URL(request.url, 'http://127.0.0.1').pathname;
   const match = /^\/r\/([a-z0-9-]+\.json)$/.exec(path);
@@ -433,7 +446,7 @@ try {
     requests.clear();
     const leanTarget=await prepare(framework,true);
     await run(['install','--no-audit','--no-fund'],leanTarget);
-    await run(['exec','--yes',`--package=shadcn@${tools.shadcn}`,'--','shadcn','add',`${origin}/r/sign-in.json`,'--yes','--overwrite'],leanTarget);
+    await run(['exec','--yes',`--package=shadcn@${tools.shadcn}`,'--','shadcn','add',`${installOrigin()}/r/sign-in.json`,'--yes','--overwrite'],leanTarget);
     const leanManifest=JSON.parse(await readFile(join(leanTarget,'package.json'),'utf8'));
     for(const dependency of ['react-day-picker','@dnd-kit/core','@dnd-kit/sortable','@base-ui/react','motion'])assert.equal(leanManifest.dependencies[dependency],undefined,'Sign-in must not install '+dependency);
     await run(['run','build'],leanTarget);
@@ -441,8 +454,8 @@ try {
     requests.clear();
     const target = await prepare(framework);
     await run(['install', '--no-audit', '--no-fund'], target);
-    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${origin}/r/session-setup.json`, `${origin}/r/theme-config.json`, `${origin}/r/file-browser.json`, `${origin}/r/chart.json`, `${origin}/r/analytics-dashboard.json`, `${origin}/r/windowed-table.json`, `${origin}/r/table-grouping.json`, `${origin}/r/large-issue-table.json`, `${origin}/r/day-agenda.json`, `${origin}/r/schedule-state.json`, `${origin}/r/schedule-planner.json`, `${origin}/r/outline.json`, '--yes', '--overwrite'], target);
-    for (const item of graph) assert.ok(requests.has(item), `shadcn did not request ${item}`);
+    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${installOrigin()}/r/session-setup.json`, `${installOrigin()}/r/theme-config.json`, `${installOrigin()}/r/file-browser.json`, `${installOrigin()}/r/chart.json`, `${installOrigin()}/r/analytics-dashboard.json`, `${installOrigin()}/r/windowed-table.json`, `${installOrigin()}/r/table-grouping.json`, `${installOrigin()}/r/large-issue-table.json`, `${installOrigin()}/r/day-agenda.json`, `${installOrigin()}/r/schedule-state.json`, `${installOrigin()}/r/schedule-planner.json`, `${installOrigin()}/r/outline.json`, '--yes', '--overwrite'], target);
+    if(!publishedVersion)for (const item of graph) assert.ok(requests.has(item), `shadcn did not request ${item}`);
     const uiDirectory = join(target, framework === 'next' ? 'components/ui/bld8' : 'src/ui/bld8');
     for (const file of ['blocks/outline-project-editor.tsx', 'blocks/outline-drafts.ts', 'drawer.tsx', 'day-agenda.tsx', 'schedule-state.ts', 'blocks/schedule-planner.tsx', 'windowed-table.tsx', 'table-grouping.ts', 'blocks/large-issue-table.tsx', 'blocks/issue-repository.ts', 'chart.tsx', 'chart-state.ts', 'blocks/analytics-dashboard.tsx', 'blocks/analytics-state.ts', 'blocks/file-browser.tsx', 'tree.tsx', 'blocks/session-setup.tsx', 'blocks/session-preferences.ts', 'time-options.ts', 'theme-config.ts', 'styles.css', 'tokens.css', 'tailwind.css', 'licenses/LICENSE', 'licenses/THIRD_PARTY_NOTICES.md']) {
       assert.ok((await readFile(join(uiDirectory, file))).length, `Missing installed source/style/notice: ${file}`);
@@ -452,6 +465,23 @@ try {
     assert.ok(!Object.keys(installed.dependencies).some(name => name.startsWith('@bld8/')), 'Registry installation must use editable source.');
     assert.ok(installed.dependencies['@base-ui/react'], 'shadcn must resolve the workflow runtime dependencies.');
     if (framework === 'vite') assert.equal(installed.dependencies.next, undefined);
+    // Capture actual CLI output, including alias and formatter transformations,
+    // before customising. A receipt is local metadata, never an overwrite plan.
+    const sourceManifest=releaseManifest??validateManifest(JSON.parse(await readFile(join(root,'apps/docs/public/releases/current.json'),'utf8')));
+    const readInstalled=localReader(dirname(uiDirectory));
+    const receipt=createReceipt(sourceManifest,['outline'],readInstalled);
+    assert.ok(planReceiptUpdate(receipt,sourceManifest,readInstalled).files.every(file=>file.status==='current'),'Clean installed Outline must not report CLI transformations as local edits.');
+    await write(target,'receipts/outline.json',receipt);
+    const editedPath='bld8/blocks/outline-project-editor.tsx',editedFile=join(dirname(uiDirectory),editedPath),originalText=await readFile(editedFile,'utf8');
+    try {
+      await writeFile(editedFile,originalText+'\n// Consumer customisation.\n');
+      assert.equal(planReceiptUpdate(receipt,sourceManifest,readInstalled).files.find(file=>file.path===editedPath)?.status,'local-only');
+      const next=structuredClone(sourceManifest);
+      for(const item of next.items)for(const file of item.files)if(file.path===editedPath)file.sha256=sourceHash('Changed upstream source');
+      next.snapshot=manifestHash(next);
+      assert.equal(planReceiptUpdate(receipt,next,readInstalled).files.find(file=>file.path===editedPath)?.status,'conflict');
+    } finally { await writeFile(editedFile,originalText); }
+    console.log(framework+': clean-install receipt recognises CLI transformations and detects a real edit/upstream conflict.');
     const theme = await exportConsumerTheme(target, uiDirectory, framework);
     await run(['run', 'build'], target);
     if (framework === 'next') {
@@ -470,7 +500,8 @@ try {
   if (browser) await browser.close();
   if (server.listening) await new Promise((done, reject) => server.close(error => error ? reject(error) : done()));
   try {
-    for (const [name, bytes] of originals) assert.ok(bytes.equals(await readFile(join(registryDirectory, name))), `Generated production registry changed during verification: ${name}`);
+    if(registryDirectory)for (const [name, bytes] of originals) assert.ok(bytes.equals(await readFile(join(registryDirectory, name))), `Generated production registry changed during verification: ${name}`);
+    if(publishedVersion)assert.equal(validateManifest(JSON.parse((await publishedBytes('manifest.json')).toString('utf8'))).snapshot,releaseManifest.snapshot,'The retained source identity must remain unchanged.');
   } finally {
     // Delete only this process's newly-created directory, after absolute-path and
     // symlink checks. No shell command or repository directory is used for cleanup.

@@ -1,3 +1,44 @@
+## Combined adoption release preflight - 9 November 2026
+
+The owner authorised all four priorities together. Implemented clean-install
+receipts, retained immutable GitHub release tooling/routes and the 21-control
+playground, and refreshed the existing personal Vercel Git connection. Native
+GitHub release immutability was enabled by the owner. Production acceptance must
+follow the actual pushed revision; local preparation is not hosted publication.
+
+Production build, workspace types and quality-suite types pass. Clean Next.js and
+custom-alias Vite consumers install their real CLI source graphs, build and pass
+both-theme workflow checks. Their new receipts recognise CLI transformations as
+installed baseline text and detect a deliberate edit/upstream conflict. Temporary
+consumer directories are removed and generated registry bytes remain unchanged.
+Six desktop/phone Kanban, Tree and Chart previews were visually reviewed.
+
+The initial full 520-test run had 518 passes and two ENOENT trace teardown errors:
+an overlapping local adapter test reused the default output directory. A separate
+47-case rerun passes the complete affected motion group and all new-feature/source
+checks, including two additional GitHub HTTP-adapter cases. Outputs are isolated;
+no interaction assertion was bypassed. The current CI suite contains 522 cases.
+
+The first Linux run found one whole-case WebKit touch timeout under competing local
+load and aborted-navigation prefetch errors in the new test. The workflow now uses
+the actual component selector and explicit shared-URL assertions; dedicated reload
+coverage remains in the production regression suite and other browser workflows.
+The final fresh pinned Linux run passes **all 200 cases** in 6.0 minutes, without
+retries, baseline changes or ignored browser errors. This includes the existing
+visuals, touch contracts and Chromium/Firefox/WebKit normal-motion flows across
+light/dark desktop and phone viewports. A native iPhone keyboard review is still
+manual and is not inferred from WebKit.
+
+Receipt checks cover portable metadata, custom UI directories, mixed versions,
+shared-baseline conflicts, source containment, tampering and exclusive outputs.
+Release checks cover exact inventories/digests, interrupted draft recovery, tag
+collisions, immutable final state, pinned redirect routes, publication context,
+API upload bytes and credential redaction. A public read verifies the pinned
+GitHub API version 2026-03-10 is supported. No personal/company GitHub token was
+used. See updating-source.md, ci-and-vercel.md and handoff.md for the release path.
+
+---
+
 ## Authorised source publication preflight - 9 November 2026
 
 The owner authorised committing and pushing BLD8 UI and private planning only.

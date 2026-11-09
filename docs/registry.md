@@ -33,7 +33,7 @@ boundary. The independent Vite consumer verifies a custom ~/ui alias. The actual
 CLI installation and build procedure is in registry-consumer-checks.md and is
 part of the prepared release workflow.
 
-The current build contains 151 registry items, including shared dependencies
+The current build contains 152 registry items, including shared dependencies
 and the pure theme-config helper. See deployment.md for recorded publication
 evidence; build counts alone do not prove that a revision is live.
 Component guidance counts and item counts describe different things; see scope.md
@@ -77,8 +77,10 @@ review the resulting diff before replacing customised files. The current public
 URLs track the deployed build. Save its /releases/current.json manifest with new
 installations. The read-only checker compares selected dependency graphs and local
 customisations without overwriting files. See updating-source.md and CHANGELOG.md.
-Versioned candidate preparation is local; immutable hosted retention and publication
-still require separate setup and acceptance. Preserve the dependency notices.
+Prefer fixed /releases/VERSION/r item URLs for repeatable installations. Their
+dependencies stay within that version and redirect to immutable GitHub release
+assets. Capture the clean installed output before customising; a local receipt
+accounts for CLI formatting and aliases. Preserve the dependency notices.
 
 Source ZIPs are an alternative to registry installation. See /frameworks for
 Next.js and Vite setup and /registry on the showcase for item discovery.

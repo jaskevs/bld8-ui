@@ -17,7 +17,8 @@ let refresh;
 const refreshLibrary = () => { clearTimeout(refresh); refresh = setTimeout(() => { try { execFileSync(process.execPath, ['scripts/prepare-library.mjs', '--source-only'], { stdio:'inherit' }); } catch { console.error('Library source refresh failed; fix the source and save again.'); } }, 600); };
 const blocksWatcher = watch('packages/blocks/src', (_event,filename) => { if (filename === 'styles.css') copyFileSync('packages/blocks/src/styles.css','packages/blocks/dist/styles.css'); refreshLibrary(); });
 const distWatchers = ['packages/ui/dist','packages/blocks/dist'].map(folder => watch(folder, refreshLibrary));
+const examplesWatcher=watch('apps/docs/src/examples',refreshLibrary);
 const docs = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'dev', 'apps/docs', '--hostname', '127.0.0.1', '--port', '3120'], { stdio: 'inherit' });
 let stopping = false;
-function stop(code = 0) { if (stopping) return; stopping = true; clearTimeout(refresh); watcher.close(); blocksWatcher.close(); for (const watcher of distWatchers) watcher.close(); types.kill(); blockTypes.kill(); utilities.kill(); docs.kill(); process.exit(code); }
+function stop(code = 0) { if (stopping) return; stopping = true; clearTimeout(refresh); watcher.close(); blocksWatcher.close(); examplesWatcher.close(); for (const watcher of distWatchers) watcher.close(); types.kill(); blockTypes.kill(); utilities.kill(); docs.kill(); process.exit(code); }
 process.on('SIGINT', () => stop()); process.on('SIGTERM', () => stop()); docs.on('exit', code => stop(code ?? 0));

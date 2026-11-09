@@ -1,19 +1,19 @@
 # Changelog
 
-## 0.2.0 — Unreleased
+## 0.2.0 — Source release
 
-This is a source-release candidate. No tag, immutable URL or hosted release is
-claimed by these notes. Private workspace package versions are separate.
+Publication is identified by the immutable v0.2.0 GitHub release and its source
+revision. Private workspace package versions are separate.
 
 ### Added
 
 - Focused registry dependency graphs and themed Next.js / Vite starter downloads.
 - Outline project details, tab drafts, conflict review, plain-text comments,
   activity and version-checked undo for bulk status changes.
-- An 18-control playground with shareable configuration, validated filter drafts
-  and matching source downloads.
+- A 21-control playground with shareable configuration, validated filter drafts
+  and matching source downloads, including Kanban, Tree and Chart.
 - Content-digested source manifests, a read-only update report and local versioned
-  candidate preparation.
+  candidate preparation, installation receipts and retained GitHub release assets.
 
 ### Changed
 

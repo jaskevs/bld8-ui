@@ -16,6 +16,11 @@
     "DND_KIT_LICENSE"
   ],
   "exports": {
+    "./core": {"types":"./dist/core.d.ts","import":"./dist/core.js"},
+    "./kanban": {"types":"./dist/kanban.d.ts","import":"./dist/kanban.js"},
+    "./tree": {"types":"./dist/tree.d.ts","import":"./dist/tree.js"},
+    "./chart": {"types":"./dist/chart.d.ts","import":"./dist/chart.js"},
+    "./reveal": {"types":"./dist/reveal.d.ts","import":"./dist/reveal.js"},
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"

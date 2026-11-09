@@ -58,21 +58,24 @@ export function releaseArtifacts(directory,version,base){
   return {items,registryBase,artifacts};
 }
 
-export function prepareSourceRelease({bundle=false}={}) {
+export function prepareSourceRelease({bundle=false,version,status,sourceRevision}={}) {
   const config=json('releases/next.json');
   if(!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(config.version)||config.status!=='unreleased'||!Array.isArray(config.changes)||config.changes.some(value=>typeof value!=='string'))throw Error('Expected an unreleased source version and release notes.');
+  version??=config.version;status??=config.status;
+  if(!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)||!['unreleased','released'].includes(status)||status==='released'&&(!bundle||!/^[a-f0-9]{40}$/.test(sourceRevision??'')))throw Error('A released bundle needs a valid version and source revision.');
   const publicDirectory=join(root,'apps/docs/public');
   const catalogue=json('apps/docs/public/r/registry.json');
-  const base=bundle?catalogue.homepage.replace(/\/$/,'')+'/releases/'+config.version:undefined;
-  const {items,registryBase,artifacts}=releaseArtifacts(publicDirectory,config.version,base);
+  const base=bundle?catalogue.homepage.replace(/\/$/,'')+'/releases/'+version:undefined;
+  const {items,registryBase,artifacts}=releaseArtifacts(publicDirectory,version,base);
   artifacts['check-source-updates.mjs']=read('scripts/check-source-updates.mjs');
   artifacts['source-release.mjs']=read('scripts/source-release.mjs');
+  artifacts['capture-installation.mjs']=read('scripts/capture-installation.mjs');
   artifacts['CHANGELOG.md']=read('CHANGELOG.md');artifacts['UPDATING.md']=read('docs/updating-source.md');artifacts['LICENSE']=read('LICENSE');
-  const manifest=createManifest({version:config.version,status:config.status,registryBase,items,artifacts});
+  const manifest=createManifest({version,status,registryBase,items,artifacts,sourceRevision});
   if(bundle){
     const parent=join(root,'.local/release-candidates');mkdirSync(parent,{recursive:true});
     if(lstatSync(parent).isSymbolicLink()||!realpathSync(parent).startsWith(realpathSync(root)+sep))throw Error('Unexpected release output directory.');
-    const destination=resolve(parent,config.version+'-'+manifest.snapshot.slice(0,16));
+    const destination=resolve(parent,version+'-'+manifest.snapshot.slice(0,16));
     if(!destination.startsWith(resolve(parent)+sep))throw Error('Unexpected release output path.');
     if(existsSync(destination)){
       if(!lstatSync(destination).isDirectory()||lstatSync(destination).isSymbolicLink())throw Error('Existing release output must be a regular directory.');
@@ -88,12 +91,12 @@ export function prepareSourceRelease({bundle=false}={}) {
       for(const [path,bytes] of Object.entries(artifacts))write(join(destination,path),bytes);
       write(join(destination,'manifest.json'),JSON.stringify(manifest,null,2));
     }
-    console.log('Prepared unreleased candidate: '+destination);
+    console.log('Prepared '+status+' source bundle: '+destination);
     console.log('Registry URLs are reserved for '+base+'. Nothing has been uploaded.');
     return {manifest,destination};
   }
   write(join(publicDirectory,'releases/current.json'),JSON.stringify(manifest,null,2));
-  for(const name of ['check-source-updates.mjs','source-release.mjs'])write(join(publicDirectory,'releases',name),artifacts[name]);
+  for(const name of ['check-source-updates.mjs','source-release.mjs','capture-installation.mjs'])write(join(publicDirectory,'releases',name),artifacts[name]);
   write(join(root,'apps/docs/src/lib/generated/release.ts'),`// Prepared from the source registry and release notes.\nexport const sourceRelease = ${JSON.stringify({...config,snapshot:manifest.snapshot,items:items.length,downloads:manifest.artifacts.filter(item=>item.path.startsWith('downloads/')).length},null,2)} as const;\n`);
   console.log(`Prepared ${config.version} source manifest (${items.length} items; unreleased).`);
   return {manifest};

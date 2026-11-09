@@ -1,5 +1,20 @@
 import {test, expect, openQualityPage, expectContained} from './fixtures';
 
+test('playground board rollback and recovery retain confirmed order under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/playground?component=Kanban&actionResult=Error&dark='+(info.project.use.colorScheme==='dark'),info);
+  const sample=page.getByRole('region',{name:'Component preview',exact:true});
+  const move=sample.getByRole('button',{name:'Move Prepare the brief',exact:true});await move.focus();await page.keyboard.press('Enter');
+  const dialog=page.getByRole('dialog',{name:'Move item',exact:true});await dialog.getByRole('combobox',{name:'Destination column',exact:true}).click();await page.getByRole('option',{name:'In progress',exact:true}).click();await dialog.getByRole('button',{name:'Move item',exact:true}).click();
+  await expect(sample.getByRole('alert')).toContainText('earlier order is restored');await sample.getByRole('button',{name:'Retry with a successful response',exact:true}).click();
+  await expect.poll(()=>new URL(page.url()).searchParams.get('kanbanOrder')).toContain('brief:active');await page.reload();await expect(sample.getByRole('region',{name:'In progress column',exact:true})).toContainText('Prepare the brief');await expectContained(page);
+});
+
+test('playground lazy tree and chart preserve shared state and keyboard context',async({page},info)=>{
+  const dark=info.project.use.colorScheme==='dark';await openQualityPage(page,'/playground?component=Tree&treeFailure=true&dark='+dark,info);
+  const sample=page.getByRole('region',{name:'Component preview',exact:true}),assets=sample.getByRole('treeitem',{name:'assets',exact:true});await assets.focus();await page.keyboard.press('ArrowRight');await expect(assets).toContainText('could not be loaded');await page.keyboard.press('ArrowRight');const tokens=sample.getByRole('treeitem',{name:'tokens.css',exact:true});await expect(tokens).toBeVisible();await tokens.click();await expect(tokens).toHaveAttribute('aria-selected','true');await expect.poll(()=>new URL(page.url()).searchParams.get('treeSelected')).toBe('tokens');await expect.poll(()=>new URL(page.url()).searchParams.get('treeLoaded')).toBe('true');await expectContained(page);
+  const controls=page.getByRole('region',{name:'Playground controls',exact:true});await controls.getByRole('combobox',{name:'Component',exact:true}).click();await page.getByRole('option',{name:'Chart',exact:true}).click();await controls.getByRole('combobox',{name:'Period',exact:true}).click();await page.getByRole('option',{name:'fortnight',exact:true}).click();await controls.getByRole('switch',{name:'Include a missing observation',exact:true}).check();const points=sample.getByRole('group',{name:'Request outcomes observations',exact:true});await expect(points.getByRole('button')).toHaveCount(14);await points.getByRole('button').first().focus();await page.keyboard.press('End');await expect(points.getByRole('button').last()).toBeFocused();await sample.getByRole('button',{name:'Area',exact:true}).click();await expect(sample.locator('.bui-chart')).toHaveAttribute('data-chart-type','area');await expect.poll(()=>new URL(page.url()).searchParams.get('chartType')).toBe('area');await sample.getByRole('button',{name:'Show data',exact:true}).click();await expect(sample.getByRole('table')).toContainText('Not recorded');await expectContained(page);
+});
+
 test('playground shares native choices and disclosures and downloads matching source',async({page},info)=>{
   await openQualityPage(page,'/playground?component=Checkbox&mixed=true&dark='+(info.project.use.colorScheme==='dark'),info);
   const controls=page.getByRole('region',{name:'Playground controls',exact:true}),preview=page.getByRole('region',{name:'Component preview',exact:true});

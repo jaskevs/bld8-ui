@@ -44,7 +44,7 @@ add('bld8-block-styles', 'BLD8 block styles', [file('registry/bld8/blocks/styles
 const groups = {
   'day-agenda':['day-agenda'], 'schedule-state':['schedule-state'],
   'windowed-table':['windowed-table'], 'table-grouping':['table-grouping'],
-  chart:['chart'],
+  chart:['chart'], reveal:['reveal'],
   tree:['tree'],
   core:['button','icon-button','input','textarea','checkbox','switch','radio','slider','badge','alert','progress','loading','empty','avatar','card','breadcrumb','pagination','input-group'],
   controls:['select','combobox','tabs','accordion'], overlays:['dialog','sheet','popover','tooltip','dropdown','toast'],

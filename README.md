@@ -13,6 +13,8 @@ npx shadcn@latest add https://ui.bld8.dev/r/button.json
 npx shadcn@latest add https://ui.bld8.dev/r/outline.json
 ```
 
+For a retained version, replace `/r/` with `/releases/0.2.0/r/`. Save its source manifest and capture a clean-install receipt before customising. [Source versions and receipts](https://ui.bld8.dev/releases) explain updates.
+
 The registry installs editable source under your configured UI directory in `bld8/`, resolves runtime dependencies and includes compiled styles and licences. It respects custom aliases and keeps existing components separate. For default aliases:
 
 ```tsx
@@ -53,7 +55,7 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 - 53 component guidance entries, sixteen blocks and three templates.
 - 1,877 canonical Lucide icons with consistent defaults and downloadable licensed SVGs.
-- An 18-control playground with native choices, disclosures, overlays, dates and table/filter workflows. Share validated configurations, try keyboard interactions and copy or download matching client-component code. See [playground guidance](docs/playground.md).
+- A 21-control playground with native choices, disclosures, overlays, dates, boards, trees, charts and table/filter workflows. Share validated configurations, try keyboard interactions and copy or download matching client-component code. See [playground guidance](docs/playground.md).
 - A shadcn-compatible registry, source manifests and 40 runnable ZIP starters: 21 Next.js and 19 React + Vite.
 - Light/dark tokens, smooth shared easing, keyboard focus and reduced-motion behaviour.
 - A theme lab with three presets, real block/template previews, contrast checks, shareable URLs and portable CSS export. Choose a starter and download a themed Next.js or Vite project with its selected fonts and configuration. See [theme setup](docs/theme-lab.md).

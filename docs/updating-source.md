@@ -6,6 +6,12 @@ workspace package versions; no BLD8 package is published to npm.
 
 ## Keep a baseline
 
+Prefer a fixed source version, for example /releases/0.2.0/r/button.json.
+Versioned registry dependencies resolve to that same version. Retained paths
+redirect to immutable assets in jaskevs/bld8-ui GitHub Releases. Download the
+matching /releases/0.2.0/manifest.json before installation.
+
+
 Save the source manifest from /releases/current.json alongside the registry source
 you install. Keep the original JSON unchanged, with your own project history.
 That URL describes the currently deployed build and changes on later deployments.
@@ -13,20 +19,44 @@ An unreleased status describes a development candidate, not a published version.
 Existing installations made before manifests need their original source; a newer
 manifest cannot reconstruct that baseline.
 
-Download both check-source-updates.mjs and source-release.mjs from /releases into
-the same folder, or use the pair from a prepared release bundle. The checker uses
+Download capture-installation.mjs, check-source-updates.mjs and source-release.mjs
+from the same retained release into one tools folder. The moving /releases tools
+are also available for development builds. The checker uses
 Node 22 built-ins. It makes no network requests and does not write source files.
+
+## Capture actual installed text
+
+Immediately after a clean CLI install, before editing:
+
+```sh
+mkdir receipts
+node tools/capture-installation.mjs --manifest bld8-source.json --item button --ui-dir src/components/ui --output receipts/button.json
+```
+
+The receipt records the upstream manifest, selected dependency graph and digests
+of the actual installed text. This accounts for CLI formatting and alias rewrites
+without guessing how to reverse them. It contains relative BLD8 paths, not local
+absolute directories. Capture writes metadata only; the output parent must exist
+outside the UI directory. Existing receipt files are never overwritten. Omit
+--output to print JSON instead. Repeat --item for source installed together.
+
+Receipts are local records, not signed proof of a clean installation. Do not
+capture an already customised tree and treat it as the original. Keep receipts
+with your own project history; do not edit their embedded manifests or digests.
 
 ## Compare before installing
 
 Save the next manifest as a separate file. From your application folder:
 
 ```sh
-node tools/check-source-updates.mjs --from bld8-baseline.json --to bld8-next.json --item button --ui-dir src/components/ui
+node tools/check-source-updates.mjs --from receipts/button.json --to bld8-next.json --ui-dir src/components/ui
 ```
 
 Point --ui-dir at your actual configured UI directory, the parent of bld8/. It
-supports custom aliases by using that directory directly. Repeat --item for other
+supports custom aliases by using that directory directly. A receipt defaults to
+its captured items. Repeat --from for multiple receipts from different versions;
+conflicting shared baselines are reported for manual review, never guessed.
+A raw original manifest is still supported with --item. Repeat --item for other
 installed public items, such as outline. Each item's complete dependency graph,
 shared styles and notices are included. Omit --ui-dir to compare upstream source
 only; this does not inspect local customisations. Use --json for a structured report.
@@ -46,9 +76,10 @@ changes as an old/new pair. Exit 0 means no upstream review is indicated for the
 selected items; 2 means review is required; 1 means invalid input or an unreadable
 file. Neither a clean report nor a matching digest certifies compatibility.
 
-Text digests normalise CRLF to LF. Formatting, alias transformations or deliberate
-refactoring may still appear as local edits. This conservative report will not
-attempt to reverse those changes. Local files resolving outside --ui-dir, including
+Text digests normalise CRLF to LF. With a receipt, CLI transformations are part
+of the installed baseline; later formatting or refactoring is a real local edit.
+With only a raw manifest, even CLI transformations may appear as local edits.
+The checker does not attempt to reverse or automatically merge those changes. Local files resolving outside --ui-dir, including
 symlink escapes, are rejected. Input manifests are bounded and validated. Hashes
 detect inconsistencies; they are not signatures. Obtain manifests and tools from
 a source you trust and inspect scripts before running them.
@@ -79,18 +110,38 @@ The candidate version is configured in releases/next.json and remains unreleased
 Its /releases/VERSION/r URLs are reserved and will return 404 until published.
 Current builds do not expose those candidate directories automatically.
 
-## Publication checklist
+## Retained publication
 
-After explicit owner authorisation, use a clean reviewed revision, passing core
-and browser checks, and a unique version. Review the prepared artifact inventory
-and notices. Archive the exact candidate and its manifest. Publish the directory
-at its reserved /releases/VERSION path and retain that directory on every future
-deployment. Keep earlier versions byte-for-byte unchanged. Verify that each
-dependency URL returns the same version and that fresh Next.js/Vite consumers
-install and build from those URLs before announcing it. Retain the protected
-Vercel release gate; preparing a bundle is not that acceptance or publication.
+The owner enables GitHub release immutability in repository settings. Main-branch
+CI validates core behaviour and browser quality before the repository-scoped
+source-release job runs. Its token has contents:write only in that job; personal
+shell credentials are never used. Pull requests cannot publish.
 
-There is deliberately no automatic publisher in this increment. Storage and
-retention for hosted immutable versions must be configured and verified at the
-first authorised release. The moving current manifest is not a replacement for
-retained versioned artifacts.
+releases/catalog.json is append-only for existing immutable versions.
+releases/publish.json names one requested version. The publisher builds from the
+clean reviewed Git SHA, prepares a released manifest with that revision, verifies
+the exact inventory and every digest, uploads a draft, then publishes it. It
+requires GitHub's immutable flag and an exact tag-to-source match. Interrupted
+drafts can resume identical assets from the same source revision. It never
+replaces an asset, moves a tag or deletes a published release. Reusing a published
+version verifies its existing assets and makes no mutation.
+
+Version routes redirect to a fixed GitHub tag and allowlisted asset path, never
+to latest. Publication verifies anonymous asset access; the final UI Release
+checks gate holds production until this job succeeds. Keep every catalogue entry
+on future deployments and verify old source URLs after publishing another build.
+Do not use publication intent to claim npm package availability.
+
+To publish the next source version, prepare reviewed notes, add a unique version
+to the catalogue and change publication intent in an authorised main-branch
+commit. Retain the existing protected Vercel gate. Review the complete CI run,
+native immutable release, fresh Next.js/Vite installations and production URLs
+before announcing availability. Local preparation alone is not publication.
+
+After the first protected deployment has promoted, maintainers can run
+`BLD8_PUBLISHED_VERSION=0.2.0 npm run check:registry:consumers` (set the environment
+variable in the current shell on Windows). This downloads and verifies that
+version's manifest/registry digests, installs the real public URLs without a
+loopback dependency rewrite, and exercises clean Next.js and Vite builds. It
+never sends GitHub credentials to the public URLs or to CLI child processes.
+The first production routes cannot be tested before their initial deployment.

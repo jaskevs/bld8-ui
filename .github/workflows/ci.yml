@@ -11,7 +11,8 @@ permissions:
 
 concurrency:
   group: bld8-ui-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # Never cancel an in-progress main-branch asset publication.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
@@ -104,17 +105,52 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  source-release:
+    name: Retained source release
+    needs: [validate, quality]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check retained versions and publication intent
+        id: publication
+        env:
+          BLD8_RELEASE_TOKEN: ${{ github.token }}
+        run: node scripts/publish-source-release.mjs --check
+      - name: Install release build dependencies
+        if: steps.publication.outputs.needsPublish == 'true'
+        run: npm ci
+      - name: Build the frozen source version
+        if: steps.publication.outputs.needsPublish == 'true'
+        run: npm run build
+      - name: Publish and verify immutable source assets
+        if: steps.publication.outputs.needsPublish == 'true'
+        env:
+          BLD8_RELEASE_TOKEN: ${{ github.token }}
+        run: node scripts/publish-source-release.mjs
+
   release-checks:
     name: ${{ github.event_name == 'pull_request' && 'UI PR checks' || 'UI Release checks' }}
-    needs: [validate, quality]
+    needs: [validate, quality, source-release]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require both validation jobs
+      - name: Require validation and retained source verification
         env:
           CORE_RESULT: ${{ needs.validate.result }}
           QUALITY_RESULT: ${{ needs.quality.result }}
+          SOURCE_RESULT: ${{ needs.source-release.result }}
+          SOURCE_REQUIRED: ${{ github.ref == 'refs/heads/main' }}
         run: |
           if [ "$CORE_RESULT" != "success" ]; then
             echo "::error::Core validation did not succeed ($CORE_RESULT)."
@@ -122,6 +158,14 @@ jobs:
           fi
           if [ "$QUALITY_RESULT" != "success" ]; then
             echo "::error::Browser quality did not succeed ($QUALITY_RESULT)."
+            exit 1
+          fi
+          if [ "$SOURCE_RESULT" != "success" ] && [ "$SOURCE_RESULT" != "skipped" ]; then
+            echo "::error::Retained source publication did not succeed ($SOURCE_RESULT)."
+            exit 1
+          fi
+          if [ "$SOURCE_REQUIRED" = "true" ] && [ "$SOURCE_RESULT" != "success" ]; then
+            echo "::error::Main requires retained source verification."
             exit 1
           fi
           echo "Core validation and browser quality passed."
