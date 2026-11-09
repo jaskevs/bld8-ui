@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/bld8/button';
 <Button variant="accent">Save changes</Button>
 ```
 
-Wrap overlays in `UIProvider` from `bld8/overlays` and set `body { position: relative; }` in global CSS. Review overwrite prompts when updating customised source. Read [registry details](docs/registry.md).
+Wrap overlays in `UIProvider` from `bld8/overlays` and set `body { position: relative; }` in global CSS. Review overwrite prompts when updating customised source. Read [registry details](docs/registry.md) and [source update guidance](docs/updating-source.md).
 
 Alternatively, choose Next.js or React + Vite for any block or template, unzip the starter, then run `npm install` and `npm run dev`. Next.js opens on port 3000; Vite opens on 5173, or the available port printed by the server. The ZIP includes local workspace packages; no BLD8 npm package is required.
 
@@ -43,6 +43,7 @@ npm run build
 npm run typecheck
 npm run check:starter:vite
 npm run check:registry:consumers
+npm run check:starters:themes
 npm test
 ```
 
@@ -52,10 +53,10 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 - 53 component guidance entries, sixteen blocks and three templates.
 - 1,877 canonical Lucide icons with consistent defaults and downloadable licensed SVGs.
-- A playground for fourteen controls, including dialogs, drawers, multi-selects, calendars, dates and tables, with validated shareable URLs and complete client-component code.
+- An 18-control playground with native choices, disclosures, overlays, dates and table/filter workflows. Share validated configurations, try keyboard interactions and copy or download matching client-component code. See [playground guidance](docs/playground.md).
 - A shadcn-compatible registry, source manifests and 40 runnable ZIP starters: 21 Next.js and 19 React + Vite.
 - Light/dark tokens, smooth shared easing, keyboard focus and reduced-motion behaviour.
-- A theme lab with three presets, isolated interactive previews, contrast checks, shareable URLs and portable CSS export. See [theme setup](docs/theme-lab.md).
+- A theme lab with three presets, real block/template previews, contrast checks, shareable URLs and portable CSS export. Choose a starter and download a themed Next.js or Vite project with its selected fonts and configuration. See [theme setup](docs/theme-lab.md).
 - Form state with async validation, field/service errors, dirty state, abortable submission and stale-result protection.
 - Tables with local or externally controlled queries, selection across pages, facets, visible columns, resizing, pinned columns and CSV export. Grouped pages and a separate bounded scrolling table share column APIs; a 10,000-record issue workspace demonstrates external detail drafts. See [large tables](docs/large-tables.md).
 - A reusable Kanban control and task workspace with Board/Backlog views, pointer/touch sorting, keyboard moves, column limits, rollback, retry and an abortable save callback.
@@ -64,7 +65,7 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 - A day agenda and schedule planner with supplied UTC availability, explicit offsets, revision-checked booking callbacks and recoverable drafts. See [scheduling](docs/scheduling.md).
 - Stepper, locale-aware numeric entry and a time picker, combined in a validated session setup with tab drafts and recoverable saves.
 
-Outline is the complete local reference application. It saves projects, resource metadata and preferences in browser storage. Project workflows cover creation, editing, filtering, sorting, paging, bulk changes, deletion, duplicate validation and unsaved-draft confirmation. The HTTP adapter and runnable sample API demonstrate the same flows over a service connection. Production authentication, database persistence and file storage belong to the host application. Other templates use in-memory sample data.
+Outline is the complete local reference application. It saves projects, resource metadata and preferences in browser storage. Project workflows cover creation, a detail drawer with tab-local draft recovery, conflict review, inline editing, filtering, sorting, paging, bulk changes with guarded undo, plain-text comments, activity history, deletion and duplicate validation. See [project details](docs/outline-details.md). The HTTP adapter and runnable sample API demonstrate the same flows over a service connection. Production authentication, database persistence and file storage belong to the host application. Other templates use in-memory sample data.
 
 ## Structure
 

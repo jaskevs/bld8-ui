@@ -6,10 +6,25 @@ accent/primary colours, typography, radius, density and shadows. Light/dark and
 phone/desktop previews use real controls, menus and dialogs. Example project
 changes last only for the mounted preview.
 
-This increment is local until its source is released. The generated registry now
-has 135 items, including the public theme-config entry and its shared module;
-the existing live registry still represents the previous release. Do not expect
-the new installation URL to work publicly before deployment.
+## Download a themed starter
+
+Select a block or template in the Starter field, then choose Next.js or React +
+Vite. The isolated preview renders that interface with the current theme. Presets,
+custom edits and light/dark mode are preserved in its shared URL alongside the
+starter/framework choices. Downloads include bld8-theme.json, the applied CSS,
+the initial colour mode and the selected self-hosted DM Sans/Manrope fonts with
+their OFL notices. System typography includes no font binary.
+
+The theme class and colour mode are placed on html, so menus and dialogs mounted
+under body inherit the same tokens. Theme imports follow the library CSS. A
+failed download keeps the selected settings and offers retry. Changing settings
+while a download is pending cancels that request.
+
+The Node download route accepts only catalogue IDs and validated theme values.
+It reads an allowlisted build archive, checks its ZIP entries and produces the
+download in memory. It accepts no uploaded archive, arbitrary CSS or file path.
+The archives are included explicitly in Next.js output tracing. Existing static
+starter URLs continue to work with the default theme.
 
 ## Export and install
 
@@ -41,7 +56,7 @@ bld8/overlays using their configured UI alias. The npm package remains unpublish
 these examples refer to the source starter's workspace package. See
 [framework setup](https://ui.bld8.dev/frameworks) for the application boundary.
 
-DM Sans and Manrope are bundled by the showcase, not by an exported theme file.
+DM Sans and Manrope are bundled by the showcase and themed starters, not by a CSS-only export.
 Self-host/load the named fonts separately to reproduce those options, or choose
 System. Every exported font stack includes a fallback. No remote font request is
 introduced by the helper.

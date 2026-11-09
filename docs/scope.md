@@ -1,12 +1,12 @@
 # Current scope
 
-The current library contains 53 component guidance entries, sixteen reusable blocks, three templates, the Lucide directory, a fourteen-control playground, a theme lab, 147 generated registry items and 40 ZIP starters (21 Next.js and 19 Vite). Registry items include shared dependencies; they are not a count of independent controls.
+The current library contains 53 component guidance entries, sixteen reusable blocks, three templates, the Lucide directory, an eighteen-control playground, a theme lab, 151 generated registry items and 40 ZIP starters (21 Next.js and 19 Vite). Registry items include shared dependencies; they are not a count of independent controls.
 
 The library includes native forms, Base UI selection/navigation/overlays, command search, date/range fields, file selection and upload callbacks, feedback, tables, drawer, context menus and responsive sidebar. Source and both collection tiers are free under MIT.
 
-The playground configures fourteen representative controls and supports validated shareable URLs. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
+The playground configures eighteen representative controls, including native choices, disclosures and table/filter workflows, and supports validated shareable URLs with downloadable source examples. See playground.md for configuration and sample-state boundaries. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
 
-Outline is the browser-persisted reference application for forms and tables. Its project flows include validation, recovery, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
+Outline is the browser-persisted reference application for forms and tables. Its project flows include a detail drawer with tab-local drafts, explicit version-conflict review, validation, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. See [project details](outline-details.md). Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
 
 Tables support externally controlled queries, resizing, pinned columns and optional supplied-record grouping. A separate WindowedTable handles complete bounded datasets with fixed single-line rows and external detail editing; it does not fetch service pages. The form adapter does not replace schema validation or a server's validation rules. Browser storage is suitable for this example, not shared multi-user persistence. The repository interface is the integration boundary for a real service.
 
@@ -26,8 +26,8 @@ cross-browser suite; see ci-and-vercel.md for source and promotion status.
 
 The theme lab adjusts colour, typography, radius, density and shadows, with an
 isolated interactive preview and light/dark CSS export. Its pure theme-config
-helper works in Next.js and Vite. This and the quality expansion remain local
-until an authorised source release; the currently live registry has 121 items.
+helper works in Next.js and Vite. These local additions await an authorised source release; the current handoff
+records the publication state.
 See [theme setup](theme-lab.md) for font, portal and installation requirements.
 
 The Tree/FileBrowser increment adds keyboard folder navigation, local metadata

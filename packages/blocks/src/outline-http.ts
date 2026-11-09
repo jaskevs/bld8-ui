@@ -1,10 +1,13 @@
-import { OutlineValidationError, type OutlinePage, type OutlineProject, type OutlineRepository, type OutlineValues } from './outline-repository.js';
+import { OutlineValidationError,isOutlineActivity,isOutlineStatusChange,type OutlinePage, type OutlineProject, type OutlineRepository, type OutlineValues } from './outline-repository.js';
 
 export interface OutlineHttpOptions {
   baseUrl: string;
   fetch?: typeof globalThis.fetch;
   headers?: HeadersInit | (() => HeadersInit | Promise<HeadersInit>);
   credentials?: RequestCredentials;
+  draftKey?:string;
+  /** Opt in only when the service implements activity, comments and reversible status changes. */
+  history?:boolean;
 }
 export class OutlineHttpError extends Error {
   constructor(message:string, public status:number){super(message);this.name='OutlineHttpError';}
@@ -12,11 +15,11 @@ export class OutlineHttpError extends Error {
 function project(value:unknown):value is OutlineProject {
   if(!value || typeof value!=='object')return false;
   const row=value as Record<string,unknown>;
-  return typeof row.id==='string' && typeof row.name==='string' && typeof row.due==='string' && typeof row.notes==='string' && ['Planned','Ready','Archived'].includes(String(row.status)) && Number.isInteger(row.version) && Number(row.version)>0;
+  return typeof row.id==='string' && typeof row.name==='string' && typeof row.due==='string' && typeof row.notes==='string' && typeof row.status==='string' && ['Planned','Ready','Archived'].includes(row.status) && Number.isInteger(row.version) && Number(row.version)>0;
 }
 
 /** Fetch adapter for the documented Outline JSON contract. Authentication stays with the host app. */
-export function createOutlineHttpRepository({baseUrl,fetch:transport=globalThis.fetch,headers,credentials='same-origin'}:OutlineHttpOptions):OutlineRepository {
+export function createOutlineHttpRepository({baseUrl,fetch:transport=globalThis.fetch,headers,credentials='same-origin',draftKey,history=false}:OutlineHttpOptions):OutlineRepository {
   const base=baseUrl.replace(/\/$/,'');
   async function request(path:string,signal:AbortSignal,method='GET',body?:unknown){
     const supplied=typeof headers==='function'?await headers():headers;
@@ -38,6 +41,19 @@ export function createOutlineHttpRepository({baseUrl,fetch:transport=globalThis.
     return data;
   }
   return {
+    draftKey,
+    ...(history?{history:{
+      async list(id:string,signal:AbortSignal){const result=await request('/projects/'+encodeURIComponent(id)+'/activity',signal) as {entries:unknown[]};if(!result||!Array.isArray(result.entries)||result.entries.length>100||!result.entries.every(item=>isOutlineActivity(item)&&item.projectId===id)||new Set(result.entries.map(item=>(item as {id:string}).id)).size!==result.entries.length)throw new OutlineHttpError('The service returned invalid project activity.',502);return result.entries as import('./outline-repository.js').OutlineActivity[];},
+      async addComment(id:string,text:string,clientId:string,signal:AbortSignal){const result=await request('/projects/'+encodeURIComponent(id)+'/comments',signal,'POST',{text,clientId});if(!isOutlineActivity(result)||result.kind!=='comment'||result.projectId!==id||result.clientId!==clientId||result.text!==text.trim())throw new OutlineHttpError('The service returned an invalid comment.',502);return result;},
+      async changeStatus(ids:string[],status:OutlineValues['status'],signal:AbortSignal){const result=await request('/projects/status',signal,'POST',{ids,status,reversible:true});if(!isOutlineStatusChange(result))throw new OutlineHttpError('The service returned an invalid status receipt.',502);return result;},
+      async undoStatus(id:string,signal:AbortSignal){await request('/projects/status/undo',signal,'POST',{id});},
+    }}:{}),
+    async get(id,signal){
+      let result:unknown;
+      try{result=await request('/projects/'+encodeURIComponent(id),signal);}catch(error){if(error instanceof OutlineHttpError&&error.status===404)return null;throw error;}
+      if(!project(result))throw new OutlineHttpError('The service returned an invalid project.',502);
+      return result;
+    },
     async list(query,signal){
       const params=new URLSearchParams({q:query.search,page:String(query.page),pageSize:String(query.pageSize)});
       if(query.filters.status)params.set('status',query.filters.status);

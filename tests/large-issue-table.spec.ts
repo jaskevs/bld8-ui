@@ -22,7 +22,7 @@ async function containedWorkspaceControls(page:Page){
       '.bblocks-heading>.bui-button','.bblocks-large-issue-toolbar>.bui-field',
       '.bblocks-large-issue-toolbar>.bui-button','.bblocks-large-issue-views',
       '.bblocks-large-issue-summary','.bblocks-large-issue-summary>.bui-button',
-      '.bblocks-large-issue-selection-slot>.bui-table-selection',
+      '.bblocks-large-issue-selection-slot .bui-table-selection',
       '.bblocks-large-issue-selection-actions>.bui-button',
       '.bblocks-large-issue-notice>.bui-alert','.bblocks-large-issue-notice>.bui-button',
       '.bblocks-large-issue-loading','.bui-data-table','.bui-table-footer>nav',

@@ -1,10 +1,11 @@
 'use client';
-import { useId, useMemo, useRef, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useId, useMemo, useRef, useEffect, useLayoutEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { Alert, Button, Checkbox, EmptyState, Icon, Input, Pagination, Skeleton, Spinner } from './core.js';
 import { Popover } from './overlays.js';
 import { Select } from './controls.js';
 import { useControllableValue } from './state.js';
+import {Reveal} from './reveal.js';
 import { buildTableRows, getTablePage, type TableGrouping, type TableRowNode } from './table-grouping.js';
 export type { TableGrouping } from './table-grouping.js';
 
@@ -64,16 +65,18 @@ export function createTableCSV<T>(rows:T[], columns:Column<T>[]) {
   const exportable = columns.filter(column => column.exportValue || column.sortValue);
   return [exportable.map(column => safe(column.header)).join(','), ...rows.map(row => exportable.map(column => safe((column.exportValue ?? column.sortValue)!(row))).join(','))].join('\r\n');
 }
-function SelectionCheckbox({label, checked, mixed, onChange}:{label:string;checked:boolean;mixed?:boolean;onChange:()=>void}) {
+function SelectionCheckbox({label, checked, mixed, onChange}:{label:string;checked:boolean;mixed?:boolean;onChange:(input:HTMLInputElement)=>void}) {
   const ref=useRef<HTMLInputElement>(null);
   useEffect(() => {if(ref.current) ref.current.indeterminate=!!mixed;},[mixed]);
-  return <label className="bui-table-select"><input ref={ref} type="checkbox" className="bui-checkbox" aria-label={label} aria-checked={mixed ? 'mixed' : checked} checked={checked} onChange={onChange} /></label>;
+  return <label className="bui-table-select"><input ref={ref} type="checkbox" className="bui-checkbox" aria-label={label} aria-checked={mixed ? 'mixed' : checked} checked={checked} onChange={event=>onChange(event.currentTarget)} /></label>;
 }
 export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageSize = 5, filters = [], columnVisibility = false,
   visibleColumnKeys, defaultVisibleColumnKeys, onVisibleColumnKeysChange, selectable = false, rowLabel = rowKey,
   selectedKeys, defaultSelectedKeys = [], onSelectedKeysChange, renderBulkActions, density = 'comfortable', loading, error, onRetry, server, renderSelectedActions, resizableColumns=false, viewOptions, emptyState, grouping, collapsedGroupKeys, defaultCollapsedGroupKeys=[], onCollapsedGroupKeysChange }: DataTableProps<T>) {
   const id=useId();
   const tableRoot=useRef<HTMLDivElement>(null);
+  const selectionOrigin=useRef<HTMLInputElement|null>(null);
+  const actionFocus=useRef<HTMLElement|null>(null);
   const [groupNotice,setGroupNotice]=useState('');
   const [local,setLocal]=useState<TableQuery>({...defaultTableQuery,pageSize});
   const state=server?.query ?? {...local,pageSize};
@@ -84,6 +87,8 @@ export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageS
   const [viewportWidth,setViewportWidth]=useState(0);
   useEffect(()=>{if(!scrollElement)return;const observer=new ResizeObserver(([entry])=>setViewportWidth(Math.floor(entry.contentRect.width)));observer.observe(scrollElement);return()=>observer.disconnect();},[scrollElement]);
   const [selected,setSelected]=useControllableValue(selectedKeys,defaultSelectedKeys,onSelectedKeysChange);
+  function restoreSelectionFocus(){const target=selectionOrigin.current?.isConnected?selectionOrigin.current:scrollElement??tableRoot.current?.querySelector<HTMLInputElement>('thead input[type="checkbox"]');target?.focus({preventScroll:true});}
+  useLayoutEffect(()=>{if(!selected.length&&actionFocus.current){const active=document.activeElement;if(active===document.body||actionFocus.current===active)restoreSelectionFocus();actionFocus.current=null;}},[selected.length]);
   const [shown,setShown]=useControllableValue(visibleColumnKeys,defaultVisibleColumnKeys ?? columns.map(column=>column.key),onVisibleColumnKeysChange);
   const [collapsed,setCollapsed]=useControllableValue(collapsedGroupKeys,defaultCollapsedGroupKeys,onCollapsedGroupKeysChange);
   const activeColumns=columns.filter(column=>column.hideable===false || shown.includes(column.key));
@@ -143,19 +148,19 @@ export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageS
     </div>}
     {grouping&&<p className="bui-table-group-notice bui-hint" role="status">{groupNotice}</p>}
     {grouping&&server&&<p className="bui-hint bui-table-group-scope">Groups describe this page of records.</p>}
-    {selectable && selected.length>0 && <div className="bui-table-selection"><span role="status">{selected.length} selected</span><div>{renderSelectedActions ? renderSelectedActions(selected) : renderBulkActions?.(selectedRows)}<Button size="sm" variant="ghost" onClick={()=>setSelected([])}>Clear selection</Button></div></div>}
+    <Reveal open={selectable&&selected.length>0} className="bui-reveal--table-selection">{selectable&&selected.length>0?<div className="bui-table-selection" onFocusCapture={event=>{actionFocus.current=event.target as HTMLElement;}} onBlurCapture={event=>{if(event.relatedTarget&&!event.currentTarget.contains(event.relatedTarget as Node))actionFocus.current=null;}}><span role="status">{selected.length} selected</span><div>{renderSelectedActions ? renderSelectedActions(selected) : renderBulkActions?.(selectedRows)}<Button size="sm" variant="ghost" onClick={()=>{restoreSelectionFocus();setSelected([]);}}>Clear selection</Button></div></div>:null}</Reveal>
     {error && <Alert title="Unable to load records" tone="danger" live>{error}{onRetry && <Button size="sm" variant="secondary" onClick={onRetry}>Retry</Button>}</Alert>}
     {error && !rows.length ? null : loading && !rows.length ? <div className="bui-table-loading"><span role="status" className="bui-hint">Loading {caption.toLowerCase()}…</span>{[0,1,2].map(index=><Skeleton key={index} height="3rem" />)}</div> : <>
       <div ref={setScrollElement} className="bui-table-scroll" tabIndex={0} role="region" aria-label={caption + ' table'}><table className="bui-table" style={fixedLayout?{tableLayout:'fixed',width:tableWidth,minWidth:tableWidth}:undefined}><caption className="bui-sr-only">{caption}</caption>{fixedLayout && <colgroup>{selectable && <col style={{width:48}} />}{displayedColumns.map(column=><col key={column.key} style={{width:width(column)}} />)}</colgroup>}<thead><tr>
-        {selectable && <th scope="col" className="bui-table-check"><SelectionCheckbox label="Select current page" checked={pageRows.length>0 && pageSelected===pageRows.length} mixed={pageSelected>0 && pageSelected<pageRows.length} onChange={()=>toggle(pageRows.map(rowKey))} /></th>}
+        {selectable && <th scope="col" className="bui-table-check"><SelectionCheckbox label="Select current page" checked={pageRows.length>0 && pageSelected===pageRows.length} mixed={pageSelected>0 && pageSelected<pageRows.length} onChange={input=>{selectionOrigin.current=input;toggle(pageRows.map(rowKey));}} /></th>}
         {displayedColumns.map(column=><th scope="col" aria-label={column.header} key={column.key} data-pinned={column.pinned} data-align={column.align ?? 'start'} style={columnStyle(column)} aria-sort={column.sortValue ? sort?.key===column.key ? sort.descending ? 'descending' : 'ascending' : 'none' : undefined}>{column.sortValue ? <button type="button" onClick={()=>{changeQuery({sort:sort?.key===column.key && sort.descending ? null : {key:column.key,descending:sort?.key===column.key && !sort.descending},page:1});}}>{column.header}<Icon icon={sort?.key===column.key ? sort.descending ? ArrowDown : ArrowUp : ArrowUpDown} size={14} /></button> : column.header}{resizableColumns && column.resizable!==false && <span className="bui-column-resize" role="separator" tabIndex={0} aria-label={'Resize '+column.header} aria-orientation="vertical" aria-valuemin={column.minWidth ?? 100} aria-valuemax={maximumWidth} aria-valuenow={width(column)} onKeyDown={event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();resize(column,width(column)+(event.key==='ArrowRight'?10:-10));}if(event.key==='Home'){event.preventDefault();resize(column,column.minWidth ?? 100);}}} onPointerDown={event=>{event.preventDefault();const start=event.clientX,initial=width(column);const target=event.currentTarget;target.setPointerCapture(event.pointerId);const move=(move:PointerEvent)=>resize(column,initial+move.clientX-start);const stop=()=>{target.removeEventListener('pointermove',move);target.removeEventListener('pointerup',stop);target.removeEventListener('pointercancel',stop);};target.addEventListener('pointermove',move);target.addEventListener('pointerup',stop);target.addEventListener('pointercancel',stop);}} />}</th>)}
       </tr></thead>{bodySections.map((section,index)=><tbody key={section.header?.id??'rows-'+index}>
         {section.header&&<tr className="bui-table-group-row"><th scope="rowgroup" colSpan={displayedColumns.length+(selectable?1:0)}><div className="bui-table-group-heading">
-          {selectable&&<SelectionCheckbox label={'Select all '+section.header.rows.length+' records in '+section.header.label} checked={section.header.rows.length>0&&section.header.rows.every(row=>selectedSet.has(rowKey(row)))} mixed={section.header.rows.some(row=>selectedSet.has(rowKey(row)))&&!section.header.rows.every(row=>selectedSet.has(rowKey(row)))} onChange={()=>toggle(section.header!.rows.map(rowKey))}/>}
+          {selectable&&<SelectionCheckbox label={'Select all '+section.header.rows.length+' records in '+section.header.label} checked={section.header.rows.length>0&&section.header.rows.every(row=>selectedSet.has(rowKey(row)))} mixed={section.header.rows.some(row=>selectedSet.has(rowKey(row)))&&!section.header.rows.every(row=>selectedSet.has(rowKey(row)))} onChange={input=>{selectionOrigin.current=input;toggle(section.header!.rows.map(rowKey));}}/>}
           <button type="button" data-table-group-key={section.header.key} aria-expanded={!collapsed.includes(section.header.key)} onClick={event=>toggleGroup(section.header!.key,event.currentTarget)}><Icon icon={ChevronDown} size={15}/><span>{section.header.label}</span><span className="bui-table-group-count">{section.header.rows.length} records</span></button>
         </div></th></tr>}
         {section.rows.map(row=><tr key={rowKey(row)} data-selected={selectable && selectedSet.has(rowKey(row)) || undefined}>
-        {selectable && <td className="bui-table-check"><SelectionCheckbox label={'Select ' + rowLabel(row)} checked={selectedSet.has(rowKey(row))} onChange={()=>toggle([rowKey(row)])} /></td>}
+        {selectable && <td className="bui-table-check"><SelectionCheckbox label={'Select ' + rowLabel(row)} checked={selectedSet.has(rowKey(row))} onChange={input=>{selectionOrigin.current=input;toggle([rowKey(row)]);}} /></td>}
         {displayedColumns.map(column=><td key={column.key} data-pinned={column.pinned} data-align={column.align ?? 'start'} style={columnStyle(column)}><div className="bui-table-cell">{column.cell(row)}</div></td>)}
       </tr>)}
       </tbody>)}</table></div>

@@ -1,3 +1,363 @@
+## Authorised source publication preflight - 9 November 2026
+
+The owner authorised committing and pushing BLD8 UI and private planning only.
+The actual Melbourne time is after 17:00. Personal Jaison author/committer identity,
+repository-local SSH, hooks and exact remote destination are verified; no time
+exception, date override or global/company configuration change is needed.
+
+The complete production build, workspace types and all 493 workflow tests pass.
+All 176 quality checks pass in the pinned Linux renderer across Chromium, Firefox,
+WebKit, both themes and desktop/phone configurations. No image baseline changed.
+The Linux runner now includes releases/next.json and CHANGELOG.md in its clean
+build copy and excludes generated release output. The source inventory passes
+credential-signature, UTF-8 and whitespace checks. Local credentials, build
+artifacts, starter ZIPs and candidate directories remain ignored.
+
+This publishes the accumulated lean installs, themed starters, stable dropdowns,
+selection/checkbox motion, Outline details/activity/comments/guarded undo,
+expanded playground and source-update tooling. Earlier clean Next.js/Vite
+consumer and starter checks remain recorded below. The full source release is
+still subject to the remote GitHub aggregate and Vercel production gate.
+
+The 0.2.0 immutable version candidate remains unreleased; a source push does not
+publish its reserved version paths. docs/next-work.md records the adoption-first
+backlog. Float0 and other sibling applications are outside this release.
+
+Evidence: ignored .local/push-20261109-build/types/tests/quality logs and statuses;
+quality report 5b19c4a9-467f-45cb-aa40-fd44c3d973fb. This is pre-push evidence,
+not an assertion of remote CI or live promotion. The exact source revision and
+remote outcome are recorded in private planning after verification.
+
+## Source versions and read-only update planning - 9 November 2026
+
+Added the unreleased 0.2.0 source version, a changelog, /releases guidance and a
+build-generated source manifest. Workspace packages remain private at their
+existing versions. The manifest records the exact registry dependency graph,
+normalised text digests and artifact byte digests. It describes this build, not
+a claimed historical release. Current URLs move with deployment.
+
+The standalone Node checker compares selected item graphs, including shared
+styles/notices and runtime dependency changes. An optional configured UI directory
+adds local-file checks: unchanged upstream, local-only edits, available updates,
+conflicts, missing files, additions/collisions and removals. It makes no network
+requests and never writes source. Inputs are bounded and checked for paths,
+digests, duplicate/conflicting targets and missing graph dependencies. Symlink
+escapes are rejected; malformed input errors do not echo file content. CRLF/LF
+is normalised, but formatting/CLI transformations remain conservative local diffs.
+
+Local candidate preparation copies only the named registry, source, starter,
+checker and notice artifacts. Every dependency URL targets the same reserved
+/releases/0.2.0/r directory. Existing candidates are verified and reused only
+when the full inventory and bytes match; altered, extra, missing or linked files
+are rejected. Candidates remain under .local/release-candidates. They are not
+copied into the public site or uploaded. Retained immutable hosting, a real tag
+and production-URL installation acceptance remain separate publication work.
+
+Production build, workspace types, script syntax and whitespace checks passed.
+The focused production run passed 34 tests, including seven new release/update
+cases, existing adoption/starter flows and 52 generated playground variants.
+After visual review, the page's browser check was rerun with explicit site themes
+rather than OS preference alone: desktop/phone containment, downloads and axe
+checks passed in both real modes. Those captures were reviewed. The earlier
+pass caught a checker download generated before its final edit; rebuilding the
+final artifacts resolved it. No full 176-case quality or physical-device run is
+claimed for this increment, and no approved image baseline was changed.
+
+The prepared candidate passed actual shadcn CLI installs, independent production
+builds and light/dark workflow checks in clean Next.js and Vite applications.
+Both the lean Sign-in and 63-item workflow graph passed, including the custom
+Vite alias. The verifier checks candidate artifact digests, rewrites URLs only
+in its loopback copy and preserves original candidate bytes. Temporary consumers
+were removed normally. This checks versioned artifacts, not unpublished host URLs.
+A separate read-only report against freshly installed Next.js Outline source
+matched 36 files and conservatively reported two CLI-transformed helpers as
+local-only differences; no files were changed. These raw-source comparisons can
+report transformations as conflicts on a future upstream edit; merge review
+remains required. No formatter-specific equivalence rule was added.
+
+Evidence: .local/source-release-final-*.log/status, source-release-theme-review.*,
+source-release-consumers.*, source-release-installed-next-report.*, and reviewed
+source-release-*.png captures. Candidate: 0.2.0-78661907c9fa31d5. Normal development
+is restored at http://127.0.0.1:3120/releases (HTTP 200). No commit, push, tag,
+deployment, global/company setting or account change occurred. Earlier pending
+work remains intact. See updating-source.md and handoff.md.
+
+## Expanded playground and matching source downloads — 9 November 2026
+
+The playground now covers 18 existing controls, adding Checkbox, RadioGroup,
+Accordion and FilterBuilder. Select and Tabs also retain their selected values.
+Version 2 links preserve validated configuration and accept version 1 links.
+Tables share query, page, selection, visible columns and page-group expansion;
+filter drafts remain separate from explicitly applied, validated conditions.
+Queries and simulated bulk writes run against local sample rows. Failed writes
+retain selection and focus; successful writes preserve selections made while
+pending. Restoring the example clears unfinished cell edits as well as row data.
+
+Downloaded TSX matches the configured example and its scoped registry install
+command. Optional filter and cell-editing modules are included only when used.
+Desktop settings stay within a scrollable sticky panel; phone jump links move
+focus between settings and preview. Overlong links stop updating beyond the
+8,000-character query budget, keep the draft, and offer the source download.
+Existing colours, shared motion, reduced-motion and native controls remain.
+No library API or runtime dependency was added.
+
+The production build and workspace/quality types passed. The focused production
+run passed 58 cases. Another source check type-checks 52 generated configurations
+against extracted registry files using the workspace dependencies; this is not a
+fresh package installation. The two new normal-motion quality workflows passed
+24 checks in pinned Linux across Chromium, Firefox and WebKit, desktop/phone,
+and light/dark. The permanent quality suite contains 176 cases; it was not run
+in full for this increment. No visual baseline changed and no physical-device
+claim is made. Three final local checks passed after the mobile offset and
+singular-condition copy refinements. Desktop and touch-phone captures were
+reviewed and contained their contents horizontally.
+
+Early checks caught a source-download click racing URL restoration. Source,
+share and reset actions now wait until that restoration is ready. The overlength
+check was corrected to use enough encoded conditions to exceed the actual budget.
+Visual review also caught the jump link doubling the fixed-header spacing; its
+local scroll margin now works with the page's existing scroll padding.
+
+Evidence: ignored .local/playground-expansion-*.log/status files and
+playground-expanded-1440.png / playground-expanded-390.png. The normal local
+preview is restored at http://127.0.0.1:3120/playground. The catalogue remains
+151 registry items, 53 guidance entries, 16 blocks, 3 templates and 40 ZIPs.
+No commit, push, deployment or global/company setting change occurred. Earlier
+pending work remains intact. See playground.md for the configuration contract.
+
+## Outline activity, comments and guarded undo — 9 November 2026
+
+Added an optional history capability to the Outline repository. Existing CRUD-only
+adapters remain compatible. Existing projects show a drawer activity feed with
+plain-text comments, real project-save entries and status-change/restoration
+entries. No history is invented for untouched seed records. Comments do not
+change project versions, use recent request-ID deduplication, and retain text on
+failed writes. Unsent comments remain in the repository instance while the page
+stays open; saved comments persist with workspace data. The composer explains
+this distinction. Pending posts block dismissal; focus returns to the enabled
+composer after completion.
+
+Mark ready and Archive return a receipt for actual status changes, skipping
+already-matching projects. Undo checks every resulting project version before
+restoring any earlier status. A later edit or deletion rejects the entire undo;
+there is no partial restoration. A repeated applied receipt does not write again.
+Transient errors retain the retry action; stale receipts are removed. The table's
+query, page, columns and current selection remain, with useful return focus.
+Creation, detail saves and permanent deletion do not gain undo in this slice.
+
+The browser adapter migrates legacy arrays on the next successful write to a
+version 2 envelope under the same key. Projects, history and receipts commit in
+one storage write. It retains 100 entries per project / 1,000 overall and 50
+recent receipts. Browser storage is a reference adapter, without cross-process
+transaction guarantees. The HTTP adapter explicitly opts in with history:true;
+the sample adds activity, idempotent comment and guarded undo endpoints using
+its existing session scope. Production ownership and atomic database transactions
+remain host responsibilities. See outline-details.md for the full contract.
+
+The production build and workspace/quality types passed. Fifteen new domain,
+HTTP and browser cases cover migration, retention, idempotency, failed storage,
+abort, session isolation, atomic version rejection, filtered restoration, retained
+selection, comment rendering, retries and pending dismissal. The focused
+production set passed 93 cases, including existing editor recovery, table/motion,
+adoption, starter and workflow regressions. The two normal-motion Outline flows
+passed all twelve browser/theme/viewport configurations each in pinned Linux:
+24 checks across Chromium, Firefox and WebKit. The permanent quality suite now
+contains 152 cases; this was not a new full-suite or physical-device run. No image
+baseline was changed. Desktop and phone activity captures were visually reviewed
+and measured no horizontal drawer overflow.
+
+The first development run passed 12 cases and caught composer focus being
+requested before its disabled state cleared. Focus now returns after that commit.
+A later rejection check caught the same handoff for Undo; a transient failure now
+restores focus after the retry button is enabled. The new focused assertion passes,
+and the consumer verifier now exercises this failure/recovery through installed
+source in both frameworks and themes.
+
+The final canonical 24-case run also includes rejected-undo focus and retry in
+all twelve configurations and passes. An ad-hoc host-bridge shortcut failed
+before posting because its non-localhost HTTP origin did not expose randomUUID.
+The standard localhost runner resolved that harness issue without changing the
+application. Run the reference app on localhost or HTTPS, as used by its UUID
+creation and the supported preview/deployment setup.
+
+Clean Next.js/Vite source installs resolve a 63-item workflow graph, with comments
+and undo exercised in both themes; independent builds pass. Sign-in remains 8
+items, 16 files and 4 dependencies. The actual generated Vite Outline ZIP also
+installs and builds independently. The local catalogue is 151 registry items,
+53 guidance entries, 16 blocks, 3 templates and 40 ZIPs. The new activity module is
+a shared implementation dependency, not another advertised control.
+
+Evidence: ignored .local/outline-activity-*.log/status files and reviewed captures.
+No commit, push, deployment or global/company setting change occurred. Earlier
+lean-install, starter, detail-editor and selection-motion work remains pending
+with this increment.
+
+## Smooth bulk selection and checkbox states — 9 November 2026
+
+The shared DataTable now expands and collapses its bulk-action bar through real
+layout space with the 320 ms control easing, a small content translation and
+opacity. The table tracks the reveal rather than jumping to its final position.
+Count updates do not replay entry; rapid reversals retarget the current height.
+Closing content remains mounted only through exit, with immediate inert/hidden
+semantics and focus return. Issue filters, the large-table selection slot and
+resource archive feedback share the helper. Mobile wrapping can grow past the
+reserved large-table slot without snapping.
+
+Native checkboxes use separate fixed-size tick and mixed-dash pseudo-elements,
+easing opacity and transform in both directions. Checked state remains immediate.
+Selected cell surfaces ease without changing column geometry. Reduced motion
+disables the reveal, indicators, row fills and hint transitions; forced colours
+retain explicit system focus and selection.
+
+The production build and workspace/quality types pass. The focused production
+run passed 113 regressions, including 10 new selection-motion cases. After a
+final hint reduced-motion refinement, all 10 new cases passed again. The tests
+measure unpaused intermediate heights, table/column/scroll stability, quick
+keyboard reversals, count changes, mixed/tick crossfades, closing focus, filter
+draft retention, archive/undo and mobile containment/axe in both themes.
+Desktop and phone selected/cleared captures were reviewed.
+All four actual visible-scrollbar dropdown stability cases also passed in light
+and dark at the top and after scrolling.
+
+All twenty existing visual baselines match in the pinned Linux renderer; no PNG
+was updated. The first comparison exposed the earlier stable-gutter change's
+fractional crop shift. Visual projects now hide only the outer OS scrollbar before
+measurement; actual-gutter browser/touch checks remain unchanged. WebKit's
+headless frame cadence made a frame-count assertion unreliable. The portable
+workflow now samples intermediate positions on the real CSS transition timeline,
+while the regular suite retains unpaused frame/reversal checks. The final workflow
+passes all twelve Chromium/Firefox/WebKit, desktop/phone, light/dark combinations.
+This is focused evidence, not a fresh run of the entire 140-case quality suite or
+physical-device coverage.
+
+Actual shadcn CLI installs and independent Next.js/Vite production builds pass
+with a 62-item workflow graph. Sign-in remains lean at 8 items, 16 files and 4
+dependencies. Generated production registry bytes remained unchanged throughout
+the consumer check. The new Reveal helper takes the local catalogue to 150
+registry items; 53 guidance entries, 16 blocks, 3 templates and 40 ZIPs remain.
+
+The first development run also caught an invisible large-table hint intercepting
+Clear selection; it no longer takes pointer events. Evidence is in ignored
+.local/selection-motion-*.log/status files, frame probes and reviewed captures.
+No commit, push, deployment, baseline update or global/company setting change
+occurred. The earlier adoption and Outline changes remain pending with this work.
+
+## Outline details and recoverable drafts — 9 November 2026
+
+Completed the selected next slice: a right-side project drawer for creation and
+editing, with a scrollable form and persistent action footer. The drawer finishes
+its 320 ms exit before unmounting; live reduced motion removes the transition.
+Existing editing names and row actions remain compatible. Saving an edit keeps
+the table query, page, selection and column state, with return focus that does not
+scroll the page. Creation returns to page one.
+
+Drafts are separate from saved projects. Recovery uses sessionStorage only when
+the repository supplies a stable namespace; other adapters remain memory-only.
+The sample HTTP namespace distinguishes demo sessions. Reloads restore edited
+and invalid field values; blocked storage explains the memory-only limit.
+Reverted fields remove obsolete drafts. Discard failures are reported, pending
+saves cannot be dismissed, and successful saves clear recovery data.
+
+Optional repository.get and draftKey additions preserve existing implementations.
+The JSON contract adds GET /projects/:id. Stale drafts retain their original
+version; a newer record is compared before the owner explicitly reapplies only
+edited fields or uses the saved project. A second save is required. Failed reads,
+deleted records and stale responses retain the draft without an automatic write.
+Production ownership and atomic writes remain host responsibilities.
+
+The reviewed production build/types and 52 focused regression cases pass,
+covering the new workflow and existing local/HTTP editing, table geometry,
+accessibility, mobile layout and stable-dropdown cases. The new normal-motion
+workflow passes all 12 pinned Linux configurations across Chromium, Firefox
+and WebKit, desktop/phone and light/dark. This targeted run does not claim a fresh
+run of the entire earlier 116-case quality suite; the permanent suite now has 128
+cases. No image baseline was updated.
+
+Fresh Next.js and Vite consumers install the actual registry through the shadcn
+CLI, build the expanded 61-item workflow graph and exercise recovery/save through
+the installed Outline drawer. Sign-in remains independently lean. Actual themed
+Next.js Outline and Vite SchedulePlanner downloads install and rebuild; the
+Outline download now exercises drawer token inheritance and recovered drafts.
+The generated source catalogue contains 149 registry items, 53 guidance entries,
+16 blocks, 3 templates and 40 ZIPs. The two new helper modules are not separate
+catalogue components.
+
+The first focused run passed 41 cases; four new assertions incorrectly expected
+alert roles on non-alert notices. The assertions now use visible notice content;
+dynamic warnings also announce through polite live regions. Draft-shape validation
+and a manual-revert recovery edge case were strengthened before the final run.
+Evidence: .local/outline-details-*.log and corresponding status files. Desktop
+and phone captures were reviewed, with matching form/footer scrollbar gutters and
+aligned action edges at 320, 390, 768 and 1440 px. An earlier independent check
+completed both framework builds and interactions, then correctly rejected registry
+files regenerated by a leftover development watcher. The verified BLD8 process
+group was stopped, and the stable registry check was rerun successfully; company
+processes were untouched. No commit, push or deployment occurred.
+Comments, activity and undo remain subsequent slices.
+
+## Dropdown page stability — 9 November 2026
+
+Reproduced a 1.8125 px vertical jump when either theme starter dropdown opens or
+closes with visible desktop scrollbars. Base UI reserves a stable scrollbar
+gutter during its modal scroll lock. Adding that gutter only at opening changes
+the viewport units used by the responsive heading and shifts the content below.
+The showcase now reserves the gutter from initial layout. Select APIs, keyboard
+handling, focus return and modal scroll locking are unchanged.
+
+The regression explicitly restores Chromium's visible scrollbars, which its
+default headless arguments hide. It samples navigation, heading, panel and scroll
+geometry on every animation frame through opening and closing both selects, in
+light/dark mode and at two scroll positions. All four cases failed against the
+old production build with the measured 1.8125 px movement and pass after the fix.
+The production build and 51 targeted theme, export, control, accessibility and
+responsive checks pass. No screenshot baseline was changed. Evidence is in
+.local/overlay-layout-{build,tests}.log and their status files; the frame probe is
+.local/select-shift-probe.json. This follow-up remains local and uncommitted.
+
+## Lean installs and themed starters — 9 November 2026
+
+Completed the two adoption priorities selected by the owner. Public registry item
+names remain compatible, while named block imports resolve to their actual UI
+modules rather than the complete index. Sign-in changed from 41 registry items /
+49 files / 10 dependencies to 8 / 16 / 4. The representative multi-workflow install
+changed from 59 to 46 items. Counts describe installed source, not bundle timings.
+
+Source ZIPs have selected package source, compiled files, dependency manifests
+and subpath exports. Their original client entry boundaries remain intact. Source
+manifests use the same focused block files. Existing static download URLs remain.
+
+The theme lab can select every block/template, preview its actual component and
+download a themed Next.js or Vite project. Shared URLs retain the starter,
+framework and mode. Exports contain theme CSS/JSON, root class/mode and selected
+self-hosted fonts/OFL notices. Pending downloads are cancelled when options change;
+failed requests retain their settings and can retry. The bounded Node route uses
+catalogue IDs and validated theme data, with explicit archive deployment tracing.
+
+The final build/types and complete 421-case regression suite pass, including
+33 theme/adoption cases. The full pinned run passed 115 cases; a long WebKit
+touch case reached its 30-second deadline during concurrent jobs, then passed
+alone with the same timeout and assertions. This covers all 116 cases and
+keeps all twenty existing image baselines unchanged. The small final control-row
+alignment is also covered by the complete final regression and isolated touch run.
+Real shadcn installs build Sign-in and
+the 46-item workflow graph independently in Next.js and Vite. Actual themed
+Outline/Next.js and SchedulePlanner/Vite downloads install, rebuild and retain
+their selected fonts, mode and portal styling in working browser interactions.
+
+Independent builds caught a missing client directive in the trimmed package
+barrel; the generator now preserves the original boundary and archive tests guard
+it. A first test-only helper call and a scroll-dependent header comparison were
+corrected without relaxing colour isolation. An initial overlapping regression
+run passed 419 cases and timed out one seven-page accessibility sweep; the final
+complete run uses the same two-worker concurrency as CI and passes. Desktop/phone
+captures were reviewed, including final control-row alignment.
+
+Evidence is under .local/adoption-*.log, corresponding status files, install
+footprint JSON and review captures. All forty archive export maps are checked.
+No commit, push, deployment or npm publication was performed for this increment.
+Outline expansion, further playground coverage and versioned releases remain
+later priorities. The fixed Workbench roadmap and exam allocation are unchanged.
+
 ## GitHub quality-container recovery — 30 October 2026
 
 Source 795996b passed GitHub core validation, including the production build,

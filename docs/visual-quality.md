@@ -28,7 +28,19 @@ Separate touch projects enable a coarse pointer in Chromium, Firefox and WebKit
 at 390 × 844 in both themes. Twelve cases check readable editable text, native
 focus/blur, unrestricted zoom metadata and vector artwork/template marks. They
 do not reproduce the physical iPhone keyboard or claim UIKit zoom validation.
-There are now 116 cases: twenty image comparisons, 84 workflow interactions and
+An eighth workflow exercises Outline detail-draft recovery, persistence and focus
+return under normal motion. A ninth checks bulk-action interpolation, checkbox
+states and return focus. It samples the actual CSS timeline at intermediate
+positions without relying on headless frame cadence; the regular selection-motion
+suite separately measures unpaused frames and rapid reversals.
+A tenth workflow posts a project comment, checks return focus, reverses a bulk
+status change and reopens its activity under normal motion. Both that flow and
+the earlier Outline draft recovery run in all twelve browser/theme/viewport
+configurations.
+Two playground workflows cover native choices/disclosure state and actual source
+downloads, plus bulk-action failure/recovery and separate draft/applied filters.
+There are now 176 cases: twenty image comparisons,
+144 workflow interactions and
 twelve touch checks. Run only the new touch cases with --project="touch-*".
 
 ## Run comparisons
@@ -64,6 +76,13 @@ images are under `playwright-report/quality/` and `test-results/quality/`;
 CI retains these on failure. The isolated server defaults to port 3123;
 `BLD8_UI_TEST_PORT` can select another unused port. Existing preview servers are
 not reused.
+
+Visual projects hide only the outer document scrollbar before measuring their
+component canvas. This preserves the reviewed Linux raster geometry when the
+showcase reserves a stable gutter; no control styles or motion are overridden.
+Normal-motion and touch projects retain the actual application gutter. The
+dedicated `tests/overlay-layout.spec.ts` regression restores visible scrollbars
+and checks page geometry through real select opening and closing.
 
 ## Review an intentional change
 

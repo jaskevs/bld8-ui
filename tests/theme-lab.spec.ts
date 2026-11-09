@@ -66,6 +66,7 @@ test('custom colour and preview mode stay inside the frame',async({page})=>{
     accent:getComputedStyle(element).getPropertyValue('--bui-accent'),
     primary:getComputedStyle(element).getPropertyValue('--bui-primary'),
   }));
+  const scrollBefore=await page.evaluate(()=>scrollY);
   const headerBefore=await page.locator('.site-header').evaluate(element=>({background:getComputedStyle(element).backgroundColor,colour:getComputedStyle(element).color}));
   await editAccent(page);
   await page.getByRole('button',{name:'Dark preview',exact:true}).click();
@@ -75,13 +76,16 @@ test('custom colour and preview mode stay inside the frame',async({page})=>{
     accent:getComputedStyle(element).getPropertyValue('--bui-accent'),
     primary:getComputedStyle(element).getPropertyValue('--bui-primary'),
   }))).toEqual(parentBefore);
-  expect(await page.locator('.site-header').evaluate(element=>({background:getComputedStyle(element).backgroundColor,colour:getComputedStyle(element).color}))).toEqual(headerBefore);
+  // Restore scroll before comparing: the floating header intentionally lifts on scroll.
+  await page.evaluate(value=>scrollTo(0,value),scrollBefore);
+  await expect.poll(()=>page.locator('.site-header').evaluate(element=>({background:getComputedStyle(element).backgroundColor,colour:getComputedStyle(element).color}))).toEqual(headerBefore);
 });
 
 test('a brand preset changes the specimen without recolouring site navigation',async({page})=>{
   await openLab(page);
   const frame=preview(page);
   const before=await frameToken(frame,'--bui-accent');
+  const scrollBefore=await page.evaluate(()=>scrollY);
   const navigationBefore=await page.locator('.site-header').evaluate(element=>({
     colour:getComputedStyle(element).color,
     background:getComputedStyle(element).backgroundColor,
@@ -90,7 +94,8 @@ test('a brand preset changes the specimen without recolouring site navigation',a
   await page.getByRole('button',{name:/^Cobalt /}).click();
   await expect.poll(()=>frameToken(frame,'--bui-accent')).not.toBe(before);
   await expect(frame.getByRole('region',{name:'Themed workspace',exact:true})).toBeVisible();
-  expect(await page.locator('.site-header').evaluate(element=>({
+  await page.evaluate(value=>scrollTo(0,value),scrollBefore);
+  await expect.poll(()=>page.locator('.site-header').evaluate(element=>({
     colour:getComputedStyle(element).color,
     background:getComputedStyle(element).backgroundColor,
     accent:getComputedStyle(element).getPropertyValue('--bui-accent'),

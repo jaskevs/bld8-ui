@@ -14,12 +14,15 @@ export interface DrawerProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onOpenChangeComplete?: (open: boolean) => void;
   initialFocus?: RefObject<HTMLElement | null>;
   finalFocus?: RefObject<HTMLElement | null>;
   className?: string;
+  footer?: ReactNode;
+  closeDisabled?: boolean;
 }
 /** A modal drawer with Base UI focus management and swipe dismissal. */
-export function Drawer({trigger,title,description,children,side='bottom',initialFocus,finalFocus,className,...props}:DrawerProps) {
+export function Drawer({trigger,title,description,children,side='bottom',initialFocus,finalFocus,className,footer,closeDisabled=false,...props}:DrawerProps) {
   return <Primitive.Root {...props} swipeDirection={side==='bottom' ? 'down' : side}>
     {trigger && <Primitive.Trigger render={trigger} />}
     <Primitive.Portal>
@@ -29,9 +32,10 @@ export function Drawer({trigger,title,description,children,side='bottom',initial
           {side==='bottom' && <div className="bui-drawer-handle bui:mx-auto bui:my-3 bui:h-1 bui:w-10 bui:rounded-full bui:bg-border" aria-hidden="true" />}
           <div className="bui-dialog-heading bui:p-6">
             <div><Primitive.Title className="bui-dialog-title">{title}</Primitive.Title>{description && <Primitive.Description className="bui-dialog-description">{description}</Primitive.Description>}</div>
-            <Primitive.Close render={<Button variant="ghost" className="bui-icon-button" aria-label="Close drawer"><Icon name="close" /></Button>} />
+            <Primitive.Close disabled={closeDisabled} render={<Button variant="ghost" className="bui-icon-button" aria-label="Close drawer"><Icon name="close" /></Button>} />
           </div>
           <Primitive.Content className="bui-drawer-content bui:min-h-0 bui:overflow-y-auto bui:overscroll-contain bui:px-6 bui:pb-6">{children}</Primitive.Content>
+          {footer && <div className="bui-drawer-footer">{footer}</div>}
         </Primitive.Popup>
       </Primitive.Viewport>
     </Primitive.Portal>

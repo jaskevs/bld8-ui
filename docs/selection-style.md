@@ -34,6 +34,14 @@ Keyboard focus remains visible independently. Destructive actions retain their
 error foreground/background, and forced-colour modes use system selection/focus
 colours. Reduced motion continues to remove animated travel.
 
+Bulk action bars expand and collapse actual table space with the shared 320 ms
+`Reveal` transition. Keep selected-count updates within the existing bar rather
+than replaying its entry. Disable outgoing actions immediately, retain their
+visual content through exit and restore focus before clearing the selection.
+Checkbox ticks and mixed dashes crossfade as separate shapes; native selection
+semantics remain immediate. Selected table cells ease their surface colour while
+columns and hit targets stay aligned. Reduced motion removes these transitions.
+
 Accent badges, avatars, illustrations, checked choices, switches, slider fills
 and selected date endpoints follow the shared accent. Progress uses the stronger
 evergreen data shade so its value remains visible on a pale track.

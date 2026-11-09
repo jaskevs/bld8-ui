@@ -21,7 +21,9 @@
     "test:quality": "playwright test --config=playwright.quality.config.ts",
     "test:quality:smoke": "playwright test --config=playwright.quality.config.ts --project=\"smoke-*\"",
     "test:quality:update": "playwright test --config=playwright.quality.config.ts --project=\"visual-*\" --update-snapshots=changed",
-    "typecheck:quality": "tsc -p tsconfig.quality.json"
+    "typecheck:quality": "tsc -p tsconfig.quality.json",
+    "check:starters:themes": "node scripts/check-themed-starters.mjs",
+    "release:prepare": "node scripts/prepare-source-release.mjs --bundle"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

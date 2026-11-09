@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import {starterOptions,isStarter,type StarterFramework} from '@/lib/starter-options';
+import {ThemedStarterDownload} from './themed-starter-download';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDownToLine, ArrowUpRight, Check, ChevronDown, Code2, Copy, Link2, Monitor, Moon, RotateCcw, Smartphone, Sun } from 'lucide-react';
 import { Button, Field, Icon, Input, Select, Slider } from '@bld8/ui';
@@ -10,16 +12,18 @@ import {
   type ThemeConfig, type ThemeMode,
 } from '@bld8/ui/theme-config';
 
-type ThemeState = { config: ThemeConfig; mode: ThemeMode };
+type ThemeState = { config: ThemeConfig; mode: ThemeMode; starter:string; framework:StarterFramework };
 type PreviewState = 'loading' | 'ready' | 'error';
 type HistoryKind = 'push' | 'replace';
 
-const defaultState = (): ThemeState => ({ config: { ...DEFAULT_THEME }, mode: 'light' });
+const defaultState = (): ThemeState => ({ config: { ...DEFAULT_THEME }, mode: 'light',starter:'',framework:'nextjs' });
 
 function themeUrl(state: ThemeState) {
   const url = new URL(window.location.href);
   url.searchParams.set('theme', serializeThemeConfig(state.config));
   url.searchParams.set('mode', state.mode);
+  if(state.starter)url.searchParams.set('starter',state.starter);else url.searchParams.delete('starter');
+  url.searchParams.set('framework',state.framework);
   return url;
 }
 
@@ -90,7 +94,8 @@ export function ThemeLab() {
       const raw = params.get('theme');
       const config = parseThemeConfig(raw);
       const mode = params.get('mode') === 'dark' ? 'dark' : 'light';
-      const next = { config: config ?? { ...DEFAULT_THEME }, mode } as ThemeState;
+      const starter=params.get('starter'),framework=params.get('framework')==='vite'?'vite':'nextjs';
+      const next:ThemeState = { config: config ?? { ...DEFAULT_THEME }, mode,starter:isStarter(starter)?starter:'',framework };
       current.current = next;
       setState(next);
       setResetKey(key => key + 1);
@@ -113,6 +118,7 @@ export function ThemeLab() {
         type: 'bld8-theme-config',
         config: current.current.config,
         mode: current.current.mode,
+        starter: current.current.starter,
       }, window.location.origin);
     } catch {
       previewConnected.current = false;
@@ -156,7 +162,7 @@ export function ThemeLab() {
 
   const chooseTheme = (config: Readonly<ThemeConfig>, resetMode = false) => {
     cancelUrlWrite();
-    const next = { config: normalizeThemeConfig(config), mode: resetMode ? 'light' as const : current.current.mode };
+    const next = { ...current.current, config: normalizeThemeConfig(config), mode: resetMode ? 'light' as const : current.current.mode };
     current.current = next;
     setState(next);
     setResetKey(key => key + 1);
@@ -174,6 +180,10 @@ export function ThemeLab() {
     setActionMessage('');
     setManualLink('');
     writeUrl(next, 'push');
+  };
+
+  const changeStarter=(starter:string,framework:StarterFramework)=>{
+    cancelUrlWrite();const next={...current.current,starter,framework};current.current=next;setState(next);setActionMessage('');setManualLink('');writeUrl(next,'push');
   };
 
   const css = useMemo(() => exportThemeCss(state.config, { selector: '.bld8-theme' }), [state.config]);
@@ -237,6 +247,14 @@ export function ThemeLab() {
   }
 
   return <div className="theme-lab" aria-busy={!hydrated || undefined}>
+    <section className="theme-starter" aria-label="Themed starter">
+      <div><p className="eyebrow">MAKE IT YOURS</p><h2>A starting point, in your style.</h2><p>Choose an interface, adjust its theme, then take the project with you.</p></div>
+      <div className="theme-starter-controls">
+        <Select label="Starter" value={state.starter||'specimen'} options={[{value:'specimen',label:'Component preview'},...starterOptions]} onValueChange={value=>{if(value==='specimen'||isStarter(value))changeStarter(value==='specimen'?'':value,state.framework);}}/>
+        <Select label="Starter framework" value={state.framework} options={[{value:'nextjs',label:'Next.js'},{value:'vite',label:'React + Vite'}]} onValueChange={value=>{if(value==='nextjs'||value==='vite')changeStarter(state.starter,value);}}/>
+        <ThemedStarterDownload id={state.starter} framework={state.framework} config={state.config} mode={state.mode}/>
+      </div>
+    </section>
     <section className="theme-presets" aria-labelledby="theme-presets-heading">
       <div className="theme-section-caption"><h2 id="theme-presets-heading">Start with a direction.</h2><span className="eyebrow">THREE STARTING POINTS</span></div>
       <div className="theme-preset-grid">{THEME_PRESETS.map(item => {
@@ -330,7 +348,7 @@ export function ThemeLab() {
               <li>Add <code>class="bld8-theme"</code> and <code>data-ui-theme="light"</code> or <code>"dark"</code> to <code>&lt;html&gt;</code>. This also themes overlays rendered in portals.</li>
               <li>Wrap overlays in <code>UIProvider</code> and set <code>body &#123; position: relative; &#125;</code>.</li>
             </ol>
-            <p>DM Sans and Manrope are loaded in this lab. Install or self-host these fonts to match them in your application; the export includes system fallbacks.</p>
+            <p>Starter downloads include the selected fonts and their licences. CSS-only exports include system fallbacks; load the named fonts in your own application.</p>
             <Link href="/frameworks" className="plain-link">Application setup <Icon icon={ArrowUpRight} size={15} /></Link>
           </div>
         </section>

@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "status": "unreleased",
+  "title": "Source adoption and complete workflows",
+  "changes": [
+    "Focused registry installs and themed Next.js or Vite starters.",
+    "Outline details, recoverable drafts, comments, activity and guarded status undo.",
+    "An 18-control playground with shared configuration and matching TSX downloads.",
+    "Smoother table selection, checkbox states and stable dropdown geometry.",
+    "Source manifests, read-only update reports and locally prepared versioned bundles."
+  ]
+}

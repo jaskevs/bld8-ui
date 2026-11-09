@@ -7,10 +7,10 @@ npx playwright install chromium
 npm run check:registry:consumers
 ```
 
-Use Node 22. The command installs eleven generated entries: `session-setup`,
+Use Node 22. The command installs twelve generated entries: `session-setup`,
 `theme-config`, `file-browser`, `chart`, `analytics-dashboard`, `windowed-table`,
 `table-grouping`, `large-issue-table`, `day-agenda`, `schedule-state` and
-`schedule-planner`. It uses the actual shadcn CLI in two new temporary
+`schedule-planner` and `outline`. It uses the actual shadcn CLI in two new temporary
 applications, then builds and exercises each app independently. Use
 `npm run check:registry:consumers -- next` or `-- vite` to run one framework,
 including separate CI matrix jobs. The browser uses `PLAYWRIGHT_CHANNEL` when
@@ -126,3 +126,19 @@ fixture chunk warnings remain visible in the log. Evidence is ignored under
 .local/schedule-consumers.log; .local/schedule-consumers.status is 0. This is
 source installation evidence; public release and host service behaviour remain
 separate checks.
+
+The 9 November selection-motion increment resolves a 62-item workflow graph in
+both clean consumers. The independent sign-in graph remains 8 items, 16 files and
+4 npm dependencies. `Reveal` travels with table workflows as a shared helper,
+without adding an animation runtime. Stop the BLD8 development watcher before
+this check so generated public files remain stable for its integrity comparison.
+
+## Outline activity and undo — 9 November 2026
+
+The workflow graph is now 63 items. After saving a recovered Outline draft, each
+consumer posts a comment through its installed activity module. It then archives
+a project, rejects the first undo by denying one reference-store write, verifies
+focus on the re-enabled retry button, and successfully retries. These steps run
+in both light and dark in the independent Next.js and Vite apps. No host or browser
+credentials are involved. The injected failure is limited to that fresh context's
+Outline storage key and restores the original method immediately.

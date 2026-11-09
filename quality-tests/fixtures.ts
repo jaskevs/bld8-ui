@@ -18,6 +18,10 @@ export async function openQualityPage(page: Page, path: string, info: TestInfo) 
     document.addEventListener('DOMContentLoaded', () => { document.documentElement.dataset.uiTheme = value; }, {once:true});
   }, theme);
   await page.goto(path);
+  // Keep the reviewed component canvas independent of the outer OS scrollbar.
+  // The visible-scrollbar regression lives in tests/overlay-layout.spec.ts;
+  // normal-motion and touch projects keep the application's actual gutter.
+  if(info.project.name.startsWith('visual-'))await page.addStyleTag({content:'html{scrollbar-width:none!important}'});
   expect(await page.evaluate(() => new Date().toISOString())).toBe('2026-10-20T12:00:00.000Z');
   await page.evaluate(value => { document.documentElement.dataset.uiTheme = value; }, theme);
   await expect(page.locator('html')).toHaveAttribute('data-ui-theme', theme);

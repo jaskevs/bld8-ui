@@ -18,7 +18,7 @@ export function useOutlineDemoRepository(baseUrl='/api/outline'){
       if(rejection.current && init?.method && init.method!=='GET'){headers.set('X-Outline-Demo-Fail','save');rejection.current=false;setRejectNext(false);}
       return fetch(input,{...init,headers});
     };
-    setRepository(createOutlineHttpRepository({baseUrl,fetch:transport,headers:{'X-Outline-Demo-Session':token}}));
+    setRepository(createOutlineHttpRepository({baseUrl,fetch:transport,headers:{'X-Outline-Demo-Session':token},draftKey:'demo:'+baseUrl+':'+token,history:true}));
   },[baseUrl]);
   return {repository,rejectNext,setRejectNext};
 }

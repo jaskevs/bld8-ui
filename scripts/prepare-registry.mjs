@@ -2,9 +2,11 @@ import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join, basename } from 'node:path';
 import { blocks, templates } from './library-catalog.mjs';
+import { createSourceGraph } from './source-graph.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = path => readFileSync(join(root, path), 'utf8');
+const graph = createSourceGraph(root);
 const origin = (process.env.BLD8_REGISTRY_URL || 'https://ui.bld8.dev').replace(/\/$/, '');
 const directory = join(root, 'apps/docs/public/r');
 mkdirSync(directory, {recursive:true});
@@ -29,14 +31,11 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
     const source = read(folder+'/'+name);
     const local = [...source.matchAll(/(?:from\s+|import\s*)['"]\.\/([^'"]+)\.js['"]/g)].map(match => `bld8-${kind === 'block' ? 'block-' : ''}${match[1]}`);
     const external = Object.entries(dependencies).filter(([dependency]) => source.includes(`'${dependency}'`) || source.includes(`'${dependency}/`)).map(([dependency,version]) => `${dependency}@${version}`);
-    let content = source.replace(/(['"])\.\/([^'"]+)\.js\1/g, "'./$2'").replace(/(['"])@bld8\/ui\1/g, "'../index'").replace(/(['"])@bld8\/ui\/filter-query\1/g, "'../filter-query'").replace(/(['"])@bld8\/ui\/time-options\1/g, "'../time-options'");
-    content = content.replace(/(['"])@bld8\/ui\/schedule-state\1/g, "'../schedule-state'");
-    if (kind === 'block' && source.includes('@bld8/ui/schedule-state')) local.push('bld8-schedule-state');
+    const rewritten = kind === 'block' ? graph.rewriteUiImports(source) : {source,modules:[]};
+    let content = rewritten.source.replace(/(['"])\.\/([^'"]+)\.js\1/g, "'./$2'");
+    for (const module of rewritten.modules) local.push('bld8-'+module);
     if (name.endsWith('.tsx')) content = content.replace(/(['"])use client\1;/, "$&\nimport './styles.css';");
     const subdirectory = kind === 'block' ? 'blocks/' : '';
-    if (kind === 'block' && source.includes('@bld8/ui')) local.push('bld8-index');
-    if (kind === 'block' && source.includes('@bld8/ui/filter-query')) local.push('bld8-filter-query');
-    if (kind === 'block' && source.includes('@bld8/ui/time-options')) local.push('bld8-time-options');
     if (kind === 'block') local.push('bld8-block-styles');
     add(`bld8-${kind === 'block' ? 'block-' : ''}${key}`, `BLD8 ${key} source`, [file('registry/bld8/'+subdirectory+name, content, '@ui/bld8/'+subdirectory+name)], external, [...new Set(['bld8-styles',...local])]);
   }
@@ -67,12 +66,13 @@ for (const entry of [...blocks,...templates]) {
   add(entry.id, entry.name, [], [], ['bld8-block-'+entry.file.replace(/\.tsx$/, '')], 'registry:block');
 }
 add('outline-http','Outline HTTP adapter',[],[],['bld8-block-outline-http'],'registry:lib');
-let rhfExample=read('examples/react-hook-form/project-form.tsx')
+const rhfImports=graph.rewriteUiImports(read('examples/react-hook-form/project-form.tsx'));
+let rhfExample=rhfImports.source
   .replaceAll("'@bld8/ui/react-hook-form'", "'../react-hook-form'")
   .replaceAll("'@bld8/ui'", "'../index'")
   .replaceAll("'@bld8/blocks/outline-repository'", "'../blocks/outline-repository'")
   .replaceAll("'@bld8/blocks'", "'../blocks/outline-http-demo'");
-add('react-hook-form-example','React Hook Form example',[file('registry/bld8/examples/react-hook-form-example.tsx',rhfExample,'@ui/bld8/examples/react-hook-form-example.tsx')],['react-hook-form@7.90.0'],['bld8-index','bld8-react-hook-form','bld8-block-outline-http-demo','bld8-block-outline-repository'],'registry:block');
+add('react-hook-form-example','React Hook Form example',[file('registry/bld8/examples/react-hook-form-example.tsx',rhfExample,'@ui/bld8/examples/react-hook-form-example.tsx')],['react-hook-form@7.90.0'],[...rhfImports.modules].map(module=>'bld8-'+module).concat(['bld8-block-outline-http-demo','bld8-block-outline-repository']),'registry:block');
 const registry = {$schema:'https://ui.shadcn.com/schema/registry.json', name:'bld8', homepage:origin, items};
 writeFileSync(join(directory,'registry.json'),JSON.stringify(registry,null,2));
 console.log(`Prepared ${items.length} shadcn registry items at ${origin}/r.`);

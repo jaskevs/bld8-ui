@@ -1,49 +1,40 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { Archive, Check, Download, Ellipsis, Plus } from 'lucide-react';
-import { Alert, Badge, Button, DataTable, Dialog, DatePicker, DropdownMenu, EditableCell, Field, Form, FormErrorSummary, Input, IconButton, Select, Textarea, Tooltip, formatDateValue, createTableCSV, defaultTableQuery, useForm, useUnsavedChanges, type Column, type TableQuery } from '@bld8/ui';
-import { OutlineValidationError, validateOutline, type OutlineProject, type OutlineRepository, type OutlineValues } from './outline-repository.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Archive, Check, Download, Ellipsis, Plus,Undo2 } from 'lucide-react';
+import { Alert, Badge, Button, DataTable, Dialog, DropdownMenu, EditableCell, IconButton,Reveal, Select, Tooltip, createTableCSV, defaultTableQuery, type Column, type TableQuery } from '@bld8/ui';
+import { OutlineConflictError,OutlineValidationError, validateOutline, type OutlineProject, type OutlineRepository, type OutlineValues } from './outline-repository.js';
+import {createOutlineDraftStore} from './outline-drafts.js';
+import {OutlineProjectEditor} from './outline-project-editor.js';
 
 function dateValue(value:string){if(!value)return null;const [year,month,day]=value.split('-').map(Number);return new Date(year,month-1,day);}
-const empty:OutlineValues={name:'',due:'',notes:'',status:'Planned'};
-function ProjectEditor({project,repository,onSaved,onClose}:{project:OutlineProject|null;repository:OutlineRepository;onSaved:()=>void;onClose:()=>void}) {
-  const [discard,setDiscard]=useState(false);
-  const form=useForm<OutlineValues>({
-    initialValues:project?{name:project.name,due:project.due,notes:project.notes,status:project.status}:empty,
-    validate:validateOutline,
-    onSubmit:async(values,{signal})=>{try{const saved=await repository.save(values,project,signal);return {values:saved};}catch(error){if(error instanceof OutlineValidationError)return {fieldErrors:error.fields};throw error;}},
-    onSuccess:onSaved,
-  });
-  useUnsavedChanges(form.dirty);
-  const close=()=>{if(form.pending)return;if(form.dirty)setDiscard(true);else onClose();};
-  return <Dialog title={project?'Edit project':'Plan a project'} description="A name, a review date and the context worth keeping." open onOpenChange={open=>{if(!open)close();}}>
-    <Form form={form} className="bblocks-stack">
-      <FormErrorSummary error={form.error} />
-      <Field label="Project name" required error={form.errors.name}><Input name="name" value={form.values.name} onChange={event=>form.setField('name',event.target.value)} disabled={form.pending} autoComplete="off" maxLength={80} /></Field>
-      <div className="bblocks-form-grid"><DatePicker label="Review date" required name="due" value={dateValue(form.values.due)} defaultMonth={dateValue(form.values.due) ?? new Date()} onValueChange={value=>form.setField('due',formatDateValue(value ?? undefined))} error={form.errors.due} disabled={form.pending} /><Select label="Status" name="status" value={form.values.status} onValueChange={value=>form.setField('status',value as OutlineValues['status'])} options={['Planned','Ready','Archived'].map(value=>({value,label:value}))} error={form.errors.status} disabled={form.pending} /></div>
-      <Field label="Notes to self" hint="Keep the useful context close." error={form.errors.notes}><Textarea name="notes" value={form.values.notes} maxLength={1000} onChange={event=>form.setField('notes',event.target.value)} disabled={form.pending} /></Field>
-      {discard && <Alert title="Discard this draft?" tone="warning"><p>Your unsaved changes will be lost.</p><div className="bblocks-inline-actions"><Button variant="danger" size="sm" onClick={onClose}>Discard changes</Button><Button variant="secondary" size="sm" onClick={()=>setDiscard(false)}>Keep editing</Button></div></Alert>}
-      <div className="bblocks-heading"><span className="bblocks-note">{form.pending?'Saving…':form.dirty?'Unsaved changes':'Ready when you are.'}</span><div className="bblocks-inline-actions"><Button variant="secondary" onClick={close} disabled={form.pending}>Cancel</Button><Button type="submit" loading={form.pending}>{project?'Save project':'Add project'}</Button></div></div>
-    </Form>
-  </Dialog>;
-}
 export function OutlineProjects({repository}:{repository:OutlineRepository}) {
   const [query,setQuery]=useState<TableQuery>({...defaultTableQuery});const [rows,setRows]=useState<OutlineProject[]>([]);const [total,setTotal]=useState(0);
   const [loading,setLoading]=useState(true);const [error,setError]=useState('');const [revision,setRevision]=useState(0);
-  const [selected,setSelected]=useState<string[]>([]);const [editor,setEditor]=useState<{project:OutlineProject|null}|null>(null);
+  const [selected,setSelected]=useState<string[]>([]);const [editor,setEditor]=useState<{project:OutlineProject|null;repository:OutlineRepository}|null>(null);
   const [deleting,setDeleting]=useState<OutlineProject|null>(null);const [mutation,setMutation]=useState(false);const [message,setMessage]=useState('');const [actionError,setActionError]=useState('');
   const [density,setDensity]=useState<'comfortable'|'compact'>('comfortable');
+  const [undo,setUndo]=useState<{id:string;count:number;repository:OutlineRepository}|null>(null);
+  const drafts=useMemo(()=>{let storage:Storage|undefined;try{if(typeof window!=='undefined')storage=window.sessionStorage;}catch{}return createOutlineDraftStore(storage,repository.draftKey);},[repository]);
   const listRun=useRef(0);const tableFocus=useRef<HTMLDivElement>(null);
   const rowTriggers=useRef(new Map<string,HTMLButtonElement>());
   const origin=useRef<HTMLElement|null>(null);const operation=useRef<AbortController|null>(null);
-  useEffect(()=>()=>operation.current?.abort(),[]);
+  const undoTrigger=useRef<HTMLButtonElement>(null),retryUndo=useRef(false);
+  useEffect(()=>{if(!mutation&&retryUndo.current){retryUndo.current=false;undoTrigger.current?.focus({preventScroll:true});}},[mutation,actionError]);
+  useEffect(()=>{setUndo(null);setActionError('');setMessage('');setSelected([]);setMutation(false);retryUndo.current=false;return()=>{operation.current?.abort();operation.current=null;};},[repository]);
   useEffect(()=>{const run=++listRun.current;const controller=new AbortController();setLoading(true);setError('');repository.list(query,controller.signal).then(result=>{if(controller.signal.aborted || run!==listRun.current)return;const last=Math.max(1,Math.ceil(result.total/query.pageSize));if(query.page>last){setQuery(current=>({...current,page:last}));return;}setRows(result.rows);setTotal(result.total);}).catch(error=>{if(!controller.signal.aborted && run===listRun.current)setError(error instanceof Error?error.message:'Unable to load projects.');}).finally(()=>{if(!controller.signal.aborted && run===listRun.current)setLoading(false);});return()=>controller.abort();},[query,revision,repository]);
   useEffect(()=>{const refresh=()=>setRevision(value=>value+1);window.addEventListener('storage',refresh);return()=>window.removeEventListener('storage',refresh);},[]);
-  function restoreFocus(){requestAnimationFrame(()=>{if(origin.current?.isConnected)origin.current.focus();else tableFocus.current?.focus();});}
-  function openEditor(project:OutlineProject|null,returnTo?:HTMLElement){origin.current=returnTo ?? document.activeElement as HTMLElement;setEditor({project});}
+  function restoreFocus(){requestAnimationFrame(()=>{if(origin.current?.isConnected)origin.current.focus({preventScroll:true});else tableFocus.current?.focus({preventScroll:true});});}
+  function openEditor(project:OutlineProject|null,returnTo?:HTMLElement){origin.current=returnTo ?? document.activeElement as HTMLElement;setEditor({project,repository});}
   function closeEditor(){setEditor(null);restoreFocus();}
   function closeDeletion(){setDeleting(null);restoreFocus();}
-  async function mutate(action:(signal:AbortSignal)=>Promise<void>,success:string){if(operation.current)return;const controller=new AbortController();operation.current=controller;setMutation(true);setActionError('');try{await action(controller.signal);if(controller.signal.aborted)return;setSelected([]);setDeleting(null);if(deleting)requestAnimationFrame(()=>tableFocus.current?.focus());setMessage(success);setRevision(value=>value+1);}catch(error){if(!controller.signal.aborted)setActionError(error instanceof Error?error.message:'Changes could not be saved.');}finally{if(operation.current===controller){operation.current=null;setMutation(false);}}}
+  async function mutate(action:(signal:AbortSignal)=>Promise<void|string>,success:string,clearSelection=true){if(operation.current)return;const controller=new AbortController();operation.current=controller;setMutation(true);setActionError('');try{const notice=await action(controller.signal);if(controller.signal.aborted)return;if(clearSelection)setSelected([]);setDeleting(null);if(deleting)requestAnimationFrame(()=>tableFocus.current?.focus());setMessage(notice??success);setRevision(value=>value+1);}catch(error){if(!controller.signal.aborted)setActionError(error instanceof Error?error.message:'Changes could not be saved.');}finally{if(operation.current===controller){operation.current=null;setMutation(false);}}}
+  function changeStatus(ids:string[],status:OutlineValues['status']){
+    void mutate(async signal=>{if(!repository.history){await repository.setStatus(ids,status,signal);return;}const result=await repository.history.changeStatus(ids,status,signal);if(signal.aborted)return;setUndo(result.undo?{...result.undo,repository}:null);return result.changed?`${result.changed} project${result.changed===1?'':'s'} ${status==='Ready'?'marked ready':'archived'}.`:'Selected projects already have this status.';},ids.length+' projects '+(status==='Ready'?'marked ready.':'archived.'));
+  }
+  function undoStatus(){
+    if(!undo||undo.repository!==repository||!repository.history)return;const receipt=undo;
+    void mutate(async signal=>{try{await repository.history!.undoStatus(receipt.id,signal);if(signal.aborted)return;tableFocus.current?.focus({preventScroll:true});setUndo(null);}catch(cause){if(!signal.aborted){if(cause instanceof OutlineConflictError||cause&&typeof cause==='object'&&'status' in cause&&cause.status===409){tableFocus.current?.focus({preventScroll:true});setUndo(null);}else retryUndo.current=true;}throw cause;}},`${receipt.count} project status${receipt.count===1?'':'es'} restored.`,false);
+  }
   async function saveCell(row:OutlineProject,key:'name'|'due'|'status',value:string,signal:AbortSignal){
     let saved:OutlineProject;
     try{saved=await repository.save({...row,[key]:value},row,signal);}
@@ -60,11 +51,11 @@ export function OutlineProjects({repository}:{repository:OutlineRepository}) {
     {key:'actions',header:'Actions',width:96,minWidth:80,align:'end',resizable:false,cell:row=><DropdownMenu trigger={<IconButton ref={node=>{if(node)rowTriggers.current.set(row.id,node);else rowTriggers.current.delete(row.id);}} label={'Actions for '+row.name} icon={Ellipsis} size="sm" variant="ghost" className="bblocks-row-menu" disabled={mutation} />} items={[{label:'Edit project',onSelect:()=>openEditor(row,rowTriggers.current.get(row.id))},{label:'Delete project',destructive:true,onSelect:()=>{origin.current=rowTriggers.current.get(row.id) ?? null;setActionError('');setDeleting(row);}}]} />},
   ];
   function download(){const url=URL.createObjectURL(new Blob(['\uFEFF'+createTableCSV(rows,columns)],{type:'text/csv;charset=utf-8;'}));const link=document.createElement('a');link.href=url;link.download='outline-current-page.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setMessage('Current page exported.');}
-  return <section className="bblocks-panel" aria-label="Outline projects"><div className="bblocks-heading"><div><p className="bblocks-kicker">PROJECTS / {total.toString().padStart(2,'0')}</p><h2>Project list</h2><p className="bblocks-muted">Select a value to edit. Use row actions for the full details.</p></div><div className="bblocks-inline-actions"><Tooltip content="Export the current page"><IconButton label="Export current page" icon={Download} variant="ghost" onClick={download} disabled={loading || !!error || !rows.length} /></Tooltip><Button leadingIcon={Plus} onClick={()=>openEditor(null)}>Plan project</Button></div></div>
-    {actionError && !deleting && <Alert title="Project update needs attention" tone="danger" live>{actionError}</Alert>}
-    <div ref={tableFocus} tabIndex={-1} aria-label="Project table updates"><DataTable caption="Outline projects" rows={rows} columns={columns} rowKey={row=>row.id} rowLabel={row=>row.name} server={{query,onQueryChange:setQuery,totalRows:total}} loading={loading} error={error} onRetry={()=>setRevision(value=>value+1)} columnVisibility viewOptions={<Select label="Table density" value={density} options={[{value:'comfortable',label:'Comfortable'},{value:'compact',label:'Compact'}]} onValueChange={value=>setDensity(value as typeof density)} />} resizableColumns density={density} selectable selectedKeys={selected} onSelectedKeysChange={setSelected} filters={[{key:'status',label:'Statuses',options:['Planned','Ready','Archived'].map(value=>({value,label:value})),value:row=>row.status}]} renderSelectedActions={keys=><><Button size="sm" leadingIcon={Check} loading={mutation} onClick={()=>mutate(signal=>repository.setStatus(keys,'Ready',signal),keys.length+' projects marked ready.')}>Mark ready</Button><Button size="sm" variant="secondary" leadingIcon={Archive} disabled={mutation} onClick={()=>mutate(signal=>repository.setStatus(keys,'Archived',signal),keys.length+' projects archived.')}>Archive</Button></>} /></div>
-    <p role="status" className="bblocks-status">{message}</p>
-    {editor && <ProjectEditor project={editor.project} repository={repository} onClose={closeEditor} onSaved={()=>{setMessage(editor.project?'Project saved.':'Project added.');setQuery(current=>({...current,page:1}));setRevision(value=>value+1);closeEditor();}} />}
+  return <section className="bblocks-panel" aria-label="Outline projects"><div className="bblocks-heading"><div><p className="bblocks-kicker">PROJECTS / {total.toString().padStart(2,'0')}</p><h2>Project list</h2><p className="bblocks-muted">Select a value to edit. Use row actions to open project details.</p></div><div className="bblocks-inline-actions"><Tooltip content="Export the current page"><IconButton label="Export current page" icon={Download} variant="ghost" onClick={download} disabled={loading || !!error || !rows.length} /></Tooltip><Button leadingIcon={Plus} onClick={()=>openEditor(null)}>Plan project</Button></div></div>
+    <Reveal open={!!actionError&&!deleting}>{actionError&&!deleting?<Alert title="Project update needs attention" tone="danger" live>{actionError}<Button variant="ghost" size="sm" disabled={mutation} onClick={()=>setRevision(value=>value+1)}>Refresh projects</Button></Alert>:null}</Reveal>
+    <div ref={tableFocus} tabIndex={-1} aria-label="Project table updates"><DataTable caption="Outline projects" rows={rows} columns={columns} rowKey={row=>row.id} rowLabel={row=>row.name} server={{query,onQueryChange:setQuery,totalRows:total}} loading={loading} error={error} onRetry={()=>setRevision(value=>value+1)} columnVisibility viewOptions={<Select label="Table density" value={density} options={[{value:'comfortable',label:'Comfortable'},{value:'compact',label:'Compact'}]} onValueChange={value=>setDensity(value as typeof density)} />} resizableColumns density={density} selectable selectedKeys={selected} onSelectedKeysChange={setSelected} filters={[{key:'status',label:'Statuses',options:['Planned','Ready','Archived'].map(value=>({value,label:value})),value:row=>row.status}]} renderSelectedActions={keys=><><Button size="sm" leadingIcon={Check} loading={mutation} onClick={()=>changeStatus(keys,'Ready')}>Mark ready</Button><Button size="sm" variant="secondary" leadingIcon={Archive} disabled={mutation} onClick={()=>changeStatus(keys,'Archived')}>Archive</Button></>} /></div>
+    <Reveal open={!!message}><div className="bblocks-project-feedback"><p role="status" className="bblocks-status">{message}</p><Button ref={undoTrigger} className="bblocks-resource-undo" data-visible={!!undo} aria-hidden={!undo||undefined} disabled={!undo||mutation} size="sm" variant="ghost" leadingIcon={Undo2} loading={mutation&&!!undo} onClick={undoStatus}>Undo status change</Button></div></Reveal>
+    {editor&&editor.repository===repository&&<OutlineProjectEditor project={editor.project} repository={repository} drafts={drafts} finalFocus={origin} onClosed={closeEditor} onDraftKept={setMessage} onSaved={saved=>{setMessage((editor.project?'Project saved.':'Project added.')+(drafts.problem?' '+drafts.problem:''));setRows(current=>current.map(row=>row.id===saved.id?saved:row));if(!editor.project)setQuery(current=>({...current,page:1}));setRevision(value=>value+1);}}/>}
     {deleting && <Dialog title="Delete project?" description={'Delete '+deleting.name+' permanently from this workspace.'} open onOpenChange={open=>{if(!open&&!mutation)closeDeletion();}}>{actionError && <Alert title="Unable to delete project" tone="danger" live>{actionError}</Alert>}<div className="bblocks-inline-actions"><Button variant="secondary" disabled={mutation} onClick={closeDeletion}>Keep project</Button><Button variant="danger" loading={mutation} onClick={()=>mutate(signal=>repository.remove(deleting,signal),'Project deleted.')}>Delete project</Button></div></Dialog>}
   </section>;
 }

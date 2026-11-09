@@ -140,3 +140,18 @@ is needed. The existing main-to-Vercel connection handles the source push.
 Verify the exact pushed revision in GitHub Actions and Vercel before calling the
 new release live. Recheck input focus/blur, pinch zoom and marks on the reporting
 iPhone after deployment; desktop WebKit does not reproduce its native keyboard.
+
+
+## Source adoption release - 9 November 2026
+
+The owner authorised the accumulated UI changes and private planning update.
+Local preflight passes the production build/types, all 493 workflow checks and
+176 pinned Linux visual/browser checks. Clean Next.js/Vite source installations
+and themed starter checks are recorded in verification.md.
+
+The push uses the existing personal main-to-Vercel link and required UI Release
+checks gate. No force promotion or project setting change is part of this release.
+Verify the pushed revision, completed aggregate and domain assignment before
+calling it live. The exact outcome is recorded in the private planning release
+record. The 0.2.0 source-version candidate is not tagged or hosted by this push;
+retained immutable publication remains planned work in next-work.md.

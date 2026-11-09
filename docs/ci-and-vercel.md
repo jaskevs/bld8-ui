@@ -8,8 +8,9 @@ a Vercel token or application credentials.
 ## Validation jobs
 
 - **UI core validation** installs the locked dependencies, builds the production
-  site, checks workspace types, builds six standalone Vite archives, installs
-  the real registry into clean Next.js and Vite consumers, and runs the existing
+  site, checks workspace types, builds eight standalone Vite archives, installs
+  the real registry into clean Next.js and Vite consumers, builds and exercises
+  actual themed downloads in both frameworks, and runs the existing
   interaction/accessibility suite in Chromium.
 - **UI browser quality** builds and compares approved screenshots and runs focused
   normal-motion interactions in Chromium, Firefox and WebKit. It uses the pinned

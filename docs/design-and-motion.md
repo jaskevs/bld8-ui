@@ -192,3 +192,28 @@ On mobile, Menu opens a compact overlay with eased opacity and movement. Hidden
 links are inert. Escape returns focus to Menu; outside clicks and link selection
 close it. Reduced-motion preferences disable transitions while preserving all
 states and actions.
+
+## Selection and disclosure motion — 9 November 2026
+
+Bulk actions use the shared `Reveal` helper. Its grid track expands and collapses
+real layout space over the 320 ms control easing; content fades and travels 6 px
+without scaling text or icons. The table follows the action bar throughout the
+transition. Count changes keep the open height, and rapid reversals start from
+the current position. Closing content stays mounted until exit completes but is
+immediately inert and hidden from assistive technology.
+
+The same pattern covers issue filters, the large-table selection slot and resource
+feedback. The large-table slot retains its reserved space; wrapped phone actions
+can expand beyond that minimum smoothly. Clear and archive actions return focus
+to a useful table control before the outgoing actions become unavailable.
+
+Checkbox ticks and mixed-state dashes use separate, fixed-size pseudo-elements.
+Their opacity and transform ease in both directions; the native checked state
+and keyboard response update immediately. Selected cell fills ease without moving
+column edges. Reduced motion removes transitions, including indicators and hints;
+forced colours preserve system selection and visible keyboard focus.
+
+`Reveal` is a shared source dependency, not another catalogue control. It adds no
+animation runtime dependency. Source installs include it automatically when a
+table or workflow needs it. Retain drafts outside a subtree that unmounts after
+closing.

@@ -40,3 +40,4 @@ export * from './windowed-table.js';
 export * from './schedule-state.js';
 
 export * from './day-agenda.js';
+export * from './reveal.js';

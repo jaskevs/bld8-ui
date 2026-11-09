@@ -8,6 +8,7 @@ import {tmpdir} from 'node:os';
 import {basename, dirname, isAbsolute, join, relative, sep} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
+import {validateManifest,byteHash} from './source-release.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(join(root, 'package.json'));
@@ -26,11 +27,17 @@ const sharedDependencies = Object.fromEntries(['react', 'react-dom'].map(name =>
 const sharedDevDependencies = Object.fromEntries(['typescript', '@types/node', '@types/react', '@types/react-dom'].map(name => [name, installedVersion(name)]));
 const {chromium, expect} = require('@playwright/test');
 const typescript = require('typescript');
-const productionPrefix = 'https://ui.bld8.dev/r/';
-const registryDirectory = join(root, 'apps/docs/public/r');
+// A prepared candidate can be checked without changing or publishing public URLs.
+const releaseManifest=process.env.BLD8_SOURCE_RELEASE ? validateManifest(JSON.parse(await readFile(process.env.BLD8_SOURCE_RELEASE,'utf8'))) : undefined;
+const productionPrefix = releaseManifest ? releaseManifest.registryBase+'/' : 'https://ui.bld8.dev/r/';
+const registryDirectory = releaseManifest ? join(dirname(await realpath(process.env.BLD8_SOURCE_RELEASE)),'r') : join(root, 'apps/docs/public/r');
 const originals = new Map();
 for (const name of await readdir(registryDirectory).catch(() => {throw new Error('Generated registry missing. Run npm run build before this check.');})) {
-  if (/^[a-z0-9-]+\.json$/.test(name)) originals.set(name, await readFile(join(registryDirectory, name)));
+  if (/^[a-z0-9-]+\.json$/.test(name)) {
+    const bytes=await readFile(join(registryDirectory,name));
+    if(releaseManifest)assert.equal(byteHash(bytes),releaseManifest.artifacts.find(file=>file.path==='r/'+name)?.sha256,'Candidate registry artifact digest: '+name);
+    originals.set(name,bytes);
+  }
 }
 assert.ok(originals.has('session-setup.json'), 'Build the current registry before checking consumers.');
 const graph = new Set();
@@ -57,6 +64,7 @@ visit('large-issue-table.json');
 visit('day-agenda.json');
 visit('schedule-state.json');
 visit('schedule-planner.json');
+visit('outline.json');
 assert.ok(graph.size > 11, 'The representative workflow must install its transitive graph.');
 
 const temporaryParent = await realpath(tmpdir());
@@ -286,6 +294,39 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
         await expect(issues.getByRole('checkbox',{name:'Select ISS-10001',exact:true})).toBeChecked();
         await expect(issues.getByRole('button',{name:'Inspect ISS-10001',exact:true})).toHaveText('Installed source edit');
         assert.ok(await issues.getByRole('table',{name:'Large issues',exact:true}).getByRole('row').count()<25,'Paged issue view must remain bounded.');
+        const outline=page.getByRole('region',{name:'Installed Outline',exact:true});
+        await outline.getByRole('button',{name:'Actions for Keyboard review',exact:true}).click();
+        await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();
+        const projectDetails=page.getByRole('dialog',{name:'Edit project',exact:true});
+        await expect(projectDetails).toBeVisible();
+        await expect(projectDetails).toHaveCSS('background-color',rgb(tokens['--bui-bg']));
+        await projectDetails.getByRole('textbox',{name:'Notes to self',exact:true}).fill('Installed source recovery.');
+        await projectDetails.getByRole('button',{name:'Cancel',exact:true}).click();
+        await projectDetails.getByRole('button',{name:'Keep draft & close',exact:true}).click();
+        await expect(projectDetails).not.toBeVisible();
+        await outline.getByRole('button',{name:'Actions for Keyboard review',exact:true}).click();
+        await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();
+        await expect(projectDetails.getByRole('textbox',{name:'Notes to self',exact:true})).toHaveValue('Installed source recovery.');
+        await projectDetails.getByRole('button',{name:'Save project',exact:true}).click();
+        await expect(projectDetails).not.toBeVisible();
+        await outline.getByRole('button',{name:'Actions for Keyboard review',exact:true}).click();
+        await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();
+        const projectActivity=projectDetails.getByRole('region',{name:'Project activity',exact:true});
+        await projectActivity.getByRole('textbox',{name:'Add a comment',exact:true}).fill('Installed source activity.');
+        await projectActivity.getByRole('button',{name:'Post comment',exact:true}).click();
+        await expect(projectActivity.getByText('Comment added.',{exact:true})).toBeVisible();
+        await expect(projectActivity.getByRole('textbox',{name:'Add a comment',exact:true})).toBeFocused();
+        await projectDetails.getByRole('button',{name:'Cancel',exact:true}).click();
+        await expect(projectDetails).not.toBeVisible();
+        await outline.getByRole('checkbox',{name:'Select Keyboard review',exact:true}).check();
+        await outline.getByRole('button',{name:'Archive',exact:true}).click();
+        await expect(outline.getByRole('button',{name:'Undo status change',exact:true})).toBeVisible();
+        await page.evaluate(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='bld8-outline-projects-v1'){Storage.prototype.setItem=original;throw new DOMException('Full','QuotaExceededError');}return original.call(this,key,value);};});
+        await outline.getByRole('button',{name:'Undo status change',exact:true}).click();
+        await expect(outline.getByRole('alert')).toContainText('Browser storage is unavailable or full.');
+        await expect(outline.getByRole('button',{name:'Undo status change',exact:true})).toBeFocused();
+        await outline.getByRole('button',{name:'Undo status change',exact:true}).click();
+        await expect(outline).toContainText('1 project status restored.');
         const schedule=page.getByRole('region',{name:'Installed schedule',exact:true});
         const availability=schedule.getByRole('group',{name:'Choose an available time',exact:true});
         await expect(availability.getByRole('button').first()).toBeEnabled();
@@ -314,8 +355,8 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
   } finally { await stopServer(child); }
 }
 
-async function prepare(framework) {
-  const target = join(workspace, framework);
+async function prepare(framework, lean=false) {
+  const target = join(workspace, (lean?'lean-':'')+framework);
   const next = framework === 'next';
   const alias = next ? '@/components/ui/bld8' : '~/ui/bld8';
   const manifest = {
@@ -343,13 +384,14 @@ async function prepare(framework) {
     include: next ? ['**/*.ts', '**/*.tsx', '.next/types/**/*.ts', '.next/dev/types/**/*.ts'] : ['src', 'vite.config.ts'],
     exclude: ['node_modules'],
   });
-  const component = `import {useState} from 'react';
+  const component = lean ? `import {SignInForm} from '${alias}/blocks/sign-in';\nexport default function Setup(){return <SignInForm/>}\n` : `import {useState} from 'react';
 import {AnalyticsDashboard} from '${alias}/blocks/analytics-dashboard';
 import {FileBrowser} from '${alias}/blocks/file-browser';
 import {SessionSetup} from '${alias}/blocks/session-setup';
 import {LargeIssueTable,createSampleLargeIssues} from '${alias}/blocks/large-issue-table';
 import {WindowedTable} from '${alias}/windowed-table';
 import {SchedulePlanner} from '${alias}/blocks/schedule-planner';
+import {OperationsTemplate} from '${alias}/blocks/operations-template';
 import {Button} from '${alias}/core';
 import {Dialog,UIProvider} from '${alias}/overlays';
 const queue=Array.from({length:240},(_,index)=>({id:'C-'+String(index).padStart(3,'0'),title:'Queue record '+index,status:index%2?'Later':'Current'}));
@@ -357,7 +399,7 @@ const queueKey=(row:typeof queue[number])=>row.id;
 const queueGrouping={key:(row:typeof queue[number])=>row.status,label:(key:string)=>key};
 const queueColumns=[{key:'id',header:'ID',width:120,cell:(row:typeof queue[number])=>row.id},{key:'title',header:'Record',width:240,flex:1,cell:(row:typeof queue[number])=>row.title}];
 const loadConsumerIssues=async({signal}:{signal:AbortSignal})=>{if(signal.aborted)throw new DOMException('Cancelled','AbortError');return createSampleLargeIssues(80);};
-export default function Setup(){const[selected,setSelected]=useState<string[]>([]);return <UIProvider><section data-consumer-content><div className="theme-controls"><Button variant="accent">Theme accent</Button><Button>Theme primary</Button><Dialog title="Installed theme portal" description="Exported CSS inherited through a body-mounted portal." trigger={<Button variant="secondary">Open theme dialog</Button>}><Button variant="accent">Portal accent</Button><Button>Portal primary</Button></Dialog></div><div className="bblocks-root"><SessionSetup/></div><section aria-label="Installed file browser" className="bblocks-root"><FileBrowser/></section><section aria-label="Installed analytics" className="bblocks-root"><AnalyticsDashboard/></section><section aria-label="Installed windowed table"><h2>Installed queue</h2><WindowedTable caption="Installed queue" rows={queue} columns={queueColumns} rowKey={queueKey} grouping={queueGrouping} height={320} rowHeight={52} overscan={3} selectable selectedKeys={selected} onSelectedKeysChange={setSelected}/><p role="status" aria-label="Installed selection">{selected.length} selected</p></section><section aria-label="Installed large issue block" className="bblocks-root"><LargeIssueTable loadRows={loadConsumerIssues}/></section><section aria-label="Installed schedule" className="bblocks-root"><SchedulePlanner/></section></section></UIProvider>}
+export default function Setup(){const[selected,setSelected]=useState<string[]>([]);return <UIProvider><section data-consumer-content><div className="theme-controls"><Button variant="accent">Theme accent</Button><Button>Theme primary</Button><Dialog title="Installed theme portal" description="Exported CSS inherited through a body-mounted portal." trigger={<Button variant="secondary">Open theme dialog</Button>}><Button variant="accent">Portal accent</Button><Button>Portal primary</Button></Dialog></div><div className="bblocks-root"><SessionSetup/></div><section aria-label="Installed file browser" className="bblocks-root"><FileBrowser/></section><section aria-label="Installed analytics" className="bblocks-root"><AnalyticsDashboard/></section><section aria-label="Installed windowed table"><h2>Installed queue</h2><WindowedTable caption="Installed queue" rows={queue} columns={queueColumns} rowKey={queueKey} grouping={queueGrouping} height={320} rowHeight={52} overscan={3} selectable selectedKeys={selected} onSelectedKeysChange={setSelected}/><p role="status" aria-label="Installed selection">{selected.length} selected</p></section><section aria-label="Installed large issue block" className="bblocks-root"><LargeIssueTable loadRows={loadConsumerIssues}/></section><section aria-label="Installed schedule" className="bblocks-root"><SchedulePlanner/></section><section aria-label="Installed Outline" className="bblocks-root"><OperationsTemplate/></section></section></UIProvider>}
 `;
   await write(target, next ? 'app/globals.css' : 'src/style.css', '*{box-sizing:border-box}body{position:relative;margin:0;padding:32px;font-family:var(--bui-font);background:var(--bui-canvas);color:var(--bui-ink)}main{max-width:1200px;margin:auto}.theme-controls{display:flex;gap:16px;margin-bottom:24px}\n');
   if (next) {
@@ -372,6 +414,10 @@ export default function Setup(){const[selected,setSelected]=useState<string[]>([
     await write(target, 'src/App.tsx', component);
     await write(target, 'src/main.tsx', `import {createRoot} from 'react-dom/client';\nimport Setup from './App';\nimport '${alias}/styles.css';\nimport './style.css';\nimport './theme.css';\ncreateRoot(document.getElementById('root')!).render(<main><Setup/></main>);\n`);
   }
+  if(lean){
+    await write(target,next?'app/theme.css':'src/theme.css','');
+    if(next)await write(target,'app/page.tsx',`'use client';\n${component}`);
+  }
   return target;
 }
 
@@ -385,12 +431,20 @@ try {
   browser = await chromium.launch({channel: process.env.PLAYWRIGHT_CHANNEL || undefined});
   for (const framework of frameworks) {
     requests.clear();
+    const leanTarget=await prepare(framework,true);
+    await run(['install','--no-audit','--no-fund'],leanTarget);
+    await run(['exec','--yes',`--package=shadcn@${tools.shadcn}`,'--','shadcn','add',`${origin}/r/sign-in.json`,'--yes','--overwrite'],leanTarget);
+    const leanManifest=JSON.parse(await readFile(join(leanTarget,'package.json'),'utf8'));
+    for(const dependency of ['react-day-picker','@dnd-kit/core','@dnd-kit/sortable','@base-ui/react','motion'])assert.equal(leanManifest.dependencies[dependency],undefined,'Sign-in must not install '+dependency);
+    await run(['run','build'],leanTarget);
+    console.log('Lean sign-in installed and built without unrelated calendar, drag or overlay dependencies.');
+    requests.clear();
     const target = await prepare(framework);
     await run(['install', '--no-audit', '--no-fund'], target);
-    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${origin}/r/session-setup.json`, `${origin}/r/theme-config.json`, `${origin}/r/file-browser.json`, `${origin}/r/chart.json`, `${origin}/r/analytics-dashboard.json`, `${origin}/r/windowed-table.json`, `${origin}/r/table-grouping.json`, `${origin}/r/large-issue-table.json`, `${origin}/r/day-agenda.json`, `${origin}/r/schedule-state.json`, `${origin}/r/schedule-planner.json`, '--yes', '--overwrite'], target);
+    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${origin}/r/session-setup.json`, `${origin}/r/theme-config.json`, `${origin}/r/file-browser.json`, `${origin}/r/chart.json`, `${origin}/r/analytics-dashboard.json`, `${origin}/r/windowed-table.json`, `${origin}/r/table-grouping.json`, `${origin}/r/large-issue-table.json`, `${origin}/r/day-agenda.json`, `${origin}/r/schedule-state.json`, `${origin}/r/schedule-planner.json`, `${origin}/r/outline.json`, '--yes', '--overwrite'], target);
     for (const item of graph) assert.ok(requests.has(item), `shadcn did not request ${item}`);
     const uiDirectory = join(target, framework === 'next' ? 'components/ui/bld8' : 'src/ui/bld8');
-    for (const file of ['day-agenda.tsx', 'schedule-state.ts', 'blocks/schedule-planner.tsx', 'windowed-table.tsx', 'table-grouping.ts', 'blocks/large-issue-table.tsx', 'blocks/issue-repository.ts', 'chart.tsx', 'chart-state.ts', 'blocks/analytics-dashboard.tsx', 'blocks/analytics-state.ts', 'blocks/file-browser.tsx', 'tree.tsx', 'blocks/session-setup.tsx', 'blocks/session-preferences.ts', 'time-options.ts', 'theme-config.ts', 'styles.css', 'tokens.css', 'tailwind.css', 'licenses/LICENSE', 'licenses/THIRD_PARTY_NOTICES.md']) {
+    for (const file of ['blocks/outline-project-editor.tsx', 'blocks/outline-drafts.ts', 'drawer.tsx', 'day-agenda.tsx', 'schedule-state.ts', 'blocks/schedule-planner.tsx', 'windowed-table.tsx', 'table-grouping.ts', 'blocks/large-issue-table.tsx', 'blocks/issue-repository.ts', 'chart.tsx', 'chart-state.ts', 'blocks/analytics-dashboard.tsx', 'blocks/analytics-state.ts', 'blocks/file-browser.tsx', 'tree.tsx', 'blocks/session-setup.tsx', 'blocks/session-preferences.ts', 'time-options.ts', 'theme-config.ts', 'styles.css', 'tokens.css', 'tailwind.css', 'licenses/LICENSE', 'licenses/THIRD_PARTY_NOTICES.md']) {
       assert.ok((await readFile(join(uiDirectory, file))).length, `Missing installed source/style/notice: ${file}`);
     }
     const installed = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'));

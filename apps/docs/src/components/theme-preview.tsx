@@ -1,6 +1,8 @@
 'use client';
 
 import {useEffect, useRef, useState, type FormEvent} from 'react';
+import dynamic from 'next/dynamic';
+import {isStarter} from '@/lib/starter-options';
 import {ArrowUpRight, Folder, Layers, Plus, SlidersHorizontal} from 'lucide-react';
 import {Badge, Button, Card, Chart, Checkbox, DataTable, Dialog, DialogClose, Field, Icon, Input, NumberField, Progress, RadioGroup, Select, Slider, Switch, Tabs} from '@bld8/ui';
 import {DEFAULT_THEME, getThemeTokens, parseThemeConfig, type ThemeConfig, type ThemeMode} from '@bld8/ui/theme-config';
@@ -18,9 +20,10 @@ const initialProjects: Project[] = [
   {id:2,name:'Navigation patterns',status:'Ready',detail:'A clearer way through the workspace'},
   {id:3,name:'Release notes',status:'In progress',detail:'Small changes, written down'},
 ];
+const StarterPreview=dynamic(()=>import('./starter-preview'),{loading:()=> <p role="status">Opening the starter…</p>});
 
 export function ThemePreview() {
-  const [theme, setTheme] = useState<{config:ThemeConfig;mode:ThemeMode}>({config:{...DEFAULT_THEME},mode:'light'});
+  const [theme, setTheme] = useState<{config:ThemeConfig;mode:ThemeMode;starter:string}>({config:{...DEFAULT_THEME},mode:'light',starter:''});
   const [projects,setProjects] = useState(initialProjects);
   const [filter,setFilter] = useState('all');
   const [open,setOpen] = useState(false);
@@ -42,7 +45,7 @@ export function ThemePreview() {
       if (!data.config || typeof data.config !== 'object' || Array.isArray(data.config)) return;
       try {
         const config = parseThemeConfig(JSON.stringify({version:1,...data.config}));
-        if (config) setTheme({config,mode:data.mode});
+        if (config) setTheme({config,mode:data.mode,starter:'starter' in data&&isStarter(data.starter)?data.starter:''});
       } catch { /* Ignore malformed messages; keep the last valid preview. */ }
     };
     window.addEventListener('message',receive);
@@ -94,6 +97,7 @@ export function ThemePreview() {
     <Card><h2>A little momentum.</h2><p>Try the controls with your own settings.</p><Slider label="Review progress" min={0} max={100} value={progress} onChange={event=>setProgress(Number(event.target.value))}/><Progress label="Interface review" value={progress}/><div className="theme-sample-action-pair"><Button variant="accent" onClick={()=>{setProgress(100);setNotice('Review marked ready in this preview.');}}>Mark ready <Icon icon={ArrowUpRight}/></Button><Button variant="secondary" onClick={()=>{setProgress(65);setNotice('Review progress reset.');}}>Reset progress</Button></div><div className="theme-sample-callout"><Icon icon={Layers}/><div><strong>One shared theme.</strong><p>Fields, actions and floating controls use the same tokens.</p></div></div></Card>
   </div>;
 
+  if(theme.starter)return <div className="theme-preview-root" data-testid="theme-preview-root"><StarterPreview key={theme.starter} id={theme.starter}/></div>;
   return <div className="theme-preview-root" data-testid="theme-preview-root">
     <section className="theme-sample" aria-label="Themed workspace">
       <header className="theme-sample-header"><div className="theme-sample-brand"><span aria-hidden="true"><Icon icon={Layers}/></span><strong>Fieldwork</strong><span>Workspace</span></div><Badge>Interactive preview</Badge></header>

@@ -1,6 +1,7 @@
 :root { --docs-width: 1280px; --docs-gutter: clamp(1.25rem, 4vw, 3rem); --docs-grid-gap: 1.5rem; --docs-panel-padding: clamp(1.25rem, 2.25vw, 2rem); }
 * { box-sizing: border-box; }
-html { scroll-padding-top: 112px; }
+/* Keep viewport-based type and page geometry stable when overlays lock scrolling. */
+html { scroll-padding-top: 112px; scrollbar-gutter: stable; }
 body { margin: 0; position: relative; background: var(--bui-canvas); color: var(--bui-ink); font-family: var(--font-body), Arial, sans-serif; font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-underline-offset: 4px; }
 button, input, textarea { font-family: inherit; }

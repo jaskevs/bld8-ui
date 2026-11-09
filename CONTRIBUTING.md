@@ -41,7 +41,21 @@ Review intentional screenshot updates in the pinned Linux environment; normal CI
 comparison must fail on missing or changed baselines. See docs/visual-quality.md
 and docs/registry-consumer-checks.md for reproducible commands and boundaries.
 
+Stop the BLD8 development watcher before clean registry verification. It rebuilds
+public artifacts; a concurrent regeneration correctly fails the integrity check.
+
 Use the shared --bui-selected-* and --bui-shadow-selected tokens for selected
 surfaces and navigation markers. Keep selection distinct from hover, keyboard
 focus, errors and Boolean-on states. Preserve system colours in forced-colour
 mode and steady text/icon alignment. See docs/selection-style.md.
+
+## Source release candidates
+
+Build first, then run `npm run release:prepare` to prepare the unreleased version
+in `releases/next.json`. The candidate stays under `.local/release-candidates/`;
+no tag, upload or deployment is performed. See [source updates](docs/updating-source.md)
+and keep the change notes in `CHANGELOG.md` current. Candidate checks can set
+`BLD8_SOURCE_RELEASE` to its absolute `manifest.json` path before running
+`npm run check:registry:consumers`; the verifier checks its digests, then serves
+a temporary loopback copy to the actual CLI in clean Next.js/Vite consumers.
+This does not prove the reserved production URLs are published or retained.

@@ -4,7 +4,7 @@ import {useEffect, useId, useMemo, useRef, useState, type FormEvent} from 'react
 import {LayoutGroup, motion} from 'motion/react';
 import {ArrowDown, ArrowUp, Download, List, RefreshCw, Rows3} from 'lucide-react';
 import {
-  Alert, Badge, Button, DataTable, Dialog, EmptyState, Field, Icon, Input, Select,
+  Alert, Badge, Button, DataTable, Dialog, EmptyState, Field, Icon, Input, Reveal, Select,
   Skeleton, WindowedTable, createTableCSV, useReducedMotionPreference,
   type Column, type TableGrouping, type TableQuery,
 } from '@bld8/ui';
@@ -93,6 +93,7 @@ export function LargeIssueTable({loadRows,onSaveIssue,className}:LargeIssueTable
   const records=useRef<Issue[]>([]),saveRequest=useRef<AbortController|null>(null);
   const titleField=useRef<HTMLInputElement>(null),heading=useRef<HTMLHeadingElement>(null),returnFocus=useRef<HTMLElement|null>(null);
   const retryOrigin=useRef<HTMLElement|null>(null);
+  const workspace=useRef<HTMLElement|null>(null);
   const exportGuard=useRef(false),exportUrl=useRef<string|null>(null),exportTimer=useRef<number|null>(null);
   const reduced=useReducedMotionPreference(),indicatorId=useId();
 
@@ -222,8 +223,8 @@ export function LargeIssueTable({loadRows,onSaveIssue,className}:LargeIssueTable
 
   const staleDraft=!!editor&&(editor.loader!==loader||editor.saver!==onSaveIssue);
   useEffect(()=>{if(saveError&&!saving&&dialogOpen&&!staleDraft)titleField.current?.focus();},[saveError,saving,dialogOpen,staleDraft]);
-  const selectionActions=<div className="bblocks-large-issue-selection-actions"><Button variant="secondary" size="sm" leadingIcon={Download} loading={exporting} disabled={!selectedRows.length} onClick={exportSelected}>Export selected CSV</Button><Button variant="ghost" size="sm" onClick={()=>setSelected([])}>Clear selection</Button></div>;
-  return <section className={'bblocks-panel bblocks-large-issues'+(className?' '+className:'')} aria-label="Large issue workspace" data-reduced-motion={!!reduced}>
+  const selectionActions=<div className="bblocks-large-issue-selection-actions"><Button variant="secondary" size="sm" leadingIcon={Download} loading={exporting} disabled={!selectedRows.length} onClick={exportSelected}>Export selected CSV</Button><Button variant="ghost" size="sm" onClick={()=>{workspace.current?.querySelector<HTMLInputElement>('thead input[type="checkbox"]')?.focus({preventScroll:true});setSelected([]);}}>Clear selection</Button></div>;
+  return <section ref={workspace} className={'bblocks-panel bblocks-large-issues'+(className?' '+className:'')} aria-label="Large issue workspace" data-reduced-motion={!!reduced}>
     <header className="bblocks-heading"><div><p className="bblocks-kicker">MORE WORK. THE SAME DETAILS.</p><h2 ref={heading} tabIndex={-1}>Keep the larger queue in view.</h2><p className="bblocks-muted">{loadRows?(onSaveIssue?'Connected issue records.':'Loaded issues. Edits stay in this page.'):'Illustrative issues. Changes last for this session.'}</p></div><Button variant="secondary" leadingIcon={RefreshCw} disabled={loading||saving||dialogOpen} onClick={()=>setRetryVersion(value=>value+1)}>Reload issues</Button></header>
     <div className="bblocks-large-issue-toolbar">
       <Field label="Search issues"><Input type="search" value={search} maxLength={200} placeholder="ID, title or assignee…" onChange={event=>setSearch(event.target.value)}/></Field>
@@ -236,7 +237,7 @@ export function LargeIssueTable({loadRows,onSaveIssue,className}:LargeIssueTable
       <LayoutGroup id={indicatorId}><div className="bblocks-large-issue-views" role="group" aria-label="Issue reading view">{([{value:'scroll',label:'Scroll',icon:Rows3},{value:'pages',label:'Pages',icon:List}] as const).map(option=><button key={option.value} type="button" aria-pressed={view===option.value} onClick={()=>setView(option.value)}>{view===option.value&&<motion.span className="bblocks-large-issue-view-indicator" layoutId="reading-view" transition={reduced?{duration:0}:{duration:.32,ease:easing}}/>}<span><Icon icon={option.icon} size={16}/>{option.label}</span></button>)}</div></LayoutGroup>
       <div className="bblocks-large-issue-summary"><span className="bui-hint" role="status">{ready?formatCount.format(filtered.length)+' of '+formatCount.format(rows.length)+' issues':loading?'Preparing issues…':'Issues unavailable'}</span>{grouping&&groupKeys.length>0&&<Button variant="ghost" size="sm" onClick={()=>setCollapsed(allCollapsed?[]:groupKeys)}>{allCollapsed?'Expand all groups':'Collapse all groups'}</Button>}</div>
     </div>
-    <div className="bblocks-large-issue-selection-slot">{ready&&selected.length>0?<div className="bui-table-selection"><span role="status">{formatCount.format(selected.length)} selected{selectedOutside>0?' · '+formatCount.format(selectedOutside)+' outside this view':''}</span>{selectionActions}</div>:<p className="bui-hint">Select issues to export a smaller set.</p>}</div>
+    <div className="bblocks-large-issue-selection-slot"><Reveal open={ready&&selected.length>0}>{ready&&selected.length>0?<div className="bui-table-selection"><span role="status">{formatCount.format(selected.length)} selected{selectedOutside>0?' · '+formatCount.format(selectedOutside)+' outside this view':''}</span>{selectionActions}</div>:null}</Reveal><p className="bui-hint" aria-hidden={ready&&selected.length>0||undefined} data-hidden={ready&&selected.length>0}>Select issues to export a smaller set.</p></div>
     <div className="bblocks-large-issue-stage" aria-busy={loading||undefined}>
       {loading?<div className="bblocks-large-issue-loading"><p className="bui-hint" role="status">Loading issues…</p>{[0,1,2,3,4,5].map(value=><Skeleton key={value} height="3rem"/>)}</div>:!ready?<div className="bblocks-large-issue-notice"><Alert title={loadState.invalid?'The issue records could not be read':'Issues could not be loaded'} tone="danger" live>{loadState.invalid?'Check the records and try again.':'The connection is unavailable. Your view settings are still here.'}</Alert><Button variant="secondary" leadingIcon={RefreshCw} onClick={event=>{retryOrigin.current=event.currentTarget;setRetryVersion(value=>value+1);}}>Retry loading issues</Button></div>:!filtered.length?<EmptyState title={rows.length?'No matching issues.':'No issues yet.'} action={search||statusFilter?<Button variant="secondary" onClick={()=>{setSearch('');setStatusFilter('');}}>Clear filters</Button>:undefined}>{rows.length?'Try another search or status.':'Issues will appear here when your source returns records.'}</EmptyState>:<>
         {view==='scroll'?<>

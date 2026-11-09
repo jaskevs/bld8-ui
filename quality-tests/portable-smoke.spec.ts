@@ -1,5 +1,82 @@
 import {test, expect, openQualityPage, expectContained} from './fixtures';
 
+test('playground shares native choices and disclosures and downloads matching source',async({page},info)=>{
+  await openQualityPage(page,'/playground?component=Checkbox&mixed=true&dark='+(info.project.use.colorScheme==='dark'),info);
+  const controls=page.getByRole('region',{name:'Playground controls',exact:true}),preview=page.getByRole('region',{name:'Component preview',exact:true});
+  const checkbox=preview.getByRole('checkbox',{name:'Include archived',exact:true});await expect(checkbox).toHaveAttribute('aria-checked','mixed');await checkbox.focus();await page.keyboard.press('Space');await expect(checkbox).toBeChecked();await expect(checkbox).toHaveJSProperty('indeterminate',false);
+  async function choose(name:string){await controls.getByRole('combobox',{name:'Component',exact:true}).click();await page.getByRole('option',{name,exact:true}).click();}
+  await choose('RadioGroup');await preview.getByRole('radio',{name:'Comfortable',exact:true}).focus();await page.keyboard.press('ArrowDown');await expect(preview.getByRole('radio',{name:'Compact',exact:true})).toBeChecked();
+  await choose('Accordion');await controls.getByRole('switch',{name:'Multiple open sections',exact:true}).check();await preview.getByRole('button',{name:'Try it with the keyboard',exact:true}).click();await expect(preview.getByRole('button',{name:'Keep the useful context',exact:true})).toHaveAttribute('aria-expanded','true');await page.reload();await expect(preview.getByRole('button',{name:'Try it with the keyboard',exact:true})).toHaveAttribute('aria-expanded','true');
+  const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Download example',exact:true}).click();expect((await pending).suggestedFilename()).toBe('accordion-example.tsx');await expectContained(page);
+});
+
+test('playground retains bulk failure context and incomplete filter drafts under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/playground?component=DataTable&tableSelected=1&actionResult=Error&dark='+(info.project.use.colorScheme==='dark'),info);
+  const controls=page.getByRole('region',{name:'Playground controls',exact:true}),preview=page.getByRole('region',{name:'Component preview',exact:true});
+  await preview.getByRole('button',{name:'Mark ready',exact:true}).click();await expect(preview.getByRole('alert')).toContainText('No rows changed.');await expect(preview.getByRole('button',{name:'Mark ready',exact:true})).toBeFocused();await preview.getByRole('button',{name:'Use successful response',exact:true}).click();await preview.getByRole('button',{name:'Mark ready',exact:true}).click();await expect(preview.getByRole('checkbox',{name:'Select Study tokens',exact:true})).not.toBeChecked();await expect(preview.getByRole('row').filter({hasText:'Study tokens'})).toContainText('Ready');
+  await controls.getByRole('combobox',{name:'Component',exact:true}).click();await page.getByRole('option',{name:'FilterBuilder',exact:true}).click();await preview.getByRole('button',{name:'Add filter',exact:true}).click();await preview.getByRole('button',{name:'Apply filters',exact:true}).click();await expect(preview.getByText('Enter a value.',{exact:true})).toBeVisible();const input=preview.getByRole('textbox',{name:'Filter 1 value',exact:true});await input.fill('motion');await preview.getByRole('button',{name:'Apply filters',exact:true}).click();await expect(preview.getByRole('checkbox',{name:'Select Refine motion',exact:true})).toBeVisible();await expect(preview.getByRole('checkbox',{name:'Select Study tokens',exact:true})).toHaveCount(0);await input.fill('tokens');await page.reload();await expect(input).toHaveValue('tokens');await expect(preview.getByRole('checkbox',{name:'Select Refine motion',exact:true})).toBeVisible();await expect(preview.getByText('Unapplied changes',{exact:true})).toBeVisible();await expectContained(page);
+});
+
+test('Outline records comments and reverses status changes without losing context',async({page},info)=>{
+  await openQualityPage(page,'/templates/outline',info);
+  const projects=page.getByRole('region',{name:'Outline projects',exact:true}),trigger=projects.getByRole('button',{name:'Actions for Keyboard review',exact:true}),editor=page.getByRole('dialog',{name:'Edit project',exact:true});
+  async function open(){await trigger.click();await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();await expect(editor).not.toHaveAttribute('data-starting-style');}
+  await open();const feed=editor.getByRole('region',{name:'Project activity',exact:true}),comment=feed.getByRole('textbox',{name:'Add a comment',exact:true});await comment.fill('Keep the keyboard path clear.');await feed.getByRole('button',{name:'Post comment',exact:true}).click();await expect(feed.getByText('Comment added.',{exact:true})).toBeVisible();await expect(comment).toBeFocused();await expect(comment).toHaveValue('');
+  await editor.getByRole('button',{name:'Cancel',exact:true}).click();await expect(editor).not.toBeVisible();await expect(trigger).toBeFocused();
+  await projects.getByRole('checkbox',{name:'Select Keyboard review',exact:true}).check();await projects.getByRole('button',{name:'Archive',exact:true}).click();await expect(projects.getByRole('button',{name:'Undo status change',exact:true})).toBeVisible();
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='bld8-outline-projects-v1'){Storage.prototype.setItem=original;throw new DOMException('Full','QuotaExceededError');}return original.call(this,key,value);};});
+  await projects.getByRole('button',{name:'Undo status change',exact:true}).click();await expect(projects.getByRole('alert')).toContainText('Browser storage is unavailable or full.');await expect(projects.getByRole('button',{name:'Undo status change',exact:true})).toBeFocused();
+  await projects.getByRole('button',{name:'Undo status change',exact:true}).click();await expect(projects).toContainText('1 project status restored.');await expect(page.getByLabel('Project table updates',{exact:true})).toBeFocused();
+  await open();await expect(feed.getByText('Keep the keyboard path clear.',{exact:true})).toBeVisible();await expect(feed.getByText('Status restored to Planned.',{exact:true})).toBeVisible();expect(await editor.evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);await page.keyboard.press('Escape');await expect(editor).not.toBeVisible();await expectContained(page);
+});
+
+test('bulk selection motion keeps native checkbox state, layout and return focus',async({page},info)=>{
+  await openQualityPage(page,'/blocks/resources',info);const block=page.getByRole('region',{name:'Resource library',exact:true});
+  const first=block.getByRole('checkbox',{name:'Select Interface brief.pdf',exact:true}),header=block.getByRole('checkbox',{name:'Select current page',exact:true}),reveal=block.locator('.bui-reveal--table-selection');
+  await first.focus();
+  // Sample the real CSS timeline rather than assuming a headless renderer's frame
+  // rate. Unpaused frame cadence and rapid reversal have separate regular tests.
+  await reveal.evaluate(element=>{
+    element.getBoundingClientRect();
+    const observer=new MutationObserver(()=>{
+      if(element.getAttribute('data-open')!=='true')return;
+      const animation=element.getAnimations().find(item=>(item as CSSTransition).transitionProperty==='grid-template-rows');
+      if(!animation)return;
+      animation.pause();animation.currentTime=Number(animation.effect!.getTiming().duration)*.25;
+      (window as Window & {bulkAnimation?:Animation}).bulkAnimation=animation;observer.disconnect();
+    });observer.observe(element,{attributes:true,attributeFilter:['data-open']});
+  });
+  await page.keyboard.press('Space');await expect(header).toHaveAttribute('aria-checked','mixed');
+  await expect.poll(()=>page.evaluate(()=>!!(window as Window & {bulkAnimation?:Animation}).bulkAnimation)).toBe(true);
+  await page.screenshot({animations:'allow'});const firstHeight=(await reveal.boundingBox())!.height;
+  await page.evaluate(()=>{const animation=(window as Window & {bulkAnimation?:Animation}).bulkAnimation!;animation.currentTime=Number(animation.effect!.getTiming().duration)*.75;});
+  await page.screenshot({animations:'allow'});const laterHeight=(await reveal.boundingBox())!.height;
+  expect(firstHeight).toBeGreaterThan(0);expect(laterHeight).toBeGreaterThan(firstHeight+10);
+  await page.evaluate(()=>{const host=window as Window & {bulkAnimation?:Animation};host.bulkAnimation!.play();delete host.bulkAnimation;});
+  await expect.poll(()=>header.evaluate(element=>getComputedStyle(element,'::before').opacity)).toBe('1');
+  await header.focus();await page.keyboard.press('Space');await expect(header).toBeChecked();await expect.poll(()=>header.evaluate(element=>getComputedStyle(element,'::after').opacity)).toBe('1');await expect.poll(()=>header.evaluate(element=>getComputedStyle(element,'::before').opacity)).toBe('0');
+  await block.getByRole('button',{name:'Clear selection',exact:true}).click();await expect(header).toBeFocused();await expect(header).not.toBeChecked();await expect(reveal).toHaveAttribute('inert','');await expect(block.getByRole('button',{name:'Clear selection',exact:true})).toHaveCount(0);await expect.poll(()=>reveal.evaluate(element=>element.getBoundingClientRect().height)).toBe(0);await expect(reveal.locator('.bui-table-selection')).toHaveCount(0);await expectContained(page);
+});
+
+test('Outline detail drafts recover, save and return focus under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/templates/outline',info);
+  const trigger=page.getByRole('button',{name:'Actions for Keyboard review',exact:true});
+  await trigger.focus();await trigger.press('Enter');await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();
+  const drawer=page.getByRole('dialog',{name:'Edit project',exact:true});
+  await expect(drawer.getByRole('heading',{name:'Keyboard review',exact:true})).toBeFocused();
+  await expect(drawer.getByRole('button',{name:'Save project',exact:true})).toBeInViewport();
+  await drawer.getByRole('textbox',{name:'Notes to self',exact:true}).fill('Review the details with the keyboard.');
+  await page.keyboard.press('Escape');await expect(drawer.getByRole('button',{name:'Keep editing',exact:true})).toBeFocused();
+  await drawer.getByRole('button',{name:'Keep draft & close',exact:true}).click();await expect(drawer).not.toBeVisible();await expect(trigger).toBeFocused();
+  await trigger.press('Enter');await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();
+  await expect(drawer.getByText('Recovered draft',{exact:true})).toBeVisible();
+  await expect(drawer.getByRole('textbox',{name:'Notes to self',exact:true})).toHaveValue('Review the details with the keyboard.');
+  await drawer.getByRole('button',{name:'Save project',exact:true}).click();await expect(drawer).not.toBeVisible();await expect(trigger).toBeFocused();
+  await page.reload();await trigger.click();await page.getByRole('menuitem',{name:'Edit project',exact:true}).click();
+  await expect(drawer.getByRole('textbox',{name:'Notes to self',exact:true})).toHaveValue('Review the details with the keyboard.');
+  await expectContained(page);
+});
+
 test('keyboard choices and interrupted dialog return focus', async ({page}, info) => {
   await openQualityPage(page, '/foundations#control-states', info);
   expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(false);

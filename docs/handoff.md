@@ -1,73 +1,85 @@
-# Development handoff — 30 October 2026
+# Development handoff — 9 November 2026
 
-Today's work is wrapped up locally. Read this with verification.md and
-library-direction.md before continuing. The fixed Workbench roadmap and exam
-allocation are unchanged.
+Included in this source release:
 
-## Current state
+- Lean registry and ZIP source graphs. Sign-in remains 8 registry items, 16 files
+  and 4 npm dependencies. The expanded clean-consumer check now includes Outline
+  alongside the earlier workflows and exercises a 63-item graph.
+- Themed starter selection, real component previews and Next.js/Vite downloads,
+  including theme CSS/JSON, mode and selected self-hosted fonts.
+- Stable showcase geometry while dropdowns lock scrolling.
+- Outline project details: a responsive drawer, persistent footer, tab-local draft
+  recovery, explicit conflict review and focus return. The current list survives
+  editing. Creation, inline editing and the HTTP sample remain compatible.
+- Bulk selection and issue filters use a reversible 320 ms layout reveal. The
+  table follows the bar, count updates stay steady, and closing actions become
+  inert immediately. Checkbox ticks and mixed dashes crossfade as fixed shapes.
+  Large-table phone wrapping, archive/undo feedback and focus return are covered.
+- Outline activity and plain-text comments, plus version-checked undo for bulk
+  statuses. Browser storage migrates legacy arrays on write; the HTTP demo opts
+  into the optional history capability. Saved comments persist with workspace
+  data; unsent comments stay in memory while this page remains open. Stale undo
+  rejects all changes; failed writes retain a retry action and useful focus.
+- The playground now covers 18 controls. Choice and accordion states, table
+  selection/query/columns/groups, and draft/applied filters have validated v2 links
+  with v1 compatibility. Presets demonstrate selection, grouping, filtering,
+  editing and rejected updates. Matching TSX downloads and scoped install commands
+  accompany the examples. Desktop settings stay visible; phone links preserve
+  keyboard context. See playground.md for transient data and link-length limits.
 
-- Palette: #FFD900, warm neutral canvas, white panels, dark primary actions and
-  related evergreen/mint support colours. Shared inset choices and easing.
-- 53 guidance entries, 16 blocks, 3 templates, 147 registry items and 40 starters
-  (21 Next.js / 19 Vite). npm packages remain private and unpublished.
-- Grouped pages and a bounded windowed table; shared selection, external detail
-  drafts, keyboard/focus recovery and a 10,000-issue example.
-- Embedded Mobile layouts follow their own container. Both the narrow preview
-  inside a wide browser and phone-width screens are checked.
-- DayAgenda/SchedulePlanner use supplied UTC availability, explicit offsets,
-  retained drafts and guarded callbacks. See scheduling.md for their limits.
-- Final polish removes repeated start times and exposes the end time through
-  accessible descriptions. Overnight bookings show their complete end date.
-- Touch-editable fields have a 16px minimum font, including compact inputs,
-  numeric fields and multi-select searches. Larger custom text stays larger;
-  fine-pointer desktop sizing is preserved. Pinch zoom remains unrestricted.
-- Preview and template marks use the shared Icon name="mark" vector rather
-  than a Unicode symbol that a phone can replace with a colour emoji.
+- Source update guidance at /releases, an unreleased 0.2.0 manifest, a read-only
+  comparison tool and locally prepared versioned candidates. Reports separate
+  upstream changes, local edits, conflicts, removed files and dependency changes.
+  Candidate inventories and digests are checked before reuse; every registry
+  dependency targets the same reserved version path. No versioned release was published in this pass.
+
+The source catalogue has 53 guidance entries, 16 blocks, 3 templates, 151 registry
+items and 40 ZIP starters. Packages remain private and unpublished to npm.
 
 ## Review locally
 
-- http://127.0.0.1:3120/components — touch search focus and blur.
-- http://127.0.0.1:3120/blocks — dark-on-yellow artwork marks.
-- http://127.0.0.1:3120/blocks/large-issue-table — Mobile in the preview toolbar.
-- http://127.0.0.1:3120/blocks/schedule-planner — booking, retry and cancellation.
-- http://127.0.0.1:3120/themes — portable configuration.
+- http://127.0.0.1:3120/templates/outline — row actions → Edit project. Change a
+  field, cancel, keep the draft and reopen; reload also preserves the tab draft.
+- In that same drawer, scroll to Activity to post a comment. Back in the table,
+  select projects → Archive or Mark ready → Undo status change. Reopen their
+  activity to inspect the actual change and restoration entries.
+- http://127.0.0.1:3120/examples/outline-http — use Fail next save to try recovery.
+- http://127.0.0.1:3120/themes?starter=outline — preview and download a themed app.
+- http://127.0.0.1:3120/blocks/resources — select, select all and clear; try
+  archive/undo, keyboard toggles and rapid reversals.
+- http://127.0.0.1:3120/releases - save a source baseline, read update notes and
+  download the two standalone checker modules. See updating-source.md.
+- http://127.0.0.1:3120/playground?component=DataTable — try its presets, selection
+  across pages, rejected update and source download. FilterBuilder keeps draft
+  conditions separate until Apply filters.
 
-The local preview runs on port 3120. If it has stopped, use Node 22 and npm run dev
-from this repository; check the port before starting another copy. Browser tests
-use a separate production server, with 3129 used for this session. Installed Edge
-was selected with PLAYWRIGHT_CHANNEL=msedge in a temporary test profile; no global
-browser or account settings changed.
+The playground build/types and 58 focused production cases pass. Its 52 generated
+source variants type-check against actual registry files. The two new workflows
+pass 24 pinned Linux browser/theme/viewport checks; three final mobile/sharing
+checks also pass after visual review. Earlier Outline acceptance includes 93
+regressions, 24 browser checks, clean Next.js/Vite source installs and an actual
+Vite ZIP build. The full quality suite now contains 176 cases; it was not rerun
+in full for this increment. See verification.md for evidence and limits.
 
-## Verification and publication
+Source updates pass the production build/types and 34 focused checks, plus a
+final explicit light/dark desktop/phone accessibility and download check. The
+prepared 0.2.0 candidate passes clean Next.js/Vite CLI installs, builds and both-
+theme workflow checks. Its registry URLs are reserved, not published. The checker
+also ran read-only against fresh Next.js Outline source; CLI transformations can
+still be reported as local differences. See verification.md for the full limits.
 
-The production build and all 406 domain/browser checks pass.
-All 116 pinned Linux checks pass: 20 images, 84 workflow checks and 12
-touch checks across Chromium, Firefox and WebKit in both themes. Four agenda
-references were reviewed for the final wording; the other 16 remain unchanged.
-All 40 archives pass CRC, path, licence and source checks, including the touch
-font floor and vector marks. Earlier clean Next.js/Vite installations proved the
-59-item dependency graph; those installations were not repeated for these fixes.
-The theme editor's more specific fallback-field override was corrected after the
-complete run. Its final build, 18 theme checks and all 12 expanded
-touch cases pass separately. The fine-pointer image rules are unchanged.
+## Publication and next work
 
-Desktop browser touch emulation does not reproduce the physical iPhone keyboard
-or prove UIKit's focus-zoom behaviour. After publication, confirm focus/blur and
-pinch zoom on the reporting phone. Manual assistive-technology review also remains.
+The owner authorised this source publication on 9 November 2026. The complete
+production build/types, all 493 workflow tests and 176 pinned Linux quality checks
+pass. Personal identity, commit-time guards and the production gate are retained.
+The previous deployed revision is 7c7af73. Follow this commit through GitHub and
+automatic Vercel promotion before treating the new source as live; private planning
+records the exact revision and remote outcome. Immutable 0.2.0 URLs are reserved,
+not published by this source push. The ordered backlog is in [next-work.md](next-work.md).
 
-The owner authorised source check-in and push on 30 October, after 17:00 in
-Australia/Melbourne. This handoff accompanies that source release, including the
-earlier approved theme, data, file and scheduling increments. The npm packages
-remain private and unpublished. Verify the exact Git revision in GitHub Actions
-and Vercel before treating the source as live; a successful local build alone is
-not evidence of production deployment. Follow ../AGENTS.md for later releases.
-
-## Next session
-
-1. Observe CI/deployment checks for the source release and its exact revision.
-2. Confirm the two reported mobile issues on the physical iPhone after release.
-3. Next feature slice: a narrow comment composer, after reviewing its editor,
-   licence and sanitisation contract.
-
-Recurrence, resource allocation, calendar sync and a production booking service
-remain outside the schedule example. No further feature work is open today.
+Next: after an authorised release, configure retained immutable-version hosting and
+verify the reserved release URLs before announcing them. Local bundle preparation
+does not provide that hosting or retention. Undo for creation,
+detail-field saves and permanent deletion remains outside this slice. Preserve the fixed
+Workbench roadmap and exam allocation; this library work remains additional scope.

@@ -38,7 +38,7 @@ test('Outline keeps selected keys across service pages, resizes and applies bulk
 test('failed storage keeps the draft and retry saves exactly once',async({page})=>{
   await page.addInitScript(()=>{const original=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='bld8-outline-projects-v1' && !(window as any).allowSave)throw new DOMException('Full','QuotaExceededError');return original.call(this,key,value);};});
   await page.goto('/templates/outline');await page.getByRole('button',{name:'Plan project',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Plan a project'});await dialog.getByRole('textbox',{name:'Project name',exact:true}).fill('Retry me');await chooseReviewDate(page,dialog,'2026-12-02');await dialog.getByRole('button',{name:'Add project'}).click();await expect(dialog.getByRole('alert')).toContainText('have not been saved');await expect(dialog.getByRole('textbox',{name:'Project name',exact:true})).toHaveValue('Retry me');
-  await page.evaluate(()=>{(window as any).allowSave=true;});await dialog.getByRole('button',{name:'Add project'}).click();await expect(dialog).not.toBeVisible();expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('bld8-outline-projects-v1')!).filter((row:any)=>row.name==='Retry me').length)).toBe(1);
+  await page.evaluate(()=>{(window as any).allowSave=true;});await dialog.getByRole('button',{name:'Add project'}).click();await expect(dialog).not.toBeVisible();expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('bld8-outline-projects-v1')!).projects.filter((row:any)=>row.name==='Retry me').length)).toBe(1);
 });
 
 test('repository rejects stale edits, validates duplicates and does not lose unrelated rows',async()=>{

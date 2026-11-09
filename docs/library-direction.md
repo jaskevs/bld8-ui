@@ -23,7 +23,7 @@ React Native and Angular need separate implementations and are outside this slic
 
 - The starting library has 43 component guidance entries, eight blocks and three
   templates. Entries are not a count of independent primitives or example variants.
-- Registry installation, a 14-control playground, React Hook Form and the Outline
+- Registry installation, an 18-control playground, React Hook Form and the Outline
   HTTP example exist. Packages are not published to npm.
 - Tables support editing, selection, column controls and externally fetched data.
   The separate bounded windowed view and row grouping are documented below. The filter builder now

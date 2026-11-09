@@ -52,6 +52,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Install registry into clean Next.js and Vite consumers
         run: npm run check:registry:consumers
+      - name: Build and exercise themed Next.js and Vite downloads
+        run: npm run check:starters:themes
       - name: Run interaction and accessibility checks
         run: npm test -- --workers=2
       - name: Save failure reports

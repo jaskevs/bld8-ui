@@ -33,9 +33,9 @@ boundary. The independent Vite consumer verifies a custom ~/ui alias. The actual
 CLI installation and build procedure is in registry-consumer-checks.md and is
 part of the prepared release workflow.
 
-The current local build contains 147 registry items, including shared dependencies
-and the pure theme-config helper. The published release still contains 121 items
-until this increment is separately released.
+The current build contains 151 registry items, including shared dependencies
+and the pure theme-config helper. See deployment.md for recorded publication
+evidence; build counts alone do not prove that a revision is live.
 Component guidance counts and item counts describe different things; see scope.md
 for the current catalogue. Generated output is built from the checked source and
 must retain production dependency URLs. Local consumer checks rewrite dependency
@@ -53,12 +53,32 @@ Authentication, authorised ownership, durable data and uploaded file storage
 belong to the host application. An installed frontend block does not supply a
 production service by itself.
 
+## Focused source installation
+
+Blocks resolve each named UI import to its actual module. Installing a small
+form no longer traverses the complete UI index. Selection is at module level;
+related exports in a shared module, shared styles and licence notices remain
+included. Public item names and configured aliases are unchanged.
+
+The Sign-in registry graph contains 8 items, 16 files and 4 npm dependencies,
+compared with 41 items, 49 files and 10 dependencies before this change. These are
+source-installation counts. The Next.js and Vite consumer checks first install
+and build Sign-in independently, then check the larger workflow graph.
+
+ZIP starters also contain only the required source/build modules, with focused
+package exports and dependency manifests. Their original client boundaries and
+pure helper subpaths are retained. Add other components through the registry
+when expanding the application.
+
 ## Updating copied source
 
 Commit your own changes before an update. Inspect the CLI overwrite prompts and
 review the resulting diff before replacing customised files. The current public
-URLs track the published release; immutable release URLs and a formal migration
-feed remain future adoption work. Preserve the included dependency notices.
+URLs track the deployed build. Save its /releases/current.json manifest with new
+installations. The read-only checker compares selected dependency graphs and local
+customisations without overwriting files. See updating-source.md and CHANGELOG.md.
+Versioned candidate preparation is local; immutable hosted retention and publication
+still require separate setup and acceptance. Preserve the dependency notices.
 
 Source ZIPs are an alternative to registry installation. See /frameworks for
 Next.js and Vite setup and /registry on the showcase for item discovery.

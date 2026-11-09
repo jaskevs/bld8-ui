@@ -1,6 +1,6 @@
 # Playground, forms and service workflows
 
-The playground covers fourteen public components. Component options, feedback
+The playground covers eighteen public components. Component options, feedback
 states, drawer side, initial focus, dates, selected disciplines, table options,
 width and theme are serialised into a validated query string. Copy configuration
 link reproduces the selected configuration. Unknown values are ignored; numeric
@@ -51,13 +51,16 @@ entry point. The downloadable form starter includes the same client and sample A
 ## HTTP adapter
 
 createOutlineHttpRepository accepts baseUrl, optional fetch, per-request headers
-(or an async header function) and credentials (same-origin by default). It sends
+(or an async header function), credentials (same-origin by default) and an optional
+draftKey owner/workspace namespace for tab-local recovery. It sends
 signals, validates successful response shapes, maps 422 field errors and preserves
 HTTP status on other failures. The host application owns sessions and authentication.
 
 The contract is documented at /integrations/outline-http. The reference server
 in examples/outline-http/demo-api.ts handles filtering/paging, validation, writes,
-record versions and bulk updates. The sample session header scopes temporary
+record versions, single-record reads and bulk updates. Project details compare
+newer versions and reapply only explicitly edited fields after review. See
+[detail editing and recovery](outline-details.md). The sample session header scopes temporary
 process-local data; it is not authentication. Sessions are bounded and expire
 following inactivity or server restart. A real service needs authenticated
 ownership and atomic database version checks. No user files are uploaded.
