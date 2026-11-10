@@ -107,15 +107,17 @@ test('feedback and avatar colours stay readable and stable across light and dark
 test('catalogue composition previews share a top baseline while simple controls stay centred',async({page})=>{
   await page.setViewportSize({width:1440,height:1100});await page.goto('/components');await page.evaluate(()=>document.fonts.ready);
   const card=(id:string)=>page.locator('.component-card').filter({has:page.locator('.component-bottom a[href="/components/'+id+'"]')});
-  const placement=async(id:string)=>card(id).locator('.component-preview').evaluate(element=>{
-    const bounds=element.getBoundingClientRect(),child=element.firstElementChild!.getBoundingClientRect(),style=getComputedStyle(element);
-    return {top:child.top,inset:child.top-bounds.top,expectedInset:parseFloat(style.paddingTop),centreError:(child.top+child.bottom)/2-(bounds.top+parseFloat(style.paddingTop)+bounds.bottom-parseFloat(style.paddingBottom))/2};
-  });
   await expect(card('chart')).toBeVisible();await expect(card('tree')).toBeVisible();
-  const chart=await placement('chart'),tree=await placement('tree');
+  // Async specimens above these cards can resize. Compare one rendered frame.
+  const placements=await page.locator('.component-grid').evaluate(grid=>Object.fromEntries(['chart','tree','button'].map(id=>{
+    const card=grid.querySelector('.component-bottom a[href="/components/'+id+'"]')!.closest('.component-card')!;
+    const element=card.querySelector('.component-preview')!,bounds=element.getBoundingClientRect(),child=element.firstElementChild!.getBoundingClientRect(),style=getComputedStyle(element);
+    return [id,{top:child.top,inset:child.top-bounds.top,expectedInset:parseFloat(style.paddingTop),centreError:(child.top+child.bottom)/2-(bounds.top+parseFloat(style.paddingTop)+bounds.bottom-parseFloat(style.paddingBottom))/2}];
+  })));
+  const {chart,tree,button}=placements;
   expect(Math.abs(chart.top-tree.top),'Paired composed previews begin on the same baseline').toBeLessThanOrEqual(1);
   for(const item of [chart,tree])expect(Math.abs(item.inset-item.expectedInset),'Composition starts at the padded top edge').toBeLessThanOrEqual(1);
-  expect(Math.abs((await placement('button')).centreError),'Standalone controls remain vertically centred').toBeLessThanOrEqual(1);
+  expect(Math.abs(button.centreError),'Standalone controls remain vertically centred').toBeLessThanOrEqual(1);
   await page.setViewportSize({width:320,height:1000});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'The aligned catalogue still fits a narrow viewport').toBe(true);
 });

@@ -1,5 +1,36 @@
 # Development handoff - 11 November 2026
 
+## Deployment check repair
+
+The approved batch was pushed as 96ec4ab. GitHub run 42906697903 failed
+one of 678 core cases and one of 326 browser-quality cases, so the deployment
+checks held production. The failing cases were catalogue preview alignment and
+a WebKit quick-filter ResizeObserver error; the production build itself passed.
+
+The local repair caps only quick-filter popup height against the viewport.
+It removes the feedback between per-side available-height measurements and
+popup resizing while retaining default collision handling and normal motion.
+Returning to Fields restores search focus without scrolling. The optional
+Popover sticky flag keeps these filter menus inside the viewport when their
+anchor scrolls away; other consumers retain the default.
+A new regression repeatedly shrinks and expands the picker/editor in short
+viewports and retains the existing uncaught-browser-error guard.
+
+Catalogue alignment is sampled in one rendered frame rather than across
+separate asynchronous measurements, with the same 1 CSS pixel assertions.
+The tab-motion test captures the native transition when it starts, verifies
+intermediate movement and interruption, and retains keyboard/reduced-motion
+checks. No product motion, visual baseline or test timeout was changed.
+
+Final local acceptance passed: production build, workspace/quality types,
+20 repeated alignment/motion checks, two unchanged Axe workflows, 57 pinned
+popup/browser/visual checks, four clean Next.js/Vite source consumers and two
+themed starter downloads. The local port 3120 preview is restored. The first
+themed install attempt was interrupted by the host; its unchanged retry passed.
+
+See docs/verification.md for repair acceptance and hosted status. Development
+remains 0.3.0/unreleased; retained 0.2.0 assets are unchanged.
+
 ## Approved source handoff
 
 The owner approved pushing the completed UI batch on 11 November: advanced data

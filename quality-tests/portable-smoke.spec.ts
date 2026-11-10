@@ -24,6 +24,25 @@ test('workspace quick filters preserve explicit apply, nested menu context and m
   await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Remove Status filter',exact:true}).click();await expect(page.getByRole('button',{name:'Add filter',exact:true})).toBeFocused();await expect(page.getByRole('gridcell',{name:'Title for ISS-103',exact:true})).toBeVisible();await expectContained(page);
 });
 
+test('dynamic filter menus stay contained through repeated picker and editor resizing',async({page},info)=>{
+  await openQualityPage(page,'/blocks/data-workspace',info);
+  const viewport=page.viewportSize()!;await page.setViewportSize({width:viewport.width,height:viewport.width<600?460:720});
+  const add=page.getByRole('button',{name:'Add filter',exact:true});await add.click();
+  const search=page.getByRole('textbox',{name:'Find a filter field',exact:true}),popup=page.locator('.bui-popover:not([data-ending-style])');
+  await expect(search).toBeVisible();expect(await popup.evaluate(element=>getComputedStyle(element).transitionDuration)).not.toBe('0s');
+  const contained=async()=>{await expect.poll(()=>popup.evaluate(element=>{const box=element.getBoundingClientRect();return {left:Math.max(0,-box.left),top:Math.max(0,-box.top),right:Math.max(0,box.right-innerWidth),bottom:Math.max(0,box.bottom-innerHeight)};}), {message:'Dynamic filter menu stays inside its viewport'}).toEqual({left:0,top:0,right:0,bottom:0});};
+  for(let cycle=0;cycle<3;cycle++){
+    await search.fill('Status');await search.press('ArrowDown');await page.keyboard.press('Enter');
+    await expect(page.getByRole('combobox',{name:'Condition',exact:true})).toBeFocused();await contained();
+    await page.getByRole('button',{name:'Fields',exact:true}).click();await expect(search).toBeFocused();await search.fill('');await contained();
+  }
+  await search.fill('Status');await search.press('ArrowDown');await page.keyboard.press('Enter');
+  const values=page.getByRole('combobox',{name:'Values',exact:true});await values.fill('Done');await page.getByRole('option',{name:'Done',exact:true}).click();if(await values.getAttribute('aria-expanded')==='true')await values.press('Escape');await contained();
+  await page.getByRole('button',{name:'Apply filter',exact:true}).click();await expect(add).toBeFocused();await expect(page.getByRole('button',{name:'Edit Status filter',exact:true})).toContainText('Done');
+  await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Edit Status filter',exact:true}).click();await contained();expect(await popup.evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');
+  await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Edit Status filter',exact:true})).toBeFocused();await expectContained(page);
+});
+
 test('data workspace pointer selection stays a clean range under normal motion',async({page},info)=>{
   await openQualityPage(page,'/blocks/data-workspace',info);
   const grid=page.getByRole('grid',{name:'Issue data grid',exact:true}),start=grid.getByRole('gridcell',{name:'Issue for ISS-101',exact:true}),end=grid.getByRole('gridcell',{name:'Title for ISS-103',exact:true});

@@ -1,3 +1,74 @@
+## CI deployment repair - 11 November 2026
+
+GitHub run 42906697903 for 96ec4ab passed its production build but failed
+core validation (677/678) and browser quality (325/326). The release gate
+correctly held deployment. The core failure compared catalogue geometry in
+separate frames; the quality failure was an uncaught WebKit ResizeObserver
+loop while quick-filter content changed from field search to rule editor.
+
+The popup trace shows its side and available-height measurements oscillating
+as content resized. Quick filters now use an independent viewport height cap.
+Their optional Popover sticky flag also retains viewport containment when
+focus or scrolling moves the anchor out of view. Returning to Fields focuses
+search without scrolling, only while the add menu is open. Other popover
+defaults and shared motion remain unchanged.
+
+The final popup snapshot passed 57/57 pinned Linux/Node 22 checks: 12 repeated
+WebKit desktop-dark cases, 24 Chromium/Firefox/WebKit light/dark desktop and
+short-phone cases, one unchanged draft-preservation case, and all 20 existing
+approved visual comparisons. The regression checks strict four-edge popup
+containment, repeated shrink/expand cycles, nested Values, Fields/Apply/Escape
+focus, normal motion and live reduced motion. The fixture rejects every
+uncaught page error; none occurred. No visual baseline was updated.
+
+Catalogue comparisons now sample one frame while retaining all 1 CSS pixel,
+padding, centering and narrow-page assertions. An intentional 8 pixel offset
+still fails; moving the common grid 64 pixels leaves the simultaneous delta
+at zero while the old cross-frame comparison reports 64. The original CI
+trace supports a cross-frame measurement race but does not expose every
+returned coordinate. The tab-motion check captures a running native transform
+at creation, pauses at an intermediate position, and verifies interruption;
+disabling transitions correctly fails it. Both cases passed 10 Linux repeats
+each (20/20). Product timing and assertion thresholds were not relaxed.
+
+The full frozen pushed-source reproductions passed 675/678 core and 325/326
+quality cases. The additional local failures were the short-lived tab-motion
+sampling assertion and three aggregate-case timeouts under concurrent load.
+The unchanged two Axe workflows passed quietly (2/2, 12.2 and 12.8 seconds);
+the unchanged draft case passed in the final popup run. These focused reruns
+do not claim a new full-suite result for the repaired source.
+
+Evidence: .local/core-ci-repro.log, core-ci-targeted.log,
+core-ci-workflows-quiet.log, ci-quality-full-20261111.log,
+ci-quality-ro-final-build-20261111.log and
+ci-quality-ro-final-checks-20261111.log. Negative-control evidence is in
+.local/ci-alignment-measurement-proof.json and ci-motion-standalone-evidence.json.
+Final popup reports: .local/quality-linux/8f9cdca3-005e-4a5a-8310-c3e17a0dd842.
+
+The final host production build, workspace types and quality-suite types pass.
+The optional sticky boolean is present in the generated website API table and
+agent Markdown. Clean shadcn installs passed all four lean/full Next.js and
+Vite consumers; the full 104-item transitive graph built independently and
+passed light/dark workflow interactions. Lean sign-in still excludes unrelated
+calendar, drag and overlay dependencies. Generated registry bytes were preserved.
+Evidence: .local/ci-repair-build.log, ci-repair-types.log,
+ci-repair-quality-types.log and ci-repair-consumers.log.
+
+Themed Next.js Outline and Vite Schedule downloads also passed independent
+installation/build and real interactions, retaining their selected fonts and
+theme through portalled UI and draft/booking flows (2/2). The first attempt
+timed out in npm install during a long host interruption, before any starter
+build or UI assertion. The exact retry passed with unchanged time limits.
+Evidence: .local/ci-repair-themed-starters.log and the preserved
+ci-repair-themed-starters-attempt1.log. The local port 3120 preview is restored
+and serves the updated Popover API.
+
+This is development 0.3.0/unreleased. Retained 0.2.0 assets, release gates and
+owner identity/time rules remain intact. A repair push and its hosted checks
+must be verified separately before treating the current additions as live.
+
+---
+
 ## Approved capability batch - 10 November 2026
 
 All four approved priorities were completed sequentially: nested filters, remote

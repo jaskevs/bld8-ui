@@ -23,6 +23,10 @@ and their dependencies stay unchanged. This does not publish another version.
 
 ### Changed
 
+- Quick-filter popups use a viewport height cap independent of side collision
+  measurements, avoiding resize feedback while picker and editor content changes.
+  Returning to the field picker restores search focus without scrolling; these
+  menus stay in the viewport when their anchor scrolls out of view.
 - File inspector metadata follows the latest selection through interrupted animations.
 - Grid selection and inline editing share one cell boundary, with stable row
   geometry, touch tap/pan handling and smooth, reduced-motion-aware menus.

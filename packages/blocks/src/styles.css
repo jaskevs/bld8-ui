@@ -582,7 +582,8 @@
 .bblocks-filter-chip-edit,.bblocks-filter-chip-remove { transition:background-color var(--bui-duration-fast) var(--bui-ease),color var(--bui-duration-fast) var(--bui-ease); }
 .bblocks-filter-chip-edit:hover,.bblocks-filter-chip-remove:hover { background:var(--bui-surface); color:var(--bui-ink); }
 .bblocks-filter-logic { font-size:var(--bui-text-meta); color:var(--bui-muted); }
-.bui-popover:has(.bblocks-filter-field-picker,.bblocks-filter-editor) { width:min(320px,calc(100vw - 24px)); padding:16px; border:1px solid var(--bui-line); border-radius:8px; }
+/* A viewport cap keeps picker/editor resizing independent of per-side collision measurements. */
+.bui-popover:has(.bblocks-filter-field-picker,.bblocks-filter-editor) { width:min(320px,calc(100vw - 24px)); max-height:min(520px,calc(100dvh - 24px)); padding:16px; border:1px solid var(--bui-line); border-radius:8px; }
 .bui-popover:has(.bblocks-filter-field-picker,.bblocks-filter-editor)>div { margin-top:12px; }
 .bui-popover:has(.bblocks-filter-editor)>.bui-label { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .bui-popover:has(.bblocks-filter-editor)>div { margin-top:0; }

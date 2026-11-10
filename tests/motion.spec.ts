@@ -1,13 +1,35 @@
 import { test, expect } from '@playwright/test';
 
+type TabMotionWindow = Window & {tabMotionCapture?:{observer:MutationObserver;animation?:Animation;wasRunning?:boolean;duration?:number}};
+
 test('tab indicator follows interrupted selection and keyboard input', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/motion');
+  await page.evaluate(() => document.fonts.ready);
   const tabs = page.getByRole('tablist', { name: 'Study stage' });
   const indicator = tabs.locator('.bui-tab-indicator');
-  await tabs.getByRole('tab', { name: 'Building', exact: true }).click();
-  expect(await indicator.evaluate(el => el.getAnimations().some(animation => animation.playState === 'running'))).toBe(true);
+  const building = tabs.getByRole('tab', { name: 'Building', exact: true });
+  const initial = (await indicator.boundingBox())!, target = (await building.boundingBox())!;
+  await indicator.evaluate(el => {
+    const host=window as TabMotionWindow;
+    // Capture the native transition at its creation, before runner load can let it finish.
+    const observer=new MutationObserver(()=>{
+      const animation=el.getAnimations().find(item=>item instanceof CSSTransition&&item.transitionProperty==='transform'&&item.playState==='running');
+      if(!animation)return;
+      const capture=host.tabMotionCapture!;
+      capture.wasRunning=animation.playState==='running';capture.duration=Number(animation.effect!.getComputedTiming().duration);capture.animation=animation;
+      animation.pause();animation.currentTime=capture.duration*.2;observer.disconnect();
+    });
+    host.tabMotionCapture={observer};observer.observe(el.parentElement!,{attributes:true,subtree:true});
+  });
+  await building.click();
+  await expect.poll(()=>page.evaluate(() => !!(window as TabMotionWindow).tabMotionCapture?.animation),'Selection starts a native transform transition').toBe(true);
+  const captured=await page.evaluate(async()=>{const capture=(window as TabMotionWindow).tabMotionCapture!;await capture.animation!.ready;return {wasRunning:capture.wasRunning,duration:capture.duration,playState:capture.animation!.playState};});
+  expect(captured.wasRunning).toBe(true);expect(captured.duration).toBeGreaterThan(0);expect(captured.playState).toBe('paused');
+  const midway=(await indicator.boundingBox())!;expect(midway.x).toBeGreaterThan(initial.x+.5);expect(midway.x).toBeLessThan(target.x-.5);
   await tabs.getByRole('tab', { name: 'Review', exact: true }).click();
+  await expect.poll(()=>page.evaluate(()=>(window as TabMotionWindow).tabMotionCapture!.animation!.playState),'A new selection interrupts the captured transition').toBe('idle');
+  await page.evaluate(()=>{const host=window as TabMotionWindow;host.tabMotionCapture!.observer.disconnect();delete host.tabMotionCapture;});
   await tabs.getByRole('tab', { name: 'Idea', exact: true }).click();
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
