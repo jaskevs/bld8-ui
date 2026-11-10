@@ -145,3 +145,13 @@ version's manifest/registry digests, installs the real public URLs without a
 loopback dependency rewrite, and exercises clean Next.js and Vite builds. It
 never sends GitHub credentials to the public URLs or to CLI child processes.
 The first production routes cannot be tested before their initial deployment.
+
+## Next.js starter dependency update - 10 November 2026
+
+Current Next.js starters pin 16.4.6. Retained 0.2.0 archives preserve their
+original 16.3.8 pin and byte identity. If starting from those archives, update
+Next.js to 16.4.6 before a production deployment, then run the build and tests.
+The [upstream advisory](https://github.com/advisories/GHSA-2464-fhr4-w9xw)
+identifies affected versions through 16.4.0 and the patched release line. This
+is a dependency update in the consuming application, not a replacement of a
+retained BLD8 source artifact. Vite starters do not depend on Next.js.

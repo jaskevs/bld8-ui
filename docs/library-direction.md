@@ -1,6 +1,6 @@
 # Community library direction
 
-Updated 30 October 2026. This is the UI library's ordered backlog, not a claim of
+Updated 10 November 2026. This is the UI library's ordered backlog, not a claim of
 feature parity, a dated delivery promise or a change to the master roadmap's hours.
 The user requested a free community library with deeper components and blocks,
 and first-class React/Next.js adoption. Keep the existing Workbench milestone and
@@ -36,6 +36,9 @@ React Native and Angular need separate implementations and are outside this slic
 - This first expansion adds a Timeline component, an ActivityFeed block, React/Next
   and community guides, issue forms and installable source. Verification is recorded
   separately in verification.md; do not infer that subsequent backlog items shipped.
+
+The current controls-first priorities are in [next-work.md](next-work.md).
+Playground expansion is lower priority than reusable control behaviour.
 
 ## Ordered increments
 
@@ -77,9 +80,10 @@ axe scans do not establish accessibility certification.
   expectations honest. Do not add a promised commercial support tier.
 - Measure installation friction through voluntary feedback first. No invented
   usage, testimonials, star counts or telemetry. Consider any analytics separately.
-- After the catalogue is stable, add machine-readable documentation and registry
-  discovery so tools can find the same supported APIs. An MCP service is a later
-  integration, not a prerequisite for a useful library.
+- Generated Markdown and the structured agent catalogue describe the same APIs
+  and registry as the site. An optional local read-only MCP server exposes that
+  catalogue; it does not install components or replace human guidance. Hosted
+  transport and npm distribution require separate release decisions.
 
 Success means developers can install a useful workflow, adapt it to their product,
 upgrade it safely and contribute a fix. Raw component counts alone are not evidence

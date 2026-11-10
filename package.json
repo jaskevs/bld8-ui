@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/docs",
+    "build": "npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/docs && npm run build --workspace=@bld8/mcp",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "playwright test",
     "pack:ui": "npm pack --workspace=@bld8/ui",
@@ -23,7 +23,11 @@
     "test:quality:update": "playwright test --config=playwright.quality.config.ts --project=\"visual-*\" --update-snapshots=changed",
     "typecheck:quality": "tsc -p tsconfig.quality.json",
     "check:starters:themes": "node scripts/check-themed-starters.mjs",
-    "release:prepare": "node scripts/prepare-source-release.mjs --bundle"
+    "release:prepare": "node scripts/prepare-source-release.mjs --bundle",
+    "docs:agents": "node scripts/prepare-agent-docs.mjs",
+    "mcp": "node packages/mcp/dist/index.js",
+    "check:starter:uploads": "node scripts/check-upload-starter.mjs",
+    "check:starters:data-workspace": "node scripts/check-data-workspace-starters.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

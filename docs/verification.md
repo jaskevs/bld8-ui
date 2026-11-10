@@ -1,3 +1,54 @@
+## Approved capability batch - 10 November 2026
+
+All four approved priorities were completed sequentially: nested filters, remote
+selection, Cascader, then week/month calendar and per-file HTTP uploads. Source
+is local 0.3.0/unreleased. Main remains e21403b; nothing was committed or deployed.
+
+Production build, workspace types and quality types pass. The 625-case regression
+sweep passed 624 cases; the sole failure was a stale search-count assertion after
+adding AsyncCombobox. Its corrected catalogue assertions and all developer/agent/
+MCP cases pass in a 36-case rerun. A later inspector interruption test makes the
+current suite 626 cases. After its repair, all 64 affected browser/source/starter/
+discovery cases pass.
+
+The pinned Linux run passed 268 of 272 cases. It exposed one real inspector race:
+waiting for an interrupted outgoing pane could leave old metadata visible after
+selection changed. The latest pane now renders immediately with entry easing.
+The other failures were a calendar motion test retaining an animation replaced by
+async loading, plus WebKit geometry 0.00003 CSS px below a nominal 144 px minimum.
+Static-data timeline sampling and 1/64px measurement rounding keep the tests
+meaningful without disabling motion or relaxing the declared CSS minimum. All 36
+cases for the three affected flows pass across Chromium, Firefox and WebKit,
+desktop/phone and both themes. No visual baseline was updated.
+
+Clean actual shadcn Next.js/Vite installs pass with a 94-item graph and both-theme
+workflows; lean sign-in still excludes unrelated overlay/calendar/drag packages.
+These installations preceded only the final FileBrowser JSX animation repair;
+its public API/dependencies are unchanged. The new calendar Vite ZIP builds, and
+the standalone upload Next.js ZIP installs/builds and acknowledges actual file
+bytes and SHA-256 on a phone layout. Four new desktop/phone previews were visually
+reviewed without page errors. No physical iPhone acceptance is claimed.
+
+Human and MCP docs expose 78 entries, 15 guides and actual TypeScript APIs. The
+current registry has 185 items and 43 ZIPs. Prepared production snapshot used by
+the final repair checks:
+a1631c7f2993416b3bd89595d2db261e0ca9e6424d5ddcbe3815c8f8b71f30c8
+
+The restored npm run dev preview may regenerate the mutable development snapshot.
+It is not another retained release. Its async, Cascader, calendar and actual-upload
+flows were also checked without page errors; verify a freshly prepared exact
+revision separately when publishing.
+
+Local logs: .local/batch-final-build.log, batch-final-regression.log,
+batch-final-docs-tests.log, batch-final-linux-quality.log, batch-repair-build.log,
+batch-repair-tests.log, batch-repair-linux-quality.log, batch-final-consumers.log,
+batch-final-upload-starter.log and batch-final-calendar-vite.log. Known existing
+Next.js tracing and Vite directive warnings remain non-fatal. Retained 0.2.0 files
+are unchanged. Workbench dates, exam allocation and the 135-hour baseline remain
+unchanged; no commit-time or ownership rule was bypassed.
+
+---
+
 ## Hosted combined adoption release - 9 November 2026
 
 Implementation f7c8998aaf4042f2e3433a276089dbf872a7b581 passed GitHub run
@@ -1924,3 +1975,200 @@ The final local editing preview was restored on port 3120. Both theme routes
 return HTTP 200; the development browser confirms a live dark Cobalt frame, seven
 contrast rows, an unchanged yellow parent theme and no page errors. UI, block and
 style watchers are active. Temporary test/consumer/quality servers are stopped.
+
+
+## Table layouts and documentation discovery - 10 November 2026
+
+Current local development: 160 registry items, 72 generated guidance entries and
+10 public guides. Production build, all workspace types and production npm audit
+pass (zero audit findings after updating Next.js/new starters to 16.4.6). Retained
+0.2.0 bytes and release metadata are unchanged.
+
+- Complete regression: 550 passed, .local/table-docs-final-regression.log.
+- Final affected regression after menu-to-modal handoff: 71 passed,
+  .local/table-docs-final-affected.log. Includes lean dependencies, Issue layouts,
+  legacy links, touch/pointer/keyboard ordering, retry, focus, API docs and MCP.
+- Pinned Linux full quality: 212 passed, .local/table-docs-quality-linux.log;
+  no approved screenshot changes.
+- Final normal-motion ordering matrix: 12 passed,
+  .local/table-docs-ordering-quality.log. Chromium/Firefox/WebKit in both themes
+  and desktop/phone widths verify the corrected menu closure and focus target.
+- Real shadcn CLI clean Next.js/Vite installs, 74-item graph, independent builds,
+  pure helper evaluation and both-theme workflows pass in
+  .local/table-docs-final-consumers.log. These precede the final menu-only change;
+  final production types/build and focused browser runs cover that change.
+- Six manual-review browser captures had no page errors; generated catalog, all
+  72 Markdown entries and 10 guides match source/TypeScript/registry authority.
+
+The optional MCP process is local/read-only, private/unpublished on npm and not
+registered in an editor or hosted. No commits, pushes or deployments were made.
+See handoff.md for remaining physical-device and release boundaries.
+
+The final development preview review also removed whitespace text between table
+cells to avoid a React development hydration warning. UI types and all 12 table
+ordering cases pass against the restored live preview, including an explicit
+valid-row DOM assertion. Fresh native UI interactions, six settled captures and
+console/page-error collection report no errors. Test screenshots wait for
+hydration and modal transitions before mutating caret styles or reading themes.
+
+## Coordinated Data Workspace acceptance — 10 November 2026
+
+- Production builds pass in .local/data-workspace-settled-build.log. All
+  workspace and quality TypeScript checks pass in
+  .local/data-workspace-acceptance-types.log; git diff --check is clean.
+- The 659-case broad sweep has 657 passes in
+  .local/data-workspace-regression.log. Its two failures were resolved: preserve
+  insertion order when no Issue sort is active, and await the initial selected
+  label before the deliberately superseded-query test starts typing. Trace
+  analysis showed the latter had searched Maya ChenMaya before reaching its
+  intended deferred Maya request. Stale-response assertions remain unchanged.
+- All 92 affected checks pass in .local/data-workspace-final-tests.log,
+  including both corrected cases, saved multi-sort views, keyboard/pointer range
+  selection, invalid paste, draft history, conflicts, stale-source writes,
+  timeout/abort zero-commit checks, real HTTP sessions, file-byte acknowledgement,
+  source manifests, human docs and MCP discovery.
+- The final confirmed-row paint change passes ten further workspace/HTTP tests
+  in .local/data-workspace-settled-tests.log. A gated post-save GET proves new
+  values remain visible while the refresh is pending. No visual baseline changed.
+- Actual shadcn 4.21.4 installs into clean Next.js and custom-alias Vite apps build
+  the 102-item graph and pass both-theme workflows in
+  .local/data-workspace-registry-consumers.log. Lean sign-in graphs remain lean.
+- Both persistent HTTP ZIPs independently install/build, save two records in the
+  browser, reload, survive an actual server restart, replay the saved receipt and
+  reject an entire two-row stale batch without partial writes. Both phone themes
+  remain contained with no browser errors. See
+  .local/data-workspace-starters-acceptance.log and its four phone captures.
+  These adoption checks precede the final internal confirmed-row paint change;
+  its final production build and targeted browser tests pass separately.
+- The original 284-case pinned Linux matrix has 280 passes and four failures in
+  .local/data-workspace-linux-quality.log: three rapid-range focus races and one
+  WebKit same-origin navigation-prefetch cancellation. Synchronous DOM focus
+  fixes the range race independently of animation frames. The fresh 18-case
+  affected matrix passes in .local/data-workspace-linux-affected.log, including
+  the unchanged WebKit touch test; no error filtering was added. All 20 approved
+  visuals pass unchanged. The later Shift-click pointer guard passes Edge tests.
+- The final prepared source manifest is 0.3.0/unreleased, snapshot
+  bb561bcca01f089c1faf79e633d2a14a255fdf53d577c2d69c1cdbff29c67d60,
+  with 195 registry items and 47 ZIPs. Development watching may regenerate the
+  mutable snapshot. Retained 0.2.0 and Git/release state are unchanged.
+
+The local disk reference needs one persistent Node server. Hosted authentication,
+database transactions and durable attachments remain host responsibilities;
+acknowledged sample bytes are discarded. Desktop WebKit does not replace a
+physical iPhone keyboard review. No commit, push or deployment was performed.
+
+## Neutral grid selection — 10 November 2026
+
+The browser text highlight is replaced by pointer-driven cell ranges: a quiet
+neutral fill, one 1px perimeter and a single corner marker. Read-only display
+cells do not initiate native text selection. Native editor selection, keyboard
+ranges, Shift-click, copy/paste and touch scrolling are preserved.
+
+- Production build passes: .local/grid-selection-build.log.
+- Workspace and quality types pass: .local/grid-selection-types.log.
+- All 25 focused grid/workspace/real-HTTP regressions pass:
+  .local/grid-selection-tests.log. Real mouse dragging selects six cells without
+  native highlights, only perimeter edges are outlined, clipboard values remain
+  canonical, and native editor double-click/select-all retains the draft.
+- All 18 new pinned browser checks pass across Chromium/Firefox/WebKit,
+  desktop/phone widths and both themes: .local/grid-selection-linux.log. Normal
+  motion, live reduced motion, touch default behaviour and 16px editor text are
+  checked. No approved visual baselines were changed.
+- Light and dark captures .local/grid-selection-light.png and
+  .local/grid-selection-dark.png were visually reviewed.
+
+No public API/dependency changes, release changes, commits, pushes or deployments.
+Existing source/ZIP/agent documentation generation includes the update. Physical
+iPhone keyboard review remains separate from these emulated browser checks.
+
+## Inline editor and grid polish — 10 November 2026
+
+The inline editor no longer stacks an input shadow and global focus ring inside
+the cell perimeter. Its background, typography and baseline follow the display
+cell, and native text selection uses a neutral highlight. The outer cell boundary
+remains visible for editing; global focus styles elsewhere are unchanged.
+Desktop rows are 52px; coarse-pointer rows remain 60px with 16px editor text.
+Grid lines and headers use neutral contrast, IDs/titles have distinct hierarchy,
+and workspace status dots supplement readable labels. Toolbar density and helper
+copy are tighter, with full keyboard guidance retained for assistive technology.
+
+- Production build passes: .local/grid-polish-build.log. Source/ZIP/registry and
+  human/agent documentation were regenerated from their authorities.
+- Workspace and quality types pass: .local/grid-polish-types.log.
+- All 27 focused grid/workspace/HTTP regressions pass:
+  .local/grid-polish-tests.log. New light/dark editor cases assert no inner ring,
+  shadow or border, unchanged row height, aligned text and a visible 1px perimeter.
+  Range copy/paste, native text selection, draft history and save recovery pass.
+- All 18 affected pinned Linux browser checks pass:
+  .local/grid-polish-linux.log; reports under
+  .local/quality-linux/320f95ef-2e1e-4d6f-ac5b-e588318e738c.
+  Chromium/Firefox/WebKit cover pointer selection at desktop/phone widths and
+  coarse-pointer editing in both themes, including stable row height, native
+  text selection, at least 16px text and live reduced motion.
+- Light/dark editor and workspace captures were visually reviewed:
+  .local/grid-polish-editor-light.png, .local/grid-polish-editor-dark.png,
+  .local/grid-polish-light.png, .local/grid-polish-dark.png and
+  .local/grid-polish-phone.png. The emulated phone page has no horizontal overflow.
+
+No public API/dependency or release changes. No visual baselines were updated.
+No commit, push or deployment was performed. Emulated browsers do not replace a
+physical iPhone keyboard review.
+
+## Grid choice menus and quick filtering — 10 November 2026
+
+Select cells use compact Base UI-backed menus, including searchable labels with
+canonical option IDs, collision positioning, selected checks and shared easing.
+The menu keeps the cell's single boundary. Keyboard completion returns focus in
+the same event turn, including the primitive's final navigation step. Closing
+editors are retained for exit motion and cleared when their row disappears.
+Touchend commits an unmoved tap once and suppresses the compatibility click;
+pointer/touch movement cancels that intent so list scrolling cannot select.
+Closing positioners stop anchor tracking. Choice lists use a shrinking flex
+layout rather than feeding available-height calculations back into their parent.
+MultiSelect also stops anchor tracking while closing, including in filter popups.
+
+Quick filters reuse the shared query evaluator, validation and advanced tree:
+field search, per-condition Apply, editable chips, all/any logic and clear/remove
+actions. Unapplied advanced edits are protected from quick replacement. Nested
+groups and negation are retained, and filtering does not discard row drafts.
+
+- Current production build: .local/grid-dropdown-build-verified.log.
+- Current workspace/quality types: .local/grid-dropdown-types-verified.log.
+- The focused 51-case sweep passes: .local/grid-dropdown-tests-final.log.
+  The final 15-case affected rerun also passes:
+  .local/grid-dropdown-regressions-verified.log. It includes a new interrupted-exit
+  case, so these scopes overlap rather than representing 66 unique tests.
+- The final 30-case pinned affected matrix passes:
+  .local/grid-dropdown-linux-affected.log; reports under
+  .local/quality-linux/9c94f7d2-7291-41bc-b87b-b18c02cdf778.
+  It covers Chromium/Firefox/WebKit desktop/phone menu and quick-filter paths,
+  both coarse-pointer themes, native text selection, tap versus pan, selected
+  canonical values, geometry, outside focus and live reduced motion.
+- Earlier browser runs exposed touch compatibility clicks and closing-popup
+  ResizeObserver feedback. Those paths were corrected rather than filtering the
+  errors. Firefox measured one 52px row as 52.0000305px; comparisons now normalize
+  to 1/64 CSS px. The earlier two advanced-filter test failures used a group role
+  for a named section; their corrected region selectors and grouped semantics
+  checks pass. No approved screenshot baseline was changed.
+- Actual shadcn Next.js/Vite installs, aliases, the 104-item dependency graph,
+  independent production builds and both theme checks passed:
+  .local/grid-dropdown-consumers.log. Later touch/closing refinements add no
+  imports or dependencies to that graph.
+- Downloadable Next.js/Vite HTTP starter checks passed:
+  .local/grid-dropdown-starters-final.log. Both include independent install/build,
+  two-row atomic saves, reload, both phone themes, real process restart/replay
+  and conflict recovery. The final touch/closing revision is separately checked
+  in .local/grid-dropdown-starters-verified.log.
+
+Public DataColumn gains optional searchable; the normal source/API/ZIP/agent
+generation includes it. There are 197 registry items and 47 ZIPs; component/block/
+template counts remain 59/18/3. Retained 0.2.0 is unchanged. Source remains local
+and uncommitted. No push, deployment, release or npm publication was performed.
+Desktop WebKit remains separate from physical iPhone keyboard verification.
+
+Final visual review: .local/grid-dropdown-final-{light,dark}.png,
+.local/grid-dropdown-search-final-{light,dark}.png,
+.local/grid-filter-chips-final-{light,dark}.png,
+.local/grid-filter-editor-final-{light,dark}.png and
+.local/grid-filter-picker-phone-final.png. The restored local examples preview
+reports no page errors in either theme; the emulated phone page fits its width.

@@ -16,16 +16,22 @@ for(const name of ['index.ts','react-hook-form.tsx']){
   if(module)for(const symbol of checker.getExportsOfModule(module))symbols.set(symbol.name,symbol.flags & ts.SymbolFlags.Alias?checker.getAliasedSymbol(symbol):symbol);
 }
 const groups={
+  'data-grid':['DataGrid','DataColumn','DataEdit','DataCellError','DataQuery','DataSource','DataChange','DataBatchRequest','BatchResult','DataSort'],
+  'upload-queue':['UploadQueue','UploadQueueItem','UploadStatus','UploadFileContext','UploadProgress','UploadReceipt','UploadHttpOptions'],
+  'event-calendar':['EventCalendar','CalendarEvent','CalendarRange','CalendarView'],
+  cascader:['Cascader','CascaderNode','CascaderOptionsRequest','AsyncOptionsPage'],
+  'async-combobox':['AsyncCombobox','AsyncOption','AsyncOptionsRequest','AsyncOptionsPage','UseAsyncOptionsOptions','AsyncOptionsState'],
+  'async-multi-select':['AsyncMultiSelect','AsyncOption','AsyncOptionsRequest','AsyncOptionsPage','UseAsyncOptionsOptions','AsyncOptionsState'],
   'day-agenda':['DayAgenda','ScheduleSnapshot','ScheduleSlot','ScheduleEvent','ScheduleStart'],
   'windowed-table':['WindowedTable','Column','TableGrouping'],
   chart:['Chart','ChartDatum','ChartSeries'],
   tree:['Tree','TreeNode'],
-  'number-field':['NumberField'], 'time-picker':['TimePicker','TimeOptions'], stepper:['Stepper','StepperStep'], kanban:['Kanban','KanbanItem','KanbanColumn','KanbanMove'], 'filter-builder':['FilterBuilder','FilterField','FilterQuery','FilterRule'], timeline:['Timeline','TimelineItem'], button:['Button'], 'icon-button':['IconButton'], icon:['Icon'], input:['Field','Input'], textarea:['Field','Textarea'], 'input-group':['InputGroup'],
+  'number-field':['NumberField'], 'time-picker':['TimePicker','TimeOptions'], stepper:['Stepper','StepperStep'], kanban:['Kanban','KanbanItem','KanbanColumn','KanbanMove'], 'filter-builder':['FilterBuilder','FilterField','FilterQuery','FilterRule','NestedFilterBuilderProps','AnyFilterQuery','NestedFilterQuery','FilterGroup'], timeline:['Timeline','TimelineItem'], button:['Button'], 'icon-button':['IconButton'], icon:['Icon'], input:['Field','Input'], textarea:['Field','Textarea'], 'input-group':['InputGroup'],
   checkbox:['Checkbox'], switch:['Switch'], radio:['RadioGroup','Option'], select:['Select','Option'], combobox:['Combobox'], slider:['Slider'],
   tabs:['Tabs'],accordion:['Accordion'],breadcrumb:['Breadcrumb'],pagination:['Pagination'],dialog:['Dialog','DialogClose'],sheet:['Sheet','DialogClose'],
   popover:['Popover'],tooltip:['Tooltip'],dropdown:['DropdownMenu','MenuItem'],toast:['UIProvider'],alert:['Alert'],badge:['Badge'],progress:['Progress'],
   loading:['Spinner','Skeleton'],empty:['EmptyState'],avatar:['Avatar'],card:['Card','Separator'],
-  table:['DataTable','Column','TableQuery','TableFilter','TableGrouping'], 'advanced-table':['DataTable','Column','TableQuery','TableFilter','TableGrouping'],
+  table:['DataTable','SortableDataTable','Column','TableQuery','TableFilter','TableGrouping','TableRowMove','TableViewState','TableViewOptions'], 'advanced-table':['DataTable','SortableDataTable','Column','TableQuery','TableFilter','TableGrouping','TableRowMove','TableViewState','TableViewOptions'],
   calendar:['Calendar','CalendarBaseProps'], 'date-picker':['DatePicker'], 'date-range':['DateRangePicker'],
   'multi-select':['MultiSelect','Option'],command:['CommandPalette','CommandItem'], 'file-upload':['FileUpload','UploadContext'],
   drawer:['Drawer','DrawerClose'],sidebar:['SidebarProvider','Sidebar','SidebarHeader','SidebarGroup','SidebarMenuButton','SidebarFooter','SidebarInset','SidebarTrigger'],
@@ -33,7 +39,7 @@ const groups={
   form:['Form','useForm','FormOptions','FormResult','FormErrorSummary'], 'editable-cell':['EditableCell'], 'react-hook-form':['RHFField','RHFControl'],
 };
 function defaults(declaration){
-  const result={};const parameter=declaration?.parameters?.[0];
+  const result=Object.create(null);const parameter=declaration?.parameters?.[0];
   if(parameter && ts.isObjectBindingPattern(parameter.name))for(const element of parameter.name.elements){if(element.initializer){const name=element.propertyName?.getText() ?? element.name.getText();result[name]=element.initializer.getText();}}
   return result;
 }
@@ -45,12 +51,15 @@ function describe(name){
   const parameter=call?.getParameters()[0];
   const type=parameter?checker.getTypeOfSymbolAtLocation(parameter,parameter.valueDeclaration ?? declaration):checker.getDeclaredTypeOfSymbol(symbol);
   const initial=defaults(declaration);
-  const properties=checker.getPropertiesOfType(type).map(property=>{
+  const scalar=part=>!!(part.flags & (ts.TypeFlags.StringLike|ts.TypeFlags.NumberLike|ts.TypeFlags.BooleanLike|ts.TypeFlags.Null|ts.TypeFlags.Undefined));
+  const scalarType=scalar(type)||(type.isUnion()&&type.types.every(scalar));
+  const definition=ts.isTypeAliasDeclaration(declaration)?declaration.type.getText():undefined;
+  const properties=(scalarType?[]:checker.getPropertiesOfType(type)).map(property=>{
     const location=property.valueDeclaration ?? property.declarations?.[0] ?? declaration;
     const origin=location.getSourceFile().fileName.replaceAll('\\','/');
-    return {name:property.name,type:checker.typeToString(checker.getTypeOfSymbolAtLocation(property,location),location,ts.TypeFormatFlags.NoTruncation|ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope),required:!(property.flags & ts.SymbolFlags.Optional),defaultValue:initial[property.name] ?? '—',description:ts.displayPartsToString(property.getDocumentationComment(checker)),native:origin.includes('/@types/react/')};
+    return {name:property.name,type:checker.typeToString(checker.getTypeOfSymbolAtLocation(property,location),location,ts.TypeFormatFlags.NoTruncation|ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope),required:!(property.flags & ts.SymbolFlags.Optional),defaultValue:Object.hasOwn(initial,property.name)?initial[property.name]:'—',description:ts.displayPartsToString(property.getDocumentationComment(checker)),native:origin.includes('/@types/react/')};
   }).sort((a,b)=>Number(a.native)-Number(b.native)||Number(b.required)-Number(a.required)||a.name.localeCompare(b.name));
-  return {name,kind:call?'Component props':'Related type',properties};
+  return {name,kind:call?'Component props':'Related type',...(definition?{definition}:{}),properties};
 }
 const api=Object.fromEntries(Object.entries(groups).map(([id,names])=>[id,names.map(describe)]));
 const target=join(root,'apps/docs/src/lib/generated/api.ts');mkdirSync(dirname(target),{recursive:true});

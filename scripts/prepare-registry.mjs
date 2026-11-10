@@ -42,8 +42,13 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
 }
 add('bld8-block-styles', 'BLD8 block styles', [file('registry/bld8/blocks/styles.css', read('packages/blocks/src/styles.css'), '@ui/bld8/blocks/styles.css','registry:file')],[],['bld8-styles']);
 const groups = {
+  'data-workspace-state':['data-workspace-state'], 'data-grid-state':['data-grid-state'], 'data-grid':['data-grid'], 'table-query':['table-query'],
+  'upload-state':['upload-state'], 'upload-http':['upload-http'], 'upload-queue':['upload-queue'],
+  'calendar-state':['calendar-state'], 'event-calendar':['event-calendar'],
+  'cascader-state':['cascader-state'], cascader:['cascader'],
+  'async-options':['async-options'], 'use-async-options':['use-async-options'], 'async-combobox':['async-combobox'], 'async-multi-select':['async-multi-select'],
   'day-agenda':['day-agenda'], 'schedule-state':['schedule-state'],
-  'windowed-table':['windowed-table'], 'table-grouping':['table-grouping'],
+  'windowed-table':['windowed-table'], 'table-grouping':['table-grouping'], 'table-view-state':['table-view-state'], 'sortable-data-table':['sortable-table'],
   chart:['chart'], reveal:['reveal'],
   tree:['tree'],
   core:['button','icon-button','input','textarea','checkbox','switch','radio','slider','badge','alert','progress','loading','empty','avatar','card','breadcrumb','pagination','input-group'],

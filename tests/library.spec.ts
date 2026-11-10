@@ -7,8 +7,10 @@ test('catalog filters by category and query, with working detail pages', async (
   await page.getByRole('button', { name: 'Forms', exact: false }).click();
   await expect(page.locator('.component-card')).toHaveCount(components.filter(item => item.category === 'Forms').length);
   await page.getByRole('searchbox', { name: 'Find a component' }).fill('combobox');
-  await expect(page.locator('.component-card')).toHaveCount(1);
-  await page.locator('.component-bottom').getByRole('link', { name: 'Combobox' }).click();
+  await expect(page.locator('.component-bottom').getByRole('link', { name: 'Async combobox', exact:true })).toBeVisible();
+  await expect(page.locator('.component-bottom').getByRole('link', { name: 'Combobox', exact:true })).toBeVisible();
+  await expect(page.locator('.component-card').filter({hasNotText:/combobox/i})).toHaveCount(0);
+  await page.locator('.component-bottom').getByRole('link', { name: 'Combobox', exact:true }).click();
   await expect(page.getByRole('heading', { name: 'Combobox.', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'API & behaviour' })).toBeVisible();
 });

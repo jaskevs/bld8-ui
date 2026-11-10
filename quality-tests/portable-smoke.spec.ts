@@ -1,5 +1,59 @@
 import {test, expect, openQualityPage, expectContained} from './fixtures';
 
+test('grid choice menus keep keyboard editing, canonical values and outside focus under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/blocks/data-workspace',info);
+  const grid=page.getByRole('grid',{name:'Issue data grid',exact:true}),priority=grid.getByRole('gridcell',{name:'Priority for ISS-102',exact:true});
+  await priority.scrollIntoViewIfNeeded();const before=(await priority.boundingBox())!;await priority.focus();await page.keyboard.press('Enter');
+  const popup=page.locator('.bui-data-grid-choice-popup');await expect(page.getByRole('option',{name:'Medium',exact:true})).toBeVisible();const box=(await popup.boundingBox())!;
+  expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(page.viewportSize()!.width);expect(Math.abs((await priority.boundingBox())!.x-before.x)).toBeLessThan(1);
+  expect(await popup.evaluate(el=>getComputedStyle(el).transitionDuration)).not.toBe('0s');
+  await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await expect(priority).toContainText('High');await expect(priority).toBeFocused();expect(Math.round((await priority.boundingBox())!.height*64)).toBe(Math.round(before.height*64));
+  await page.keyboard.press('Enter');await expect(page.getByRole('option',{name:'High',exact:true})).toBeVisible();await page.keyboard.press('Tab');
+  const assignee=grid.getByRole('gridcell',{name:'Assignee for ISS-102',exact:true});await expect(assignee).toBeFocused();await page.keyboard.press('Enter');const search=page.getByRole('combobox',{name:'Search Assignee for ISS-102 options',exact:true});await expect(search).toBeFocused();await search.fill('sam');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await expect(assignee).toContainText('Sam Rivera');await expect(assignee).toBeFocused();
+  await assignee.press('Enter');await page.getByRole('textbox',{name:'Search issues',exact:true}).click();await expect(popup).toHaveCount(0);await expect(page.getByRole('textbox',{name:'Search issues',exact:true})).toBeFocused();
+  await page.emulateMedia({reducedMotion:'reduce'});await priority.scrollIntoViewIfNeeded();await priority.focus();await priority.press('Enter');await expect(popup).toBeVisible();expect(await popup.evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');await page.keyboard.press('Escape');await expect(priority).toBeFocused();await expectContained(page);
+});
+
+test('workspace quick filters preserve explicit apply, nested menu context and mobile containment under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/blocks/data-workspace',info);await page.getByRole('button',{name:'Add filter',exact:true}).click();
+  const search=page.getByRole('textbox',{name:'Find a filter field',exact:true});await search.fill('Status');await search.press('ArrowDown');await page.keyboard.press('Enter');
+  const values=page.getByRole('combobox',{name:'Values',exact:true});await values.fill('Done');await page.getByRole('option',{name:'Done',exact:true}).click();if(await values.getAttribute('aria-expanded')==='true')await values.press('Escape');
+  await expect(page.getByRole('button',{name:'Apply filter',exact:true})).toBeVisible();await expect(page.getByRole('gridcell',{name:'Title for ISS-103',exact:true})).toHaveCount(1);
+  const popup=page.locator('.bui-popover');const box=(await popup.boundingBox())!;expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  await page.getByRole('button',{name:'Apply filter',exact:true}).click();await expect(page.getByRole('button',{name:'Edit Status filter',exact:true})).toContainText('Done');await expect(page.getByRole('gridcell',{name:'Title for ISS-103',exact:true})).toHaveCount(0);
+  await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Remove Status filter',exact:true}).click();await expect(page.getByRole('button',{name:'Add filter',exact:true})).toBeFocused();await expect(page.getByRole('gridcell',{name:'Title for ISS-103',exact:true})).toBeVisible();await expectContained(page);
+});
+
+test('data workspace pointer selection stays a clean range under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/blocks/data-workspace',info);
+  const grid=page.getByRole('grid',{name:'Issue data grid',exact:true}),start=grid.getByRole('gridcell',{name:'Issue for ISS-101',exact:true}),end=grid.getByRole('gridcell',{name:'Title for ISS-103',exact:true});
+  await expect(end).toBeVisible();await end.scrollIntoViewIfNeeded();
+  await grid.locator('..').evaluate(element=>{const from=element.querySelector<HTMLElement>('[data-row-id="ISS-101"][data-column-key="id"]')!.getBoundingClientRect(),to=element.querySelector<HTMLElement>('[data-row-id="ISS-103"][data-column-key="title"]')!.getBoundingClientRect(),box=element.getBoundingClientRect();element.scrollLeft+=(from.left+to.right)/2-(box.left+box.width/2);});
+  const from=(await start.boundingBox())!,to=(await end.boundingBox())!;
+  await page.mouse.move(from.x+from.width/2,from.y+from.height/2);await page.mouse.down();await page.mouse.move(to.x+to.width/2,to.y+to.height/2,{steps:12});await page.mouse.up();
+  await expect(grid.locator('[aria-selected=true]')).toHaveCount(6);await expect(end).toBeFocused();expect(await page.evaluate(()=>getSelection()?.toString())).toBe('');
+  await expect(grid.locator('.bui-data-grid-range-corner')).toHaveCount(1);expect(await end.evaluate(element=>getComputedStyle(element,'::before').borderBottomWidth)).toBe('1px');
+  await page.keyboard.press('Shift+ArrowUp');await expect(grid.locator('[aria-selected=true]')).toHaveCount(4);await page.keyboard.press('Escape');await expect(grid.locator('[aria-selected=true]')).toHaveCount(1);
+  const title=grid.getByRole('gridcell',{name:'Title for ISS-102',exact:true});const rowHeight=(await title.boundingBox())!.height;await title.dblclick();const editor=grid.getByRole('textbox',{name:'Title for ISS-102',exact:true});await editor.fill('Native editor selection');await editor.dblclick();await expect(editor).toHaveValue('Native editor selection');await expect(editor).toHaveCSS('outline-style','none');await expect(editor).toHaveCSS('box-shadow','none');expect((await title.boundingBox())!.height).toBe(rowHeight);await editor.press('Escape');await expect(title).toBeFocused();
+  await page.emulateMedia({reducedMotion:'reduce'});expect(await title.evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');await expectContained(page);
+});
+
+test('data workspace range, draft history and keyboard editing preserve context under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/blocks/data-workspace',info);
+  const grid=page.getByRole('grid',{name:'Issue data grid',exact:true}),title=grid.getByRole('gridcell',{name:'Title for ISS-101',exact:true});
+  await expect(title).toBeVisible();await title.focus();
+  expect(await title.evaluate(element=>getComputedStyle(element).transitionDuration)).not.toBe('0s');
+  await page.keyboard.press('Shift+ArrowRight');await page.keyboard.press('Shift+ArrowDown');
+  await expect(grid.locator('[aria-selected="true"]')).toHaveCount(4);await page.keyboard.press('Escape');await expect(grid.locator('[aria-selected="true"]')).toHaveCount(1);
+  await title.focus();await page.keyboard.press('Enter');const input=grid.getByRole('textbox',{name:'Title for ISS-101',exact:true});
+  await expect(input).toBeFocused();await input.fill('Cancelled keyboard draft');await page.keyboard.press('Escape');await expect(title).toBeFocused();await expect(title).not.toContainText('Cancelled keyboard draft');
+  await page.keyboard.press('F2');await input.fill('A clearer keyboard workflow');await page.keyboard.press('Enter');await expect(title).toBeFocused();await expect(title).toHaveAttribute('data-dirty');
+  await page.keyboard.press('Control+z');await expect(title).not.toHaveAttribute('data-dirty');await expect(title).toBeFocused();
+  await page.keyboard.press('Control+Shift+z');await expect(title).toHaveAttribute('data-dirty');await expect(title).toBeFocused();
+  await expectContained(page);expect(await page.locator('.bui-data-grid-scroll').evaluate(element=>element.getBoundingClientRect().right<=innerWidth+1/64)).toBe(true);
+  await page.emulateMedia({reducedMotion:'reduce'});expect(await title.evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');expect(await grid.locator('.bui-data-grid-sort').first().evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');
+});
+
 test('playground board rollback and recovery retain confirmed order under normal motion',async({page},info)=>{
   await openQualityPage(page,'/playground?component=Kanban&actionResult=Error&dark='+(info.project.use.colorScheme==='dark'),info);
   const sample=page.getByRole('region',{name:'Component preview',exact:true});
@@ -357,4 +411,169 @@ test('schedule booking preserves explicit instants, draft and return focus',asyn
   await page.keyboard.press('Escape');await expect(details).not.toBeVisible();await expect(event).toBeFocused();
   await page.getByRole('group',{name:'Preview width',exact:true}).getByRole('button',{name:'Mobile',exact:true}).click();
   expect(await specimen.evaluate(panel=>panel.scrollWidth<=panel.clientWidth+1)).toBe(true);await expectContained(page);
+});
+
+test('table ordering retains failed move drafts, selection and keyboard context under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/examples/table-ordering',info);
+  const example=page.getByRole('region',{name:'Table ordering example',exact:true,includeHidden:true});
+  const table=example.getByRole('table',{name:'Ordered projects',exact:true,includeHidden:true});
+  const order=()=>table.locator('tbody tr[data-row-key]').evaluateAll(rows=>rows.map(row=>row.getAttribute('data-row-key')));
+  const columns=example.getByRole('button',{name:'Columns',exact:true});
+  await columns.focus();await page.keyboard.press('Enter');
+  const owner=page.getByRole('button',{name:'Move Owner column',exact:true});
+  await owner.focus();await page.keyboard.press('Enter');
+  const columnDialog=page.getByRole('dialog',{name:'Move column',exact:true});
+  await expect(columnDialog).not.toHaveAttribute('data-starting-style');
+  await expect(page.locator('.bui-popover')).not.toBeVisible();
+  const columnPosition=columnDialog.getByRole('combobox',{name:'Column position',exact:true});
+  await columnPosition.focus();await page.keyboard.press('Enter');
+  const beforeProject=page.getByRole('option',{name:'Before Project',exact:true});
+  await beforeProject.focus();await page.keyboard.press('Enter');
+  await columnDialog.getByRole('button',{name:'Move column',exact:true}).focus();await page.keyboard.press('Enter');
+  await expect(columnDialog).not.toBeVisible();await expect(columns).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect.poll(()=>table.locator('thead th[aria-label]').evaluateAll(headers=>headers.map(header=>header.getAttribute('aria-label')))).toEqual(['Owner','Project','Status']);
+  await expectContained(page);
+
+  const selection=example.getByRole('checkbox',{name:'Select Navigation study',exact:true});
+  await selection.focus();await page.keyboard.press('Space');await expect(selection).toBeChecked();
+  const fail=example.getByRole('checkbox',{name:'Fail next row save',exact:true});
+  await fail.focus();await page.keyboard.press('Space');
+  const handle=example.getByRole('button',{name:'Move Navigation study',exact:true});
+  await handle.focus();await page.keyboard.press('Enter');
+  const dialog=page.getByRole('dialog',{name:'Move row',exact:true});
+  await expect(dialog).not.toHaveAttribute('data-starting-style');
+  const position=dialog.getByRole('combobox',{name:'Row position',exact:true});
+  await position.focus();await page.keyboard.press('Enter');
+  const beforeIcon=page.getByRole('option',{name:'Before Icon audit',exact:true});
+  await beforeIcon.focus();await page.keyboard.press('Enter');
+  const save=dialog.getByRole('button',{name:'Save row position',exact:true});
+  await save.focus();await page.keyboard.press('Enter');
+  await expect(dialog.getByRole('alert')).toContainText('could not be saved');
+  await expect.poll(order).toEqual(['navigation','forms','motion','end']);
+  await expect(position).toContainText('Before Icon audit');await expect(save).toBeFocused();
+  await page.keyboard.press('Enter');await expect(dialog).not.toBeVisible();
+  await expect.poll(order).toEqual(['forms','motion','navigation','end']);
+  await expect(handle).toBeFocused();await expect(selection).toBeChecked();
+  await example.getByRole('button',{name:'Clear selection',exact:true}).click();
+  await expect(selection).toBeFocused();await expect(selection).not.toBeChecked();
+  await expectContained(page);
+});
+
+
+test('nested filters preserve invalid drafts, group motion and keyboard context through exclusion',async({page},info)=>{
+  await openQualityPage(page,'/blocks/issue-table',info);
+  await expect(page.getByText('12 results',{exact:true})).toBeVisible();
+  const filters=page.getByRole('button',{name:/^Filters/});await filters.focus();await page.keyboard.press('Enter');
+  const add=page.getByRole('button',{name:'Add group',exact:true});await add.focus();
+  // Capture the insertion before its first animation frame; the browser controls
+  // subsequent frame cadence and the test waits for the real settled layout.
+  await page.evaluate(()=>{
+    const host=window as Window & {nestedMotionStart?:{height:number;inlineHeight:string}};
+    const observer=new MutationObserver(()=>{
+      const group=document.querySelector<HTMLElement>('.bui-filter-group');if(!group)return;
+      host.nestedMotionStart={height:group.getBoundingClientRect().height,inlineHeight:group.style.height};observer.disconnect();
+    });observer.observe(document.body,{childList:true,subtree:true});
+  });
+  await page.keyboard.press('Enter');
+  const group=page.locator('.bui-filter-group'),field=page.getByRole('combobox',{name:'Filter 1 field',exact:true});
+  await expect(field).toBeFocused();
+  await expect.poll(()=>page.evaluate(()=>(window as Window & {nestedMotionStart?:unknown}).nestedMotionStart!==undefined)).toBe(true);
+  const initial=await page.evaluate(()=>(window as Window & {nestedMotionStart?:{height:number;inlineHeight:string}}).nestedMotionStart!);
+  expect(parseFloat(initial.inlineHeight)).toBe(0);
+  await expect.poll(()=>group.evaluate(element=>(element as HTMLElement).style.height)).toBe('auto');
+  expect((await group.boundingBox())!.height).toBeGreaterThan(initial.height+30);
+  const apply=page.getByRole('button',{name:'Apply filters',exact:true});await apply.focus();await page.keyboard.press('Enter');
+  await expect(page.getByText('Enter a value.',{exact:true})).toBeVisible();
+  const value=page.getByRole('textbox',{name:'Filter 1 value',exact:true});await expect(value).toBeFocused();
+  await expect(page.getByText('12 results',{exact:true})).toBeVisible();
+  await value.fill('dialog');await apply.focus();await page.keyboard.press('Enter');
+  await expect(page.getByText('1 results',{exact:true})).toBeVisible();
+  const exclude=page.getByRole('checkbox',{name:'Exclude group 1',exact:true});await exclude.focus();await page.keyboard.press('Space');
+  await expect(exclude).toBeChecked();await expect(page.getByText('1 results',{exact:true})).toBeVisible();
+  await apply.focus();await page.keyboard.press('Enter');await expect(page.getByText('11 results',{exact:true})).toBeVisible();
+  await expect.poll(()=>JSON.parse(new URL(page.url()).searchParams.get('buiIssues')!).filters.root.children[0].not).toBe(true);
+  const remove=page.getByRole('button',{name:'Remove group 1',exact:true});await remove.focus();await page.keyboard.press('Enter');
+  await expect(page.getByRole('button',{name:'Add filter',exact:true})).toBeFocused();await expect(group).toHaveCount(0);
+  await expect(page.getByRole('combobox',{name:'Match conditions',exact:true})).toContainText('Match all');
+  await expectContained(page);
+});
+
+test('remote choices keep selected labels, recover failed search and submit stable IDs under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/examples/async-selection',info);
+  const assignee=page.getByRole('combobox',{name:'Assignee',exact:true}),reviewers=page.getByRole('combobox',{name:'Reviewers',exact:true});
+  await expect(assignee).toHaveValue('Maya Chen');await expect(page.getByRole('button',{name:'Remove Sam Rivera',exact:true})).toBeVisible();
+  await reviewers.fill('Oliver');await expect(page.getByRole('option').filter({hasText:'Oliver Reed'})).toBeVisible();await reviewers.press('ArrowDown');await reviewers.press('Enter');
+  await expect(page.getByRole('button',{name:'Remove Oliver Reed',exact:true})).toBeVisible();await reviewers.fill('Casey');await expect(page.getByRole('option').filter({hasText:'Casey'})).toHaveCount(3);await reviewers.press('Escape');
+  await expect(page.getByRole('button',{name:'Remove Sam Rivera',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Remove Oliver Reed',exact:true})).toBeVisible();
+  const fail=page.getByRole('checkbox',{name:'Fail next search',exact:true});await fail.focus();await page.keyboard.press('Space');
+  await page.getByRole('button',{name:'Show assignee options',exact:true}).click();const retry=page.getByRole('button',{name:'Retry assignee search',exact:true});await expect(retry).toBeVisible();await retry.focus();await page.keyboard.press('Enter');
+  await expect(page.getByRole('listbox',{name:'Assignee options',exact:true}).getByRole('option')).toHaveCount(20);await expect(assignee).toBeFocused();await assignee.press('Escape');
+  await page.getByRole('button',{name:'Read form values',exact:true}).click();await expect(page.getByLabel('Submitted IDs')).toContainText('["assignee","maya"]');await expect(page.getByLabel('Submitted IDs')).toContainText('["reviewers","oliver"]');await expectContained(page);
+});
+
+test('hierarchical choices keep labels, keyboard focus and a continuous level transition under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/examples/cascader',info);
+  const trigger=page.getByRole('button',{name:'Project area',exact:true});await expect(trigger).toContainText('Engineering / Frontend / React');await trigger.focus();await trigger.press('Enter');
+  await page.getByRole('button',{name:'All options',exact:true}).click();await page.getByRole('button',{name:'Open Engineering',exact:true}).click();const backend=page.getByRole('button',{name:'Open Backend',exact:true});await expect(backend).toBeVisible();
+  // Sample the actual CSS timeline at two phases; do not depend on a renderer's frame cadence.
+  await page.locator('.bui-cascader-popup').evaluate(element=>{
+    const observer=new MutationObserver(()=>{const level=element.querySelector('.bui-cascader-level'),animation=level?.getAnimations().find(item=>(item as CSSAnimation).animationName==='bui-cascader-level-in');if(!animation)return;animation.pause();animation.currentTime=Number(animation.effect!.getTiming().duration)*.2;(window as Window & {cascaderMotion?:Animation}).cascaderMotion=animation;observer.disconnect();});
+    observer.observe(element,{childList:true,subtree:true});
+  });
+  await backend.focus();await backend.press('ArrowRight');await expect(page.getByRole('button',{name:'Choose .NET',exact:true})).toBeFocused();await expect.poll(()=>page.evaluate(()=>!!(window as Window & {cascaderMotion?:Animation}).cascaderMotion)).toBe(true);
+  const level=page.locator('.bui-cascader-level');await page.screenshot({animations:'allow'});const early=await level.evaluate(element=>({opacity:Number(getComputedStyle(element).opacity),height:element.getBoundingClientRect().height,minHeight:getComputedStyle(element).minHeight}));expect(early.opacity).toBeGreaterThan(0);expect(early.opacity).toBeLessThan(1);expect(early.minHeight).toBe('144px');expect(Math.round(early.height*64)/64).toBeGreaterThanOrEqual(144);
+  await page.evaluate(()=>{const animation=(window as Window & {cascaderMotion?:Animation}).cascaderMotion!;animation.currentTime=Number(animation.effect!.getTiming().duration)*.8;});await page.screenshot({animations:'allow'});expect(await level.evaluate(element=>Number(getComputedStyle(element).opacity))).toBeGreaterThan(early.opacity);
+  await expect(trigger).toContainText('Engineering / Frontend / React');await page.evaluate(()=>{const host=window as Window & {cascaderMotion?:Animation};host.cascaderMotion!.play();delete host.cascaderMotion;});await page.keyboard.press('Enter');await expect(page.locator('.bui-cascader-popup')).not.toBeVisible();await expect(trigger).toBeFocused();await expect(trigger).toContainText('Engineering / Backend / .NET');await page.getByRole('button',{name:'Read path value',exact:true}).click();await expect(page.getByLabel('Submitted path',{exact:true})).toHaveText('["engineering","backend","dotnet"]');await expectContained(page);
+});
+
+test('calendar view height, keyboard dates and retry preserve context under normal motion',async({page},info)=>{
+  // Isolate the view transition from the workspace's separate range-loading
+  // transition, which legitimately retargets height when the response arrives.
+  await openQualityPage(page,'/components/event-calendar',info);
+  const calendar=page.getByRole('region',{name:'Team calendar',exact:true}),stage=calendar.locator('.bui-event-calendar-stage');
+  await expect(calendar.getByRole('button',{name:'View Interface review',exact:true})).toBeVisible();
+  await expect.poll(()=>stage.evaluate(element=>parseFloat((element as HTMLElement).style.height)||0)).toBeGreaterThan(0);
+  await stage.evaluate(element=>{
+    const observer=new MutationObserver(()=>{
+      element.getBoundingClientRect();
+      const animation=element.getAnimations().find(item=>(item as CSSTransition).transitionProperty==='height');if(!animation)return;
+      animation.pause();animation.currentTime=Number(animation.effect!.getTiming().duration)*.2;
+      (window as Window&{calendarHeightMotion?:Animation}).calendarHeightMotion=animation;observer.disconnect();
+    });observer.observe(element,{attributes:true,attributeFilter:['style']});
+  });
+  const week=calendar.getByRole('button',{name:'Week',exact:true});await week.focus();await page.keyboard.press('Enter');
+  await expect.poll(()=>page.evaluate(()=>!!(window as Window&{calendarHeightMotion?:Animation}).calendarHeightMotion)).toBe(true);
+  await page.screenshot({animations:'allow'});const early=(await stage.boundingBox())!.height;
+  await page.evaluate(()=>{const animation=(window as Window&{calendarHeightMotion?:Animation}).calendarHeightMotion!;animation.currentTime=Number(animation.effect!.getTiming().duration)*.8;});
+  await page.screenshot({animations:'allow'});expect((await stage.boundingBox())!.height).toBeLessThan(early-5);
+  await page.evaluate(()=>{const host=window as Window&{calendarHeightMotion?:Animation};host.calendarHeightMotion!.play();delete host.calendarHeightMotion;});
+  await expect(calendar.locator('[data-calendar-date]')).toHaveCount(7);await expect(week).toBeFocused();await expectContained(page);
+  await openQualityPage(page,'/blocks/calendar-workspace',info);
+  const sample=page.getByRole('region',{name:'Workspace calendar',exact:true}),workspaceStage=sample.locator('.bui-event-calendar-stage');
+  const date=(value:string)=>sample.locator('[data-calendar-date="'+value+'"]');
+  await expect(sample.getByRole('button',{name:'View Interface review',exact:true})).toBeVisible();
+  await sample.getByRole('button',{name:'Week',exact:true}).focus();await page.keyboard.press('Enter');await expect(sample.locator('[data-calendar-date]')).toHaveCount(7);await expect(sample.getByRole('button',{name:'View Interface review',exact:true})).toBeVisible();
+  await date('2026-11-02').focus();await page.keyboard.press('ArrowRight');await expect(date('2026-11-03')).toBeFocused();await page.keyboard.press('Enter');await expect(date('2026-11-03')).toHaveAttribute('aria-pressed','true');
+  await page.keyboard.press('PageDown');await expect(date('2026-11-10')).toBeFocused();const action=sample.getByRole('button',{name:'View Documentation review',exact:true});await expect(action).toBeVisible();await action.focus();await page.keyboard.press('Enter');
+  const dialog=page.getByRole('dialog',{name:'Calendar event details',exact:true});await expect(dialog.locator('time').first()).toHaveAttribute('datetime','2026-11-09T22:00:00.000Z');await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();await expect(action).toBeFocused();
+  await page.getByRole('checkbox',{name:'Fail next calendar load',exact:true}).check();await page.getByRole('button',{name:'Reload events',exact:true}).click();const retry=sample.getByRole('button',{name:'Retry loading events',exact:true});await expect(retry).toBeVisible();await retry.focus();await page.keyboard.press('Enter');await expect(action).toBeVisible();await expect(date('2026-11-10')).toBeFocused();
+  await page.emulateMedia({reducedMotion:'reduce'});const month=sample.getByRole('button',{name:'Month',exact:true});await month.focus();await page.keyboard.press('Enter');await expect(sample.locator('[data-calendar-date]')).toHaveCount(42);await expect(month).toBeFocused();expect(await workspaceStage.evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');expect(await sample.locator('.bui-event-calendar-grid').evaluate(element=>getComputedStyle(element).animationName)).toBe('none');await expectContained(page);
+});
+
+test('upload insertion, failed acknowledgement and keyboard retry preserve context under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/examples/upload-http',info);
+  const queue=page.getByRole('group',{name:'Files to receive',exact:true}),list=queue.locator('.bui-upload-queue-list');
+  await list.evaluate(element=>{
+    const observer=new MutationObserver(()=>{const row=element.querySelector('[data-upload-id]'),animation=row?.getAnimations().find(item=>(item as CSSAnimation).animationName==='bui-upload-row-in');if(!animation)return;animation.pause();animation.currentTime=Number(animation.effect!.getTiming().duration)*.2;(window as Window&{uploadRowMotion?:Animation}).uploadRowMotion=animation;observer.disconnect();});observer.observe(element,{childList:true});
+  });
+  await page.getByLabel('Files to receive files',{exact:true}).setInputFiles({name:'motion-review.txt',mimeType:'text/plain',buffer:Buffer.from('Useful material')});
+  const row=queue.locator('[data-upload-id]');await expect(row).toHaveAttribute('data-upload-status','queued');await expect.poll(()=>page.evaluate(()=>!!(window as Window&{uploadRowMotion?:Animation}).uploadRowMotion)).toBe(true);
+  await page.screenshot({animations:'allow'});const early=await row.evaluate(element=>Number(getComputedStyle(element).opacity));expect(early).toBeGreaterThan(0);expect(early).toBeLessThan(1);
+  await page.evaluate(()=>{const animation=(window as Window&{uploadRowMotion?:Animation}).uploadRowMotion!;animation.currentTime=Number(animation.effect!.getTiming().duration)*.8;});await page.screenshot({animations:'allow'});expect(await row.evaluate(element=>Number(getComputedStyle(element).opacity))).toBeGreaterThan(early);
+  await page.evaluate(()=>{const host=window as Window&{uploadRowMotion?:Animation};host.uploadRowMotion!.play();delete host.uploadRowMotion;});
+  const fail=page.getByRole('checkbox',{name:'Fail next upload',exact:true});await fail.focus();await page.keyboard.press('Space');const start=queue.getByRole('button',{name:'Start queued',exact:true});await start.focus();await page.keyboard.press('Enter');
+  await expect(row).toHaveAttribute('data-upload-status','error');const retry=queue.getByRole('button',{name:'Retry motion-review.txt',exact:true});await expect(retry).toBeFocused();await page.keyboard.press('Enter');await expect(row).toHaveAttribute('data-upload-status','complete');
+  const remove=queue.getByRole('button',{name:'Remove motion-review.txt',exact:true});await expect(remove).toBeFocused();await page.emulateMedia({reducedMotion:'reduce'});await page.keyboard.press('Enter');await expect(queue.getByRole('button',{name:'Browse files',exact:true})).toBeFocused();expect(await queue.locator('.bui-upload-queue-stage').evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');
+  await page.getByLabel('Files to receive files',{exact:true}).setInputFiles({name:'reduced-review.txt',mimeType:'text/plain',buffer:Buffer.from('More useful material')});expect(await queue.locator('[data-upload-id]').evaluate(element=>getComputedStyle(element).animationName)).toBe('none');await expectContained(page);
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { ArrowUp, ChevronRight, File, FileCode2, FileImage, FileText, Folder, FolderOpen, Layers, RefreshCw } from 'lucide-react';
 import { Alert, Badge, Button, EmptyState, Field, Icon, Input, Select, Skeleton, Tree, useReducedMotionPreference, type TreeNode } from '@bld8/ui';
 import { collectFileBrowserIds, findFileBrowserPath, formatFileBrowserSize, mergeFileBrowserChildren, sortFileBrowserEntries, validateFileBrowserEntries, type FileBrowserEntry, type FileBrowserSort } from './file-browser-state.js';
@@ -226,9 +226,10 @@ export function FileBrowser({ entries = fileBrowserSample, loadChildren, loading
         </div>
         <div className="bblocks-files-footer"><span>{entries === fileBrowserSample ? 'Illustrative metadata. File contents are not stored or opened.' : 'File contents and storage are managed by your application.'}</span>{!blocked && !busy && !unloaded && <span>{contents.filter(entry => entry.kind === 'folder').length} {contents.filter(entry => entry.kind === 'folder').length === 1 ? 'folder' : 'folders'} · {contents.filter(entry => entry.kind === 'file').length} {contents.filter(entry => entry.kind === 'file').length === 1 ? 'file' : 'files'}</span>}</div>
       </div>
-      <section className="bblocks-files-inspector" aria-label="File details"><div className="bblocks-files-inspector-heading"><span>Details</span><Badge>Metadata</Badge></div><AnimatePresence initial={false} mode="wait"><motion.div key={detail?.id ?? 'none'} className="bblocks-files-detail" initial={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: reduced ? 0 : -3 }} transition={{ duration: reduced ? 0 : .18, ease: easing }}>
+      {/* Selection data must not wait for an offscreen or interrupted exit animation. */}
+      <section className="bblocks-files-inspector" aria-label="File details"><div className="bblocks-files-inspector-heading"><span>Details</span><Badge>Metadata</Badge></div><motion.div key={detail?.id ?? 'none'} className="bblocks-files-detail" initial={mounted.current ? { opacity: reduced ? 1 : 0, y: reduced ? 0 : 5 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduced ? 0 : .18, ease: easing }}>
         {detail && !blocked ? <><div className="bblocks-files-detail-icon" aria-hidden="true"><Icon icon={entryIcon(detail, true)} size={28} /></div><h3>{detail.label}</h3><p className="bblocks-files-detail-copy">{detail.description ?? (detail.kind === 'folder' ? 'A folder in this workspace.' : 'Select another file to compare its details.')}</p><dl><div><dt>Type</dt><dd>{entryType(detail)}</dd></div>{detail.kind === 'file' && <div><dt>Size</dt><dd>{formatFileBrowserSize(detail.size)}</dd></div>}<div><dt>Updated</dt><dd>{detail.modified ?? 'Not provided'}</dd></div><div className="bblocks-files-detail-location"><dt>Location</dt><dd>{detailsPath.slice(0, -1).map(entry => entry.label).join(' / ') || 'Files'}</dd></div></dl><p className="bblocks-files-detail-note">Details describe the file. This example does not open its contents.</p></> : <><div className="bblocks-files-detail-icon" aria-hidden="true"><Icon icon={FolderOpen} size={28} /></div><h3>Keep the context.</h3><p className="bblocks-files-detail-copy">Select a file or folder to see its metadata here.</p></>}
-      </motion.div></AnimatePresence></section>
+      </motion.div></section>
     </div>
   </section>;
 }

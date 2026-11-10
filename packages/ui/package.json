@@ -16,11 +16,26 @@
     "DND_KIT_LICENSE"
   ],
   "exports": {
-    "./core": {"types":"./dist/core.d.ts","import":"./dist/core.js"},
-    "./kanban": {"types":"./dist/kanban.d.ts","import":"./dist/kanban.js"},
-    "./tree": {"types":"./dist/tree.d.ts","import":"./dist/tree.js"},
-    "./chart": {"types":"./dist/chart.d.ts","import":"./dist/chart.js"},
-    "./reveal": {"types":"./dist/reveal.d.ts","import":"./dist/reveal.js"},
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
+    },
+    "./kanban": {
+      "types": "./dist/kanban.d.ts",
+      "import": "./dist/kanban.js"
+    },
+    "./tree": {
+      "types": "./dist/tree.d.ts",
+      "import": "./dist/tree.js"
+    },
+    "./chart": {
+      "types": "./dist/chart.d.ts",
+      "import": "./dist/chart.js"
+    },
+    "./reveal": {
+      "types": "./dist/reveal.d.ts",
+      "import": "./dist/reveal.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
@@ -58,6 +73,74 @@
     "./schedule-state": {
       "types": "./dist/schedule-state.d.ts",
       "import": "./dist/schedule-state.js"
+    },
+    "./table-view-state": {
+      "types": "./dist/table-view-state.d.ts",
+      "import": "./dist/table-view-state.js"
+    },
+    "./sortable-data-table": {
+      "types": "./dist/sortable-data-table.d.ts",
+      "import": "./dist/sortable-data-table.js"
+    },
+    "./async-options": {
+      "types": "./dist/async-options.d.ts",
+      "import": "./dist/async-options.js"
+    },
+    "./use-async-options": {
+      "types": "./dist/use-async-options.d.ts",
+      "import": "./dist/use-async-options.js"
+    },
+    "./async-combobox": {
+      "types": "./dist/async-combobox.d.ts",
+      "import": "./dist/async-combobox.js"
+    },
+    "./async-multi-select": {
+      "types": "./dist/async-multi-select.d.ts",
+      "import": "./dist/async-multi-select.js"
+    },
+    "./cascader-state": {
+      "types": "./dist/cascader-state.d.ts",
+      "import": "./dist/cascader-state.js"
+    },
+    "./cascader": {
+      "types": "./dist/cascader.d.ts",
+      "import": "./dist/cascader.js"
+    },
+    "./calendar-state": {
+      "types": "./dist/calendar-state.d.ts",
+      "import": "./dist/calendar-state.js"
+    },
+    "./event-calendar": {
+      "types": "./dist/event-calendar.d.ts",
+      "import": "./dist/event-calendar.js"
+    },
+    "./upload-state": {
+      "types": "./dist/upload-state.d.ts",
+      "import": "./dist/upload-state.js"
+    },
+    "./upload-http": {
+      "types": "./dist/upload-http.d.ts",
+      "import": "./dist/upload-http.js"
+    },
+    "./upload-queue": {
+      "types": "./dist/upload-queue.d.ts",
+      "import": "./dist/upload-queue.js"
+    },
+    "./data-workspace-state": {
+      "types": "./dist/data-workspace-state.d.ts",
+      "import": "./dist/data-workspace-state.js"
+    },
+    "./data-grid-state": {
+      "types": "./dist/data-grid-state.d.ts",
+      "import": "./dist/data-grid-state.js"
+    },
+    "./data-grid": {
+      "types": "./dist/data-grid.d.ts",
+      "import": "./dist/data-grid.js"
+    },
+    "./table-query": {
+      "types": "./dist/table-query.d.ts",
+      "import": "./dist/table-query.js"
     }
   },
   "sideEffects": [

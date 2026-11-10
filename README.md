@@ -4,6 +4,8 @@ React components, reusable blocks and complete interface examples. Built with Ba
 
 [React, Vite & Next.js guide](https://ui.bld8.dev/frameworks) · [Community](https://ui.bld8.dev/community) · [Showcase](https://ui.bld8.dev) · [Registry](https://ui.bld8.dev/registry) · [Playground](https://ui.bld8.dev/playground) · [Outline](https://ui.bld8.dev/templates/outline)
 
+[Developer and coding-agent guide](docs/agents.md) · [Documentation index](https://ui.bld8.dev/llms.txt) · [Structured catalogue](https://ui.bld8.dev/agent/catalog.json)
+
 ## Install source
 
 In a React 19 application with shadcn initialised:
@@ -44,6 +46,7 @@ Open http://127.0.0.1:3120. UI source, blocks and styles rebuild on save.
 npm run build
 npm run typecheck
 npm run check:starter:vite
+npm run check:starter:uploads
 npm run check:registry:consumers
 npm run check:starters:themes
 npm test
@@ -53,18 +56,23 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 53 component guidance entries, sixteen blocks and three templates.
+- 59 component guidance entries, eighteen blocks and three templates.
 - 1,877 canonical Lucide icons with consistent defaults and downloadable licensed SVGs.
 - A 21-control playground with native choices, disclosures, overlays, dates, boards, trees, charts and table/filter workflows. Share validated configurations, try keyboard interactions and copy or download matching client-component code. See [playground guidance](docs/playground.md).
-- A shadcn-compatible registry, source manifests and 40 runnable ZIP starters: 21 Next.js and 19 React + Vite.
+- A shadcn-compatible registry, source manifests and 47 runnable ZIP starters: 25 Next.js and 22 React + Vite.
+- An optional DataGrid and complete Data Workspace: typed batch review, atomic saves, conflict recovery and durable local HTTP references. Read [the workflow contract](docs/data-workspace.md).
 - Light/dark tokens, smooth shared easing, keyboard focus and reduced-motion behaviour.
 - A theme lab with three presets, real block/template previews, contrast checks, shareable URLs and portable CSS export. Choose a starter and download a themed Next.js or Vite project with its selected fonts and configuration. See [theme setup](docs/theme-lab.md).
 - Form state with async validation, field/service errors, dirty state, abortable submission and stale-result protection.
 - Tables with local or externally controlled queries, selection across pages, facets, visible columns, resizing, pinned columns and CSV export. Grouped pages and a separate bounded scrolling table share column APIs; a 10,000-record issue workspace demonstrates external detail drafts. See [large tables](docs/large-tables.md).
+- Optional SortableDataTable adds pointer/touch ordering, with keyboard positions and host-owned row saves. Ordinary tables keep drag dependencies out. [Ordering and saved layouts](docs/table-views.md) explain the contract.
 - A reusable Kanban control and task workspace with Board/Backlog views, pointer/touch sorting, keyboard moves, column limits, rollback, retry and an abortable save callback.
 - Bounded line/bar/area charts with keyboard exploration, missing-value gaps and exact data tables, composed in an analytics dashboard with abortable reports and CSV export. See [charts and analytics](docs/charts-and-analytics.md).
 - A keyboard-friendly Tree and file-browser block with folder navigation, metadata inspection, abortable lazy loading and recoverable failures. See [the service contract](docs/file-browser.md).
 - A day agenda and schedule planner with supplied UTC availability, explicit offsets, revision-checked booking callbacks and recoverable drafts. See [scheduling](docs/scheduling.md).
+- A week/month event calendar and abortable calendar workspace with overlap, multi-day events, explicit time zones and responsive day agendas. See [calendar workflows](docs/calendar-workflows.md).
+- Nested all/any/not filters preserve earlier flat links. Async Combobox/MultiSelect and Cascader add bounded remote search, retained labels, paging and keyboard recovery. See [nested filters](docs/nested-filters.md), [remote choices](docs/async-selection.md) and [hierarchical selection](docs/cascader.md).
+- A per-file upload queue and raw HTTP adapter with actual byte progress, cancellation, stable retry IDs and server acknowledgements. The Next.js HTTP starter receives, hashes and discards bytes. See [upload workflows](docs/upload-workflows.md).
 - Stepper, locale-aware numeric entry and a time picker, combined in a validated session setup with tab drafts and recoverable saves.
 
 Outline is the complete local reference application. It saves projects, resource metadata and preferences in browser storage. Project workflows cover creation, a detail drawer with tab-local draft recovery, conflict review, inline editing, filtering, sorting, paging, bulk changes with guarded undo, plain-text comments, activity history, deletion and duplicate validation. See [project details](docs/outline-details.md). The HTTP adapter and runnable sample API demonstrate the same flows over a service connection. Production authentication, database persistence and file storage belong to the host application. Other templates use in-memory sample data.
@@ -79,6 +87,8 @@ Outline is the complete local reference application. It saves projects, resource
 - `scripts/prepare-library.mjs`: source views and allowlisted ZIP starters.
 - `scripts/prepare-registry.mjs`: real registry items and dependency graph.
 - `scripts/prepare-api.mjs`: complete prop tables derived from the public TypeScript APIs.
+- `scripts/prepare-agent-docs.mjs`: public Markdown and a structured component/block/template catalogue, generated from the same metadata and TypeScript exports.
+- `packages/mcp`: optional read-only local MCP discovery over the generated public catalogue.
 - `tests`: browser behaviour, responsive layout, workflow and automated accessibility checks.
 
 ## Styling and ownership

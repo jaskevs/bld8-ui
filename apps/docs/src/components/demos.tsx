@@ -1,4 +1,9 @@
 'use client';
+import {DataGridDemo} from './data-workspace-demo';
+import {UploadHttpDemo} from './upload-http-demo';
+import {EventCalendarDemo} from './calendar-demos';
+import {CascaderDemo} from './cascader-demo';
+import {PeopleDirectoryDemo} from './async-selection-demo';
 import {DayAgendaDemo} from './schedule-demos';
 import {WindowedTableDemo} from './windowed-table-demo';
 import {TreeDemo} from './tree-demo';
@@ -40,6 +45,12 @@ export const projectColumns: Column<ProjectRow>[] = [
 export function ComponentDemo({ id }: { id: string }) {
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch(id) {
+    case 'data-grid': return <DataGridDemo/>;
+    case 'upload-queue': return <UploadHttpDemo />;
+    case 'event-calendar': return <EventCalendarDemo />;
+    case 'cascader': return <CascaderDemo />;
+    case 'async-combobox': return <PeopleDirectoryDemo multiple={false}/>;
+    case 'async-multi-select': return <PeopleDirectoryDemo multiple/>;
     case 'chart': return <ChartDemo/>;
     case 'tree': return <TreeDemo/>;
     case 'number-field': return <NumberFieldDemo/>;

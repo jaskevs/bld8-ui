@@ -33,7 +33,7 @@ boundary. The independent Vite consumer verifies a custom ~/ui alias. The actual
 CLI installation and build procedure is in registry-consumer-checks.md and is
 part of the prepared release workflow.
 
-The current build contains 152 registry items, including shared dependencies
+The current build contains 160 registry items, including shared dependencies
 and the pure theme-config helper. See deployment.md for recorded publication
 evidence; build counts alone do not prove that a revision is live.
 Component guidance counts and item counts describe different things; see scope.md

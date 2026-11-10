@@ -5,6 +5,32 @@
 Development manifests now use the next planning version. Retained 0.2.0 assets
 and their dependencies stay unchanged. This does not publish another version.
 
+### Added
+
+- Table layouts and optional pointer/touch ordering, with portable saved views.
+- Bounded nested filters, preserving legacy queries in the client and HTTP adapter.
+- Async Combobox/MultiSelect and Cascader with remote search, paging and recovery.
+- Week/month calendars, overlapping multi-day UTC events and abortable range loading.
+- Per-file upload queues, real XHR progress and temporary HTTP acknowledgements,
+  with a runnable Next.js receiver example.
+- Shared developer/agent API documentation and optional local read-only MCP discovery.
+- Optional DataGrid with typed cell editors, rectangular selection, bounded
+  clipboard edits and local draft history.
+- Data Workspace with atomic batch review/save, conflict recovery and persistent
+  Next.js/Vite HTTP reference applications.
+- Searchable grid choice menus and quick filtering with editable condition chips,
+  shared range validation and preserved advanced groups.
+
+### Changed
+
+- File inspector metadata follows the latest selection through interrupted animations.
+- Grid selection and inline editing share one cell boundary, with stable row
+  geometry, touch tap/pan handling and smooth, reduced-motion-aware menus.
+- Related union types remain type declarations in the website, Markdown and MCP
+  documentation rather than exposing inherited JavaScript primitive methods.
+- Current app and newly generated Next.js starters use 16.4.6. Retained release
+  archives remain unchanged; applications consuming them own their dependency updates.
+
 ## 0.2.0 — Source release
 
 Publication is identified by the immutable v0.2.0 GitHub release and its source

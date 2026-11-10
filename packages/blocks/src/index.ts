@@ -29,3 +29,8 @@ export * from './analytics-state.js';
 export * from './large-issue-table.js';
 
 export * from './schedule-planner.js';
+
+export * from './calendar-workspace.js';
+
+export * from './issue-data-source.js';
+export * from './data-workspace.js';

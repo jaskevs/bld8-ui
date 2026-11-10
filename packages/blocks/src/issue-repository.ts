@@ -1,7 +1,8 @@
-import {emptyFilterQuery,filterRecords,isFilterDate,parseFilterQuery,serializeFilterQuery,filterQueryKey,type FilterField,type FilterQuery,type FilterValue} from '@bld8/ui/filter-query';
+import {createTableViewState,normalizeTableViewState,parseTableViewState,type TableViewState} from '@bld8/ui/table-view-state';
+import {emptyFilterQuery,filterRecords,isFilterDate,parseFilterQuery,serializeFilterQuery,filterQueryKey,type FilterField,type AnyFilterQuery,type FilterValue} from '@bld8/ui/filter-query';
 
 export interface Issue { id:string; title:string; status:'backlog'|'in-progress'|'review'|'done'; priority:'low'|'medium'|'high'|'urgent'; assignee:string; estimate:number; due:string; revision:number }
-export interface IssueView { filters:FilterQuery; search:string; sort:{key:string;descending:boolean}|null; columns:string[]; density:'comfortable'|'compact'; pageSize:number }
+export interface IssueView { filters:AnyFilterQuery; search:string; sort:{key:string;descending:boolean}|null; sorts?:{key:string;descending:boolean}[]; columns:string[]; density:'comfortable'|'compact'; pageSize:number; layout?:Pick<TableViewState,'version'|'columnOrderKeys'|'columnWidths'|'columnPinning'> }
 export interface SavedIssueView { id:string; name:string; view:IssueView }
 export interface IssueListQuery { view:IssueView; page:number }
 export interface IssueChange { id:string; expectedRevision:number; patch:Partial<Pick<Issue,'title'|'status'>> }
@@ -12,14 +13,32 @@ export const issuePeople=[{value:'maya',label:'Maya Chen'},{value:'oliver',label
 export const issueFields:readonly FilterField[]=[{id:'title',label:'Title',kind:'text'},{id:'status',label:'Status',kind:'select',options:issueStatuses},{id:'priority',label:'Priority',kind:'select',options:issuePriorities},{id:'assignee',label:'Assignee',kind:'select',options:issuePeople},{id:'estimate',label:'Estimate',kind:'number'},{id:'due',label:'Due date',kind:'date'}];
 export const issueColumnKeys=['id','title','status','priority','assignee','estimate','due'];
 export const defaultIssueView=():IssueView=>({filters:emptyFilterQuery(),search:'',sort:null,columns:[...issueColumnKeys],density:'comfortable',pageSize:5});
-export function issueViewKey(view:IssueView){return JSON.stringify({...view,columns:issueColumnKeys.filter(key=>view.columns.includes(key)),filters:filterQueryKey(view.filters)});}
+const issueTableOptions={columns:issueColumnKeys.map(key=>({key,hideable:key!=='title',minWidth:({id:100,title:220,status:140,priority:112,assignee:150,estimate:100,due:136} as Record<string,number>)[key]})),pageSizes:[5,10,20]};
+export function issueTableView(view:IssueView):TableViewState {
+  return normalizeTableViewState({...createTableViewState(issueTableOptions),...view.layout,query:{search:view.search,filters:{},sort:view.sort,...(view.sorts?{sorts:view.sorts}:{}),pageSize:view.pageSize},visibleColumnKeys:view.columns,density:view.density},issueTableOptions);
+}
+export function withIssueTableView(view:IssueView,patch:Partial<Pick<TableViewState,'columnOrderKeys'|'columnWidths'|'columnPinning'>>):IssueView {
+  const table=normalizeTableViewState({...issueTableView(view),...patch},issueTableOptions);
+  const layout={version:1 as const,columnOrderKeys:table.columnOrderKeys,columnWidths:table.columnWidths,columnPinning:table.columnPinning};
+  const isDefault=JSON.stringify(layout)===JSON.stringify({version:1,columnOrderKeys:issueColumnKeys,columnWidths:{},columnPinning:{}});
+  const {layout:previous,...rest}=view;return isDefault?rest:{...rest,layout};
+}
+export function issueViewKey(view:IssueView){const canonical=withIssueTableView(view,{});const {sorts:criteria,...rest}=canonical;const sorts=criteria??(canonical.sort?[canonical.sort]:[]);return JSON.stringify({...rest,sort:sorts[0]??null,...(sorts.length>1?{sorts}:{}),columns:issueColumnKeys.filter(key=>view.columns.includes(key)),filters:filterQueryKey(view.filters)});}
 export function parseIssueView(text:string):IssueView|null {
   try{
     if(text.length>20000)return null;const value=JSON.parse(text);if(!value||typeof value!=='object'||typeof value.search!=='string'||value.search.length>200||!['comfortable','compact'].includes(value.density)||![5,10,20].includes(value.pageSize))return null;
-    const filters=parseFilterQuery(JSON.stringify(value.filters),issueFields).query;if(!filters)return null;
+    const filters=parseFilterQuery(JSON.stringify(value.filters),issueFields,{allowNested:true}).query;if(!filters)return null;
     if(!Array.isArray(value.columns)||!value.columns.includes('title')||value.columns.length>issueColumnKeys.length||new Set(value.columns).size!==value.columns.length||value.columns.some((key:unknown)=>typeof key!=='string'||!issueColumnKeys.includes(key)))return null;
     if(value.sort!==null&&(!value.sort||!issueColumnKeys.includes(value.sort.key)||typeof value.sort.descending!=='boolean'))return null;
-    return {filters,search:value.search,sort:value.sort?{key:value.sort.key,descending:value.sort.descending}:null,columns:issueColumnKeys.filter(key=>value.columns.includes(key)),density:value.density,pageSize:value.pageSize};
+    if(value.sorts!==undefined&&(!Array.isArray(value.sorts)||value.sorts.length>5||Array.from(value.sorts).some((item:any)=>!item||!issueColumnKeys.includes(item.key)||typeof item.descending!=='boolean')||new Set(value.sorts.map((item:any)=>item.key)).size!==value.sorts.length))return null;
+    const view:IssueView={filters,search:value.search,sort:value.sorts?.[0]??(value.sorts?null:value.sort?{key:value.sort.key,descending:value.sort.descending}:null),...(value.sorts?{sorts:value.sorts.map((item:any)=>({key:item.key,descending:item.descending}))}:{}),columns:issueColumnKeys.filter(key=>value.columns.includes(key)),density:value.density,pageSize:value.pageSize};
+    if(value.layout!==undefined){
+      if(!value.layout||typeof value.layout!=='object'||Array.isArray(value.layout))return null;
+      const parsed=parseTableViewState(JSON.stringify({...createTableViewState(issueTableOptions),version:value.layout.version,columnOrderKeys:value.layout.columnOrderKeys,columnWidths:value.layout.columnWidths,columnPinning:value.layout.columnPinning,query:{search:view.search,filters:{},sort:view.sort,...(view.sorts?{sorts:view.sorts}:{}),pageSize:view.pageSize},visibleColumnKeys:view.columns,density:view.density}),issueTableOptions);
+      if(!parsed)return null;
+      return withIssueTableView(view,{columnOrderKeys:parsed.columnOrderKeys,columnWidths:parsed.columnWidths,columnPinning:parsed.columnPinning});
+    }
+    return view;
   }catch{return null;}
 }
 export function serializeIssueView(view:IssueView){serializeFilterQuery(view.filters,issueFields);const parsed=parseIssueView(JSON.stringify(view));if(!parsed)throw new Error('This view configuration is invalid.');return JSON.stringify(parsed);}
@@ -39,7 +58,7 @@ export function createMemoryIssueRepository(initial:readonly Issue[]=issueSeed):
   return {
     async list(query,signal){abort(signal);const view=parseIssueView(JSON.stringify(query.view));if(!view||!Number.isInteger(query.page)||query.page<1)throw new Error('Invalid issue query.');
       let filtered=filterRecords(records,view.filters,issueFields,(row,field)=>row[field as keyof Issue] as FilterValue).filter(row=>(row.id+' '+row.title).toLowerCase().includes(view.search.toLowerCase()));
-      if(view.sort){const {key,descending}=view.sort;filtered.sort((a,b)=>{const av=a[key as keyof Issue],bv=b[key as keyof Issue];return (typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv),undefined,{numeric:true}))*(descending?-1:1);});}
+      const sorts=view.sorts??(view.sort?[view.sort]:[]);filtered.sort((a,b)=>{for(const {key,descending} of sorts){const av=a[key as keyof Issue],bv=b[key as keyof Issue];const order=(typeof av==='number'&&typeof bv==='number'?av-bv:String(av).localeCompare(String(bv),undefined,{numeric:true}))*(descending?-1:1);if(order)return order;}return sorts.length?a.id.localeCompare(b.id,undefined,{numeric:true}):0;});
       const total=filtered.length,start=(query.page-1)*view.pageSize;return {rows:filtered.slice(start,start+view.pageSize).map(clone),total};},
     async create(draft,signal){abort(signal);if(draft.title.trim().length<3||draft.title.length>120)throw new Error('Use a title between 3 and 120 characters.');if(!issuePriorities.some(item=>item.value===draft.priority)||!issuePeople.some(item=>item.value===draft.assignee))throw new Error('Choose a supported priority and assignee.');const row:Issue={...draft,title:draft.title.trim(),id:'ISS-'+next++,status:'backlog',estimate:0,due:'',revision:1};records=[row,...records];return clone(row);},
     async update(changes,signal){abort(signal);if(!changes.length||changes.length>100||new Set(changes.map(change=>change.id)).size!==changes.length)throw new Error('Choose up to 100 distinct issues.');

@@ -15,8 +15,9 @@ function DialogFrame({ trigger, title, description, children, sheet, initialFocu
 export function Dialog(props: DialogProps) { return <DialogFrame {...props} />; }
 export function Sheet(props: DialogProps) { return <DialogFrame {...props} sheet />; }
 export function DialogClose({ children = 'Cancel' }: { children?: ReactNode }) { return <PrimitiveDialog.Close render={<Button variant="secondary">{children}</Button>} />; }
-export function Popover({ trigger, title, children }: { trigger: ReactElement; title: string; children: ReactNode }) {
-  return <PrimitivePopover.Root><PrimitivePopover.Trigger render={trigger} /><PrimitivePopover.Portal><PrimitivePopover.Positioner className="bui-positioner" sideOffset={8}><PrimitivePopover.Popup className="bui-popup bui-popover"><PrimitivePopover.Title className="bui-label">{title}</PrimitivePopover.Title><div>{children}</div></PrimitivePopover.Popup></PrimitivePopover.Positioner></PrimitivePopover.Portal></PrimitivePopover.Root>;
+export interface PopoverProps {trigger:ReactElement;title:string;children:ReactNode;open?:boolean;onOpenChange?:(open:boolean)=>void;onOpenChangeComplete?:(open:boolean)=>void}
+export function Popover({ trigger, title, children, ...props }: PopoverProps) {
+  return <PrimitivePopover.Root {...props}><PrimitivePopover.Trigger render={trigger} /><PrimitivePopover.Portal><PrimitivePopover.Positioner className="bui-positioner" sideOffset={8} disableAnchorTracking={props.open===false}><PrimitivePopover.Popup className="bui-popup bui-popover"><PrimitivePopover.Title className="bui-label">{title}</PrimitivePopover.Title><div>{children}</div></PrimitivePopover.Popup></PrimitivePopover.Positioner></PrimitivePopover.Portal></PrimitivePopover.Root>;
 }
 export function Tooltip({ content, children }: { content: string; children: ReactElement }) {
   const id = useId(); const [open, setOpen] = useState(false); return <PrimitiveTooltip.Root open={open} onOpenChange={setOpen}><PrimitiveTooltip.Trigger render={children} delay={350} aria-describedby={open ? id : undefined} /><PrimitiveTooltip.Portal><PrimitiveTooltip.Positioner className="bui-positioner" sideOffset={8}><PrimitiveTooltip.Popup className="bui-tooltip" id={id} role="tooltip">{content}</PrimitiveTooltip.Popup></PrimitiveTooltip.Positioner></PrimitiveTooltip.Portal></PrimitiveTooltip.Root>;

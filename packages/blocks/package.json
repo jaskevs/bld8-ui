@@ -35,6 +35,10 @@
     "./analytics-state": {
       "import": "./dist/analytics-state.js",
       "types": "./dist/analytics-state.d.ts"
+    },
+    "./issue-data-source": {
+      "types": "./dist/issue-data-source.d.ts",
+      "import": "./dist/issue-data-source.js"
     }
   },
   "sideEffects": [

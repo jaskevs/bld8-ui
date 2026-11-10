@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,lstatSync,symlinkSync,unlinkSync} from 'node:fs';
+import {readFileSync,readdirSync,writeFileSync,mkdirSync,mkdtempSync,rmSync,lstatSync,symlinkSync,unlinkSync} from 'node:fs';
 import {resolve,join,sep,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
@@ -67,10 +67,10 @@ test('source reads reject a directory link that escapes the configured UI root',
 });
 
 test('the actual candidate pins every dependency and refuses altered existing output',()=>{
-  const {manifest,destination}=prepareSourceRelease({bundle:true});expect(manifest.status).toBe('unreleased');expect(manifest.items).toHaveLength(152);
+  const {manifest,destination}=prepareSourceRelease({bundle:true});expect(manifest.status).toBe('unreleased');const registry=JSON.parse(readFileSync(join(root,'apps/docs/public/r/registry.json'),'utf8'));expect(manifest.items.map(item=>item.name).sort()).toEqual(registry.items.map((item:{name:string})=>item.name).sort());
   for(const item of manifest.items){const json=JSON.parse(readFileSync(join(destination,'r',item.name+'.json'),'utf8'));for(const url of json.registryDependencies)expect(url).toMatch(new RegExp('^https://ui\\.bld8\\.dev/releases/'+manifest.version.replaceAll('.','\\.')+'/r/[a-z0-9-]+\\.json$'));}
   for(const file of manifest.artifacts)expect(byteHash(readFileSync(join(destination,file.path))),file.path).toBe(file.sha256);
-  expect(manifest.artifacts.filter(file=>file.path.startsWith('downloads/'))).toHaveLength(40);
+  expect(manifest.artifacts.filter(file=>file.path.startsWith('downloads/')).map(file=>file.path).sort()).toEqual(readdirSync(join(root,'apps/docs/public/downloads')).filter(name=>name.endsWith('.zip')).map(name=>'downloads/'+name).sort());
   expect(prepareSourceRelease({bundle:true}).manifest.snapshot).toBe(manifest.snapshot);
   const artifact=join(destination,'r/button.json'),original=readFileSync(artifact);try{writeFileSync(artifact,'altered');expect(()=>prepareSourceRelease({bundle:true})).toThrow('will not be overwritten');expect(readFileSync(artifact,'utf8')).toBe('altered');}finally{writeFileSync(artifact,original);}
   const extra=join(destination,'unexpected.txt');try{writeFileSync(extra,'fixture');expect(()=>prepareSourceRelease({bundle:true})).toThrow('unexpected file');}finally{unlinkSync(extra);}

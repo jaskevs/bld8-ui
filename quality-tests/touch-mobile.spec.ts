@@ -1,6 +1,19 @@
 import {test,expect,openQualityPage,expectContained} from './fixtures';
 import type {Locator} from '@playwright/test';
 
+test('grid touch keeps scrolling available and native editor text selectable',async({page},info)=>{
+  await openQualityPage(page,'/blocks/data-workspace',info);const grid=page.getByRole('grid',{name:'Issue data grid',exact:true}),cell=grid.getByRole('gridcell',{name:'Title for ISS-101',exact:true});
+  await expect(cell).toBeVisible();await cell.tap();await expect(cell).toBeFocused();await expect(grid.locator('[aria-selected=true]')).toHaveCount(1);
+  expect(await cell.evaluate(element=>{const event=new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerType:'touch',pointerId:91,isPrimary:true,button:0});element.dispatchEvent(event);return event.defaultPrevented;})).toBe(false);
+  expect(await cell.evaluate(element=>getComputedStyle(element).touchAction)).toBe('auto');const rowHeight=(await cell.boundingBox())!.height;await cell.press('Enter');const editor=grid.getByRole('textbox',{name:'Title for ISS-101',exact:true});await editor.fill('Native touch editing');await expect(editor).toHaveCSS('user-select','text');await expect(editor).toHaveCSS('outline-style','none');await expect(editor).toHaveCSS('box-shadow','none');expect((await cell.boundingBox())!.height).toBe(rowHeight);expect(await editor.evaluate(element=>parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
+  await editor.press('Control+A');expect(await editor.evaluate(element=>{const input=element as HTMLInputElement;return input.selectionStart===0&&input.selectionEnd===input.value.length;})).toBe(true);await editor.press('Escape');await expect(cell).toBeFocused();await expectContained(page);
+  const assignee=grid.getByRole('gridcell',{name:'Assignee for ISS-101',exact:true});await assignee.scrollIntoViewIfNeeded();await assignee.tap();const choiceHeight=(await assignee.boundingBox())!.height;await assignee.press('Enter');
+  const search=page.getByRole('combobox',{name:'Search Assignee for ISS-101 options',exact:true});await expect(search).toBeFocused();expect(await search.evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);await search.fill('Sam');const option=page.getByRole('option',{name:'Sam Rivera',exact:true});expect((await option.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await option.evaluate(element=>{const box=element.getBoundingClientRect(),base={bubbles:true,cancelable:true,pointerType:'touch',pointerId:97,isPrimary:true,clientX:box.x+box.width/2,clientY:box.y+box.height/2};element.dispatchEvent(new PointerEvent('pointerdown',base));element.dispatchEvent(new PointerEvent('pointermove',{...base,clientY:base.clientY+24}));element.dispatchEvent(new PointerEvent('pointerup',{...base,clientY:base.clientY+24}));});await expect(search).toBeVisible();await expect(grid.locator('[data-dirty]')).toHaveCount(0);
+  await option.tap();await expect(assignee).toBeFocused();await expect(assignee).toContainText('Sam Rivera');expect((await assignee.boundingBox())!.height).toBe(choiceHeight);
+  const priority=grid.getByRole('gridcell',{name:'Priority for ISS-101',exact:true});await priority.scrollIntoViewIfNeeded();await priority.tap();await priority.press('Enter');await page.getByRole('option',{name:'Urgent',exact:true}).tap();await expect(priority).toContainText('Urgent');await expect(priority).toBeFocused();await expect(grid.locator('[data-dirty]')).toHaveCount(2);await expectContained(page);
+});
+
 async function readable(field:Locator) {
   await expect(field).toBeVisible();
   expect(await field.evaluate(element=>parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);

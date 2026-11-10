@@ -18,3 +18,6 @@ apps/docs/public/icon-assets/
 
 apps/docs/public/sources/
 apps/docs/public/releases/
+apps/docs/public/agent/
+apps/docs/public/llms.txt
+apps/docs/public/llms-full.txt

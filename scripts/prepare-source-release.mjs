@@ -37,7 +37,7 @@ export function releaseArtifacts(directory,version,base){
   for(const item of items)artifacts['r/'+item.name+'.json']=Buffer.from(JSON.stringify(item,null,2));
   artifacts['r/registry.json']=Buffer.from(JSON.stringify({...catalogue,items},null,2));
   const entries=[...blocks,...templates];
-  const allowed={downloads:new Set([...entries.flatMap(item=>[item.id+'.zip',item.id+'-vite.zip']),'outline-http.zip','react-hook-form.zip']),sources:new Set(entries.map(item=>item.id+'.json'))};
+  const allowed={downloads:new Set([...entries.flatMap(item=>[item.id+'.zip',item.id+'-vite.zip']),'outline-http.zip','react-hook-form.zip','upload-http.zip','data-workspace-http.zip','data-workspace-http-vite.zip']),sources:new Set(entries.map(item=>item.id+'.json'))};
   for(const folder of ['downloads','sources'])for(const filename of [...allowed[folder]].sort()){
     if(!(folder==='downloads'?/^[a-z0-9-]+\.zip$/:/^[a-z0-9-]+\.json$/).test(filename))throw Error('Unexpected release artifact name.');
     const file=join(directory,folder,filename);if(!lstatSync(file).isFile()||lstatSync(file).isSymbolicLink())throw Error('Release artifacts must be regular files.');

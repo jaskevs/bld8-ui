@@ -1,5 +1,5 @@
 'use client';
-import { useId, type Ref, type FocusEventHandler } from 'react';
+import { useId, useState, type Ref, type FocusEventHandler } from 'react';
 import { Combobox } from '@base-ui/react/combobox';
 import { Icon, type Option } from './core.js';
 import { useControllableValue } from './state.js';
@@ -22,12 +22,13 @@ export interface MultiSelectProps {
 
 export function MultiSelect({ label, options, value, defaultValue = [], onValueChange, placeholder = 'Choose options…', hint, error, inputRef, onBlur, ...props }: MultiSelectProps) {
   const id = useId();
+  const [open,setOpen]=useState(false);
   const [selected, setSelected] = useControllableValue(value, defaultValue, onValueChange);
   const labelFor = (value: string) => options.find(option => option.value === value)?.label ?? value;
   const descriptions = [hint && id + '-hint', error && id + '-error'].filter(Boolean).join(' ') || undefined;
   return <div className="bui-field">
     <label htmlFor={id} className="bui-label">{label}{props.required && <span aria-hidden="true"> *</span>}</label>
-    <Combobox.Root multiple items={options.map(option => option.value)} value={selected} onValueChange={(values,details)=>{if(details.reason==='escape-key'){details.cancel();return;}setSelected(values);}} itemToStringLabel={labelFor} {...props}>
+    <Combobox.Root multiple items={options.map(option => option.value)} value={selected} onValueChange={(values,details)=>{if(details.reason==='escape-key'){details.cancel();return;}setSelected(values);}} itemToStringLabel={labelFor} {...props} open={open} onOpenChange={setOpen}>
       <Combobox.Chips className="bui-multi-input" data-invalid={!!error || undefined}>
         <Combobox.Value>{(values: string[]) => values.map(value => <Combobox.Chip key={value} className="bui-chip">
           <span className="bui-chip-label" title={labelFor(value)}>{labelFor(value)}</span><Combobox.ChipRemove aria-label={'Remove ' + labelFor(value)}><Icon name="close" size={14} /></Combobox.ChipRemove>
@@ -35,7 +36,7 @@ export function MultiSelect({ label, options, value, defaultValue = [], onValueC
         <Combobox.Input ref={inputRef} onBlur={onBlur} id={id} aria-describedby={descriptions} aria-invalid={!!error || undefined} placeholder={selected.length ? 'Add another…' : placeholder} className="bui-chip-input" />
         <Combobox.Trigger className="bui-combobox-trigger" aria-label={'Show ' + label.toLowerCase() + ' options'}><Icon name="chevron" /></Combobox.Trigger>
       </Combobox.Chips>
-      <Combobox.Portal><Combobox.Positioner className="bui-positioner" sideOffset={6}><Combobox.Popup className="bui-popup bui-select-popup">
+      <Combobox.Portal><Combobox.Positioner className="bui-positioner" sideOffset={6} disableAnchorTracking={!open}><Combobox.Popup className="bui-popup bui-select-popup">
         <Combobox.Empty className="bui-combo-empty">No matching options.</Combobox.Empty>
         <Combobox.List>{(value: string) => <Combobox.Item key={value} value={value} disabled={options.find(option => option.value === value)?.disabled} className="bui-option">
           <span className="bui-option-label">{labelFor(value)}</span><Combobox.ItemIndicator><Icon name="check" /></Combobox.ItemIndicator>

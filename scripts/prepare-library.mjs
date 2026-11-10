@@ -7,6 +7,8 @@ import { createStarterPackages } from './starter-packages.mjs';
 import { DEFAULT_THEME, exportThemeCss, serializeThemeConfig } from '../packages/ui/dist/theme-config.js';
 import { blocks, templates } from './library-catalog.mjs';
 import { createViteStarter } from './vite-starter.mjs';
+import { createUploadStarter } from './upload-starter.mjs';
+import {createDataWorkspaceStarters} from './data-workspace-starter.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = name => readFileSync(join(root,name));
@@ -36,7 +38,7 @@ let outlineStarter;
 for(const item of entries) {
   const files={...packageFiles({blocks:[item.file.replace(/\.tsx$/,'')]}),
     'LICENSE':read('LICENSE'),
-    'package.json':JSON.stringify({name:'bld8-' + item.id + '-starter',private:true,scripts:{dev:'next dev',build:'npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/blocks && next build',start:'next start'},workspaces:['packages/*'],dependencies:{'@bld8/ui':'*','@bld8/blocks':'*',next:'16.3.8',react:'19.3.0','react-dom':'19.3.0'},devDependencies:{typescript:'~5.9.3','@types/react':'19.3.0','@types/react-dom':'19.3.0','@types/node':'^22.0.0'}},null,2),
+    'package.json':JSON.stringify({name:'bld8-' + item.id + '-starter',private:true,scripts:{dev:'next dev',build:'npm run build --workspace=@bld8/ui && npm run build --workspace=@bld8/blocks && next build',start:'next start'},workspaces:['packages/*'],dependencies:{'@bld8/ui':'*','@bld8/blocks':'*',next:'16.4.6',react:'19.3.0','react-dom':'19.3.0'},devDependencies:{typescript:'~5.9.3','@types/react':'19.3.0','@types/react-dom':'19.3.0','@types/node':'^22.0.0'}},null,2),
     'app/layout.tsx':`import '@bld8/ui/styles.css';\nimport '@bld8/blocks/styles.css';\nimport './globals.css';\nimport { UIProvider } from '@bld8/ui';\nexport const metadata = { title: ${JSON.stringify(item.name + ' — BLD8 UI')} };\nexport default function Layout({ children }: { children: React.ReactNode }) { return <html lang="en"><body><UIProvider><main>{children}</main></UIProvider></body></html>; }\n`,
     'app/page.tsx':`'use client';\nimport { ${item.exportName} } from '@bld8/blocks';\nexport default function Page() { return <div className="bblocks-root"><${item.exportName} /></div>; }\n`,
     'next.config.ts':'export default { agentRules: false };',
@@ -78,5 +80,12 @@ for(const kind of ['outline-http','react-hook-form']) {
   write(`apps/docs/public/downloads/${kind}.zip`,zip(files));
 }
 
+write('apps/docs/public/downloads/upload-http.zip',zip(createUploadStarter({root,base:outlineStarter,packageFiles})));
+const dataStarters=createDataWorkspaceStarters({root,base:outlineStarter,packageFiles});
+write('apps/docs/public/downloads/data-workspace-http.zip',zip(themed(dataStarters.nextjs,'nextjs')));
+write('apps/docs/public/downloads/data-workspace-http-vite.zip',zip(themed(dataStarters.vite,'vite')));
+
 execFileSync(process.execPath,['scripts/prepare-playground.mjs'],{cwd:root,stdio:'inherit'});
 execFileSync(process.execPath,['scripts/prepare-source-release.mjs'],{cwd:root,stdio:'inherit'});
+
+execFileSync(process.execPath,['scripts/prepare-agent-docs.mjs'],{cwd:root,stdio:'inherit'});
