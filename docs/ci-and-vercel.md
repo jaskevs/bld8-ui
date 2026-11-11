@@ -25,6 +25,11 @@ or approve replacement images. Review a deliberate update in the same pinned
 Linux environment. See [visual quality](visual-quality.md) and
 [clean registry consumers](registry-consumer-checks.md).
 
+The browser-quality job has a 30-minute execution budget. The expanded 398-case
+local pinned run took 18.4 minutes for tests alone; setup, installation and build
+also need room. Per-test limits, retries, screenshot tolerances and the release
+gate remain unchanged.
+
 ## Current connection and gate
 
 The personal Vercel project bld8-ui is linked to jaskevs/bld8-ui with main as its

@@ -1,4 +1,5 @@
 'use client';
+import {CoreControlDemo} from './core-controls-demo';
 import {DataGridDemo} from './data-workspace-demo';
 import {UploadHttpDemo} from './upload-http-demo';
 import {EventCalendarDemo} from './calendar-demos';
@@ -43,6 +44,8 @@ export const projectColumns: Column<ProjectRow>[] = [
   { key:'updated',header:'Updated',cell:row => <span className="muted">{row.updated}</span> },
 ];
 export function ComponentDemo({ id }: { id: string }) {
+  const newExamples:Record<string,string>={'toggle-group':'toggle-formatting','tag-input':'tag-input-validation','range-slider':'range-budget','otp-input':'otp-code'};
+  if(newExamples[id])return <CoreControlDemo id={id}/>;
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch(id) {
     case 'data-grid': return <DataGridDemo/>;

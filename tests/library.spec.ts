@@ -41,7 +41,7 @@ test('select works from the keyboard', async ({ page }) => {
 test('combobox filters, handles empty results and selects', async ({ page }) => {
   await page.goto('/components/combobox');
   const input = page.getByRole('combobox', { name: 'Framework', exact: true });
-  await input.fill('NoSuchFramework'); await expect(page.getByText('No matching options.')).toBeVisible();
+  await input.fill('NoSuchFramework'); await expect(page.getByRole('status').filter({hasText:'No matching options.'})).toBeVisible();
   await input.fill('Ang'); await page.getByRole('option', { name: 'Angular', exact: true }).click();
   await expect(input).toHaveValue('Angular');
 });

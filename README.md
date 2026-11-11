@@ -4,7 +4,7 @@ React components, reusable blocks and complete interface examples. Built with Ba
 
 [React, Vite & Next.js guide](https://ui.bld8.dev/frameworks) · [Community](https://ui.bld8.dev/community) · [Showcase](https://ui.bld8.dev) · [Registry](https://ui.bld8.dev/registry) · [Playground](https://ui.bld8.dev/playground) · [Outline](https://ui.bld8.dev/templates/outline)
 
-[Developer and coding-agent guide](docs/agents.md) · [Documentation index](https://ui.bld8.dev/llms.txt) · [Structured catalogue](https://ui.bld8.dev/agent/catalog.json)
+[Core component guide](docs/core-components.md) · [Developer and coding-agent guide](docs/agents.md) · [Documentation index](https://ui.bld8.dev/llms.txt) · [Structured catalogue](https://ui.bld8.dev/agent/catalog.json)
 
 ## Install source
 
@@ -56,8 +56,11 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 59 component guidance entries, eighteen blocks and three templates.
-- 1,877 canonical Lucide icons with consistent defaults and downloadable licensed SVGs.
+- 63 component families, eighteen blocks and three templates. Families and named examples are counted separately.
+- Complete, build-typechecked client examples share their actual preview source with human and agent documentation.
+- Rich grouped choices, composable menus, TagInput, ToggleGroup, RangeSlider and one-native-input code entry.
+- Shareable category/capability filters, related controls and portable optional DataGrid layouts, pinning, resizing and touch/keyboard multi-sort.
+- 1,877 canonical Lucide icons with a stable gallery, semantic search, keyboard browsing, saved icons and shareable selected previews. Try common button examples and export sized, licensed SVGs or complete React usage.
 - A 21-control playground with native choices, disclosures, overlays, dates, boards, trees, charts and table/filter workflows. Share validated configurations, try keyboard interactions and copy or download matching client-component code. See [playground guidance](docs/playground.md).
 - A shadcn-compatible registry, source manifests and 47 runnable ZIP starters: 25 Next.js and 22 React + Vite.
 - An optional DataGrid and complete Data Workspace: typed batch review, atomic saves, conflict recovery and durable local HTTP references. Read [the workflow contract](docs/data-workspace.md).

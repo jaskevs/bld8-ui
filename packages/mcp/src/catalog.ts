@@ -18,6 +18,7 @@ const entry = z.object({
     files: z.array(z.object({ path: text, target: text.optional(), type: text })).max(500),
   }).nullable(),
   example: z.object({ language: z.literal('tsx'), code: text, complete: z.boolean() }),
+  examples:z.array(z.object({id,title:text,description:text,language:z.literal('tsx'),code:text,registryCode:text,complete:z.literal(true),keyboard:z.array(text).max(50),states:z.array(text).max(50)})).max(100).default([]),
   api: z.array(z.object({ name: text, kind: text, definition:text.optional(), properties: z.array(property).max(2000) })).max(100),
 });
 const guide = z.object({ id, title: text, url: text, markdownUrl: text, content: text });
@@ -107,7 +108,7 @@ export function entryDetails(catalog: Catalog, item: Entry, options: {
   if (options.section === 'overview' || options.section === 'all') {
     Object.assign(result, { notes: item.notes, installation: catalog.installation, registry: item.registry });
   }
-  if (options.section === 'example' || options.section === 'all') result.example = item.example;
+  if (options.section === 'example' || options.section === 'all') {result.example = item.example;result.examples=item.examples;}
   if (options.section === 'api' || options.section === 'all') {
     const properties = item.api.flatMap(definition => definition.properties
       .filter(prop => options.includeNative || !prop.native)

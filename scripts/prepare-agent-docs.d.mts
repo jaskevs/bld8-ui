@@ -23,6 +23,7 @@ export interface AgentEntry {
   markdownUrl:string;
   registry:{name:string;url:string;dependencies:string[];registryDependencies:string[];files:{path:string;target?:string;type:string}[]};
   example:{language:'tsx';code:string;complete:false};
+  examples:{id:string;title:string;description:string;language:'tsx';code:string;registryCode:string;complete:true;keyboard:string[];states:string[]}[];
   api:AgentDeclaration[];
 }
 export interface AgentCatalog {

@@ -15,33 +15,47 @@ interactions instead of photographing the entire catalogue:
 Each has a reviewed resting image in light and dark at 1440 × 1100 and
 390 × 844 CSS pixels: twenty Chromium Linux baselines in
 `quality-tests/__screenshots__/`. The phone projects use a narrow viewport;
-they do not claim real-device coverage. The separate smoke projects exercise
-keyboard choices, dismissal during normal dialog entry, focus restoration and
-the complete session workflow with canonical time values and draft restoration.
-They run in Chromium, Firefox and WebKit in both themes and viewport sizes.
-A third smoke case changes the theme lab, verifies preview isolation and keyboard
-portals, checks an actual downloaded stylesheet, and reopens a shared URL. A fourth case checks Tree focus/expansion, the lazy-loaded file inspector and stable folder/search focus handoffs during normal motion.
-A fifth case checks analytics period changes, point exploration, series visibility, exact data and narrow-axis label spacing under normal motion.
-A sixth case checks large-table keyboard endpoints, logical row indices, bounded
-mounted rows and selection across Scroll/Pages. A seventh case books a UTC appointment, inspects its instants and restores focus.
+they do not claim real-device coverage. The smoke projects start with normal motion and run in Chromium, Firefox and
+WebKit, in light/dark themes at both desktop and phone viewport sizes. All tests
+retain the uncaught-browser-error guard.
+
+The 26 workflows in `quality-tests/portable-smoke.spec.ts` cover native choices,
+dialog dismissal and focus return, session drafts, theme isolation and downloads,
+trees, analytics, table ordering/selection, scheduling, Outline recovery and
+activity, playground state, nested filters, remote/hierarchical choices, calendar
+and upload recovery, icon preview isolation, and editable-grid/filter workflows.
+They check state and keyboard context through the real interfaces. Bulk-selection
+checks also sample the actual CSS timeline at intermediate positions; the regular
+selection-motion suite separately measures unpaused frames and rapid reversals.
+
+The four flows in `quality-tests/core-controls.spec.ts` add:
+
+- Nested menus, disabled destinations, checked/radio preferences, dismissal and
+  focus restoration, including a live reduced-motion preference change.
+- ToggleGroup and TagInput keyboard choices, canonical native form values,
+  duplicate rejection, deliberate tag removal and native form reset.
+- Rich Select, Combobox and MultiSelect options, alias search where supported,
+  canonical IDs, clear actions, disabled choices and popup containment.
+- Ordered RangeSlider keyboard bounds and reset, plus one-native-input OTP
+  validation, selection/deletion, form ownership and reset.
+
+Those four flows run in all twelve browser/theme/viewport combinations, adding
+48 cases to the existing 312 portable workflow cases. The phone viewport is
+390 × 844 CSS pixels; containment is checked in both themes.
+
 Separate touch projects enable a coarse pointer in Chromium, Firefox and WebKit
-at 390 × 844 in both themes. Twelve cases check readable editable text, native
-focus/blur, unrestricted zoom metadata and vector artwork/template marks. They
-do not reproduce the physical iPhone keyboard or claim UIKit zoom validation.
-An eighth workflow exercises Outline detail-draft recovery, persistence and focus
-return under normal motion. A ninth checks bulk-action interpolation, checkbox
-states and return focus. It samples the actual CSS timeline at intermediate
-positions without relying on headless frame cadence; the regular selection-motion
-suite separately measures unpaused frames and rapid reversals.
-A tenth workflow posts a project comment, checks return focus, reverses a bulk
-status change and reopens its activity under normal motion. Both that flow and
-the earlier Outline draft recovery run in all twelve browser/theme/viewport
-configurations.
-Two playground workflows cover native choices/disclosure state and actual source
-downloads, plus bulk-action failure/recovery and separate draft/applied filters.
-There are now 176 cases: twenty image comparisons,
-144 workflow interactions and
-twelve touch checks. Run only the new touch cases with --project="touch-*".
+at 390 × 844 in both themes. Their three scenarios check editable text size,
+native focus/blur and unrestricted zoom metadata; vector artwork/template marks;
+and grid touch scrolling with native editor text selection. These are eighteen
+touch cases, not a reproduction of the physical iPhone keyboard or UIKit zoom.
+
+The suite contains **398 cases**: twenty approved image comparisons, eighteen
+touch checks and 360 smoke checks (30 workflows × twelve configurations). The
+local pinned-Linux run on 11 November 2026 passed all 398 with snapshot updates
+disabled and all approved image files unchanged. Final evidence is recorded in
+[verification](verification.md). Run only touch cases with
+`--project="touch-*"`, or only the new core flows with
+`npm run test:quality -- core-controls.spec.ts`.
 
 ## Run comparisons
 
@@ -133,9 +147,11 @@ capture must preserve its complete CSS document box. Masks and pixel thresholds
 stay the same. Fixed Date leaves timers and animation frames running. Masked
 loading controls retain disabled/busy checks in this and the existing suite.
 
-Normal-motion smoke tests are separate from screenshot stabilization. They never
-use animation disabling or reduced-motion overrides, and check uncaught browser
-errors. They exercise portable user interactions rather than Chromium-only
+Normal-motion smoke tests are separate from screenshot stabilization. They start
+with `prefers-reduced-motion: no-preference` and do not disable animations to make
+interactions pass. Explicit live-preference checks switch to reduced motion and
+verify that the interface responds without losing state or focus. All flows check
+uncaught browser errors and use portable interactions rather than Chromium-only
 animation internals. A narrow Firefox viewport is deliberately used instead of
 unsupported Firefox mobile emulation.
 

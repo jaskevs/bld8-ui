@@ -86,6 +86,7 @@ write('apps/docs/public/downloads/data-workspace-http.zip',zip(themed(dataStarte
 write('apps/docs/public/downloads/data-workspace-http-vite.zip',zip(themed(dataStarters.vite,'vite')));
 
 execFileSync(process.execPath,['scripts/prepare-playground.mjs'],{cwd:root,stdio:'inherit'});
+execFileSync(process.execPath,['scripts/prepare-component-examples.mjs'],{cwd:root,stdio:'inherit'});
 execFileSync(process.execPath,['scripts/prepare-source-release.mjs'],{cwd:root,stdio:'inherit'});
 
 execFileSync(process.execPath,['scripts/prepare-agent-docs.mjs'],{cwd:root,stdio:'inherit'});

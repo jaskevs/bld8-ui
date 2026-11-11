@@ -7,6 +7,12 @@ and their dependencies stay unchanged. This does not publish another version.
 
 ### Added
 
+- TagInput, ToggleGroup, RangeSlider and OTPInput with native form, ref and keyboard contracts.
+- Rich stable-ID local choices and composable action, checked and radio submenus.
+- Complete named modules used directly by previews, build-typechecked and shared with human/agent/MCP documentation.
+- Capability filters, related controls, and human block/template API tables.
+- Optional DataGrid layouts, logical pinning, resizing, density and touch/keyboard multi-sort.
+
 - Table layouts and optional pointer/touch ordering, with portable saved views.
 - Bounded nested filters, preserving legacy queries in the client and HTTP adapter.
 - Async Combobox/MultiSelect and Cascader with remote search, paging and recovery.
@@ -23,6 +29,9 @@ and their dependencies stay unchanged. This does not publish another version.
 
 ### Changed
 
+- Icon browsing keeps a fixed gallery while selected previews expose size/stroke
+  settings, common button examples, saved icons, share links and correctly sized
+  licensed SVG exports. Failed SVG preparation can be retried.
 - Quick-filter popups use a viewport height cap independent of side collision
   measurements, avoiding resize feedback while picker and editor content changes.
   Returning to the field picker restores search focus without scrolling; these

@@ -17,6 +17,13 @@ export interface DataColumn<T extends DataRecord> {
   max?:number;
   minLength?:number;
   maxLength?:number;
+  /** Optional presentation constraints shared with portable table views. */
+  width?:number;
+  minWidth?:number;
+  hideable?:boolean;
+  pinned?:'start'|'end';
+  resizable?:boolean;
+  sortable?:boolean;
 }
 export interface DataEdit<T extends DataRecord> { id:string; key:Extract<keyof T,string>; value:unknown }
 export interface DataCellError { id:string; key:string; message:string }

@@ -1,3 +1,8 @@
-import { Catalog } from '@/components/catalog';
-export const metadata = { title: 'Components' };
-export default function Page() { return <div className="page"><header className="page-intro"><p className="eyebrow">THE LIBRARY</p><h1>Small pieces.<br /><span>Plenty of possibility.</span></h1><p className="lead">Explore the states, try the interactions, then shape the components for your own application.</p></header><Catalog /></div>; }
+import {Catalog} from '@/components/catalog';
+import {components} from '@/lib/catalog';
+import {componentExampleCount,examplesFor} from '@/lib/component-examples';
+export const metadata={title:'React components',description:'Editable React components for Next.js and Vite, with typed APIs, complete examples and clear keyboard behaviour. Free under MIT.'};
+export default function Page(){
+  const exampleCounts=Object.fromEntries(components.map(component=>[component.id,examplesFor(component.id).length]));
+  return <div className="page"><header className="page-intro"><p className="eyebrow">REACT COMPONENTS</p><h1>React components.<br/><span>Ready to adapt.</span></h1><p className="lead">Editable controls for Next.js and Vite, with typed APIs, complete examples and shared styles. Free under MIT.</p><p className="bui-hint">{components.length} component families · {componentExampleCount} named examples. Search by what the control needs to do.</p></header><Catalog exampleCounts={exampleCounts}/></div>;
+}

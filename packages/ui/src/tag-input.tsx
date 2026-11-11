@@ -1,0 +1,36 @@
+'use client';
+import {useEffect,useId,useImperativeHandle,useLayoutEffect,useRef,useState,type ComponentProps,type Ref} from 'react';
+import {X} from 'lucide-react';
+import {Field} from './core.js';
+import {Icon} from './icons.js';
+
+export interface TagInputProps extends Omit<ComponentProps<'input'>,'value'|'defaultValue'|'onChange'|'name'|'type'|'size'|'ref'> {
+  label:string;value?:readonly string[];defaultValue?:readonly string[];onValueChange?:(value:string[])=>void;
+  name?:string;hint?:string;error?:string;maxTags?:number;maxTagLength?:number;validateTag?:(tag:string,values:readonly string[])=>string|undefined;
+  inputRef?:Ref<HTMLInputElement>;ref?:Ref<HTMLInputElement>;
+}
+/** Enter/comma commit tags; a comma/newline paste commits one validated batch. */
+export function TagInput({label,value,defaultValue=[],onValueChange,name,hint,error,maxTags=10,maxTagLength=40,validateTag,inputRef,ref,disabled=false,readOnly=false,required=false,id:suppliedId,form,onBlur,onInvalid,onKeyDown,onPaste,onCompositionStart,onCompositionEnd,className,...props}:TagInputProps) {
+  const generated=useId(),id=suppliedId??generated,input=useRef<HTMLInputElement>(null),removals=useRef<(HTMLButtonElement|null)[]>([]),composing=useRef(false),pendingFocus=useRef<number|null>(null),defaults=useRef(defaultValue);defaults.current=defaultValue;
+  const [internal,setInternal]=useState<readonly string[]>(defaultValue),[draft,setDraft]=useState(''),[localError,setLocalError]=useState(''),[status,setStatus]=useState('');
+  const values=value??internal,limit=Number.isFinite(maxTags)?Math.max(1,Math.min(100,Math.floor(maxTags))):10,lengthLimit=Number.isFinite(maxTagLength)?Math.max(1,Math.min(500,Math.floor(maxTagLength))):40;
+  const problem=error||localError,describedBy=[hint&&id+'-hint',id+'-keys',problem&&id+'-error',props['aria-describedby']].filter(Boolean).join(' ');
+  useImperativeHandle(inputRef,()=>input.current!,[]);useImperativeHandle(ref,()=>input.current!,[]);
+  useLayoutEffect(()=>{input.current?.setCustomValidity(disabled||readOnly?'':localError||(draft.trim()?'Press Enter to add the tag, or clear the unfinished text.':required&&!values.length?'Add at least one tag.':''));},[draft,values.length,required,disabled,readOnly,localError]);
+  useLayoutEffect(()=>{if(pendingFocus.current===null)return;const target=pendingFocus.current;pendingFocus.current=null;if(target<0)input.current?.focus();else (removals.current[target]??input.current)?.focus();},[values.length]);
+  useEffect(()=>{const target=input.current?.form;if(!target)return;const reset=()=>{if(value===undefined)setInternal(defaults.current);setDraft('');setLocalError('');setStatus('');};target.addEventListener('reset',reset);return()=>target.removeEventListener('reset',reset);},[value===undefined,form]);
+  function change(next:string[]){if(value===undefined)setInternal(next);onValueChange?.(next);}
+  function commit(text:string){
+    if(disabled||readOnly)return;const incoming=text.split(/[,\r\n]+/).map(tag=>tag.trim()).filter(Boolean);if(!incoming.length)return;
+    if(text.length>10000){setLocalError('Paste fewer tags at a time.');return;}
+    const next=[...values],seen=new Set(values.map(tag=>tag.toLocaleLowerCase()));let issue='';
+    for(const tag of incoming){if(seen.has(tag.toLocaleLowerCase())){issue='Already added: '+tag;break;}if(tag.length>lengthLimit){issue='Keep each tag to '+lengthLimit+' characters.';break;}if(next.length>=limit){issue='Use no more than '+limit+' tags.';break;}try{issue=validateTag?.(tag,next)??'';}catch{issue='This tag could not be validated.';}if(issue)break;seen.add(tag.toLocaleLowerCase());next.push(tag);}
+    if(issue){setDraft(text);setLocalError(issue);setStatus('No tags added.');return;}
+    change(next);setDraft('');setLocalError('');setStatus(incoming.length===1?'Added '+incoming[0]+'.':'Added '+incoming.length+' tags.');
+  }
+  function remove(index:number){if(disabled||readOnly)return;const removed=values[index];pendingFocus.current=values.length>1?Math.min(index,values.length-2):-1;change(values.filter((_,position)=>position!==index));setLocalError('');setStatus('Removed '+removed+'.');}
+  return <Field label={label} hint={hint} error={problem} id={id} required={required}><div className={'bui-tag-input'+(className?' '+className:'')} data-disabled={disabled||undefined} data-readonly={readOnly||undefined} data-invalid={!!problem||undefined} onClick={event=>{if(event.target===event.currentTarget)input.current?.focus();}}>
+    {values.length>0&&<ul className="bui-tag-list" aria-label={label+' tags'}>{values.map((tag,index)=><li className="bui-tag" key={tag+'-'+index}><span>{tag}</span>{!readOnly&&<button type="button" className="bui-tag-remove" ref={element=>{removals.current[index]=element;}} aria-label={'Remove '+tag} disabled={disabled} tabIndex={-1} onClick={()=>remove(index)} onKeyDown={event=>{if(event.key==='Backspace'||event.key==='Delete'){event.preventDefault();remove(index);}else if(event.key==='ArrowLeft'){event.preventDefault();removals.current[Math.max(0,index-1)]?.focus();}else if(event.key==='ArrowRight'){event.preventDefault();(removals.current[index+1]??input.current)?.focus();}else if(event.key==='Escape'){event.preventDefault();input.current?.focus();}}}><Icon icon={X} size={12}/></button>}</li>)}</ul>}
+    <input {...props} ref={input} id={id} form={form} type="text" className="bui-tag-input-draft" value={draft} disabled={disabled} readOnly={readOnly} required={required&&!values.length} aria-required={required||undefined} aria-describedby={describedBy} aria-invalid={!!problem||undefined} onBlur={onBlur} onChange={event=>{setDraft(event.target.value);setLocalError('');}} onInvalid={event=>{onInvalid?.(event);setLocalError(localError||(draft.trim()?'Press Enter to add the tag, or clear the unfinished text.':'Add at least one tag.'));}} onCompositionStart={event=>{composing.current=true;onCompositionStart?.(event);}} onCompositionEnd={event=>{composing.current=false;onCompositionEnd?.(event);}} onKeyDown={event=>{onKeyDown?.(event);if(event.defaultPrevented||composing.current||event.nativeEvent.isComposing||event.keyCode===229)return;if(readOnly||disabled){if(event.key==='Enter')event.preventDefault();return;}if(event.key==='Enter'||event.key===','){event.preventDefault();commit(draft);}else if((event.key==='Backspace'||event.key==='ArrowLeft')&&!draft&&values.length){event.preventDefault();removals.current[values.length-1]?.focus();}}} onPaste={event=>{onPaste?.(event);if(event.defaultPrevented||disabled||readOnly||composing.current)return;const text=event.clipboardData.getData('text');if(!/[,\r\n]/.test(text))return;event.preventDefault();const element=event.currentTarget,start=element.selectionStart??draft.length,end=element.selectionEnd??start;commit(draft.slice(0,start)+text+draft.slice(end));}}/>
+  </div><p id={id+'-keys'} className="bui-sr-only">Enter or comma adds a tag. Backspace in an empty input focuses the last remove button; press Backspace again to remove it.</p><span className="bui-sr-only" role="status">{status}</span>{name&&values.map((tag,index)=><input key={tag+'-'+index} type="hidden" name={name} form={form} value={tag} disabled={disabled}/>)}</Field>;
+}

@@ -38,7 +38,7 @@ for(const name of Object.keys(imports).sort()) {
   if(module.__iconData.name!==name) continue;
   const exportName=module.default.displayName;
   if(!/^[A-Za-z][A-Za-z0-9]*$/.test(exportName)) throw new Error(`Unsupported icon export: ${name}`);
-  entries.push({name,label:name.split('-').map(word => word[0].toUpperCase()+word.slice(1)).join(' '),exportName,category:category(name)});
+  entries.push({name,label:name.split('-').map(word => word[0].toUpperCase()+word.slice(1)).join(' '),exportName,category:category(name),aliases:Array.isArray(module.__iconData.aliases)?module.__iconData.aliases.filter(alias=>typeof alias==='string'):[]});
   for(const strokeWidth of [1.5,1.75,2]) {
     const svg=renderToStaticMarkup(createElement(module.default,{size:24,strokeWidth,color:'#000',role:'img','aria-label':name,xmlns:'http://www.w3.org/2000/svg'}));
     writeFileSync(join(assets,`${name}-${strokeWidth}.svg`),`<!-- Lucide React ${metadata.version}. Original licence notices retained below.\n${license.replaceAll('--','—')}\n-->\n${svg}`);

@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useId, useState, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type FocusEventHandler, type ReactNode, type Ref } from 'react';
 import {CircleAlert, CircleCheck, Info, TriangleAlert, type LucideIcon} from 'lucide-react';
 import { Icon } from './icons.js';
 import { cn } from './utils.js';
@@ -12,45 +12,59 @@ export function Button({ variant = 'primary', size = 'md', loading, disabled, cl
   return <button {...props} type={type} disabled={disabled || loading} aria-busy={loading || undefined} className={cn(buttonVariants({variant,size}),className)}><span className="bui-button-content">{leadingIcon && <Icon icon={leadingIcon} size={size === 'sm' ? 16 : 18} />}{children}{trailingIcon && <Icon icon={trailingIcon} size={size === 'sm' ? 16 : 18} />}</span>{loading && <span className="bui-button-spinner"><Spinner /></span>}</button>;
 }
 export function IconButton({ label, icon, children, ...props }: ButtonProps & { label: string; icon?:LucideIcon }) { return <Button {...props} aria-label={label} className={cx('bui-icon-button', props.className)}>{children ?? (icon && <Icon icon={icon} size={props.size === 'sm' ? 16 : 18} />)}</Button>; }
-const FieldContext = createContext<{ id: string; description?: string; invalid: boolean; required?: boolean } | null>(null);
-export function Field({ label, hint, error, id: suppliedId, children, required }: { label: string; hint?: string; error?: string; id?: string; children: ReactNode; required?: boolean }) {
+const FieldContext = createContext<{ id: string; description?: string; invalid: boolean; required?: boolean; disabled?:boolean } | null>(null);
+const describedBy=(...values:(string|false|undefined)[])=>values.filter(Boolean).join(' ')||undefined;
+function setInputRef(ref:Ref<HTMLInputElement>|undefined,node:HTMLInputElement|null){if(typeof ref==='function')ref(node);else if(ref)ref.current=node;}
+export interface FieldProps {label:string;hint?:string;error?:string;id?:string;children:ReactNode;required?:boolean;disabled?:boolean}
+export function Field({ label, hint, error, id: suppliedId, children, required, disabled }: FieldProps) {
   const generated = useId(); const id = suppliedId || generated;
   const description = [hint && id + '-hint', error && id + '-error'].filter(Boolean).join(' ') || undefined;
-  return <FieldContext.Provider value={{ id, description, invalid: !!error, required }}><div className="bui-field"><label className="bui-label" htmlFor={id}>{label}{required && <span aria-hidden="true"> *</span>}</label>{children}{hint && <p id={id + '-hint'} className="bui-hint">{hint}</p>}{error && <p id={id + '-error'} className="bui-error" role="alert">{error}</p>}</div></FieldContext.Provider>;
+  return <FieldContext.Provider value={{ id, description, invalid: !!error, required, disabled }}><div className="bui-field" data-disabled={disabled||undefined}><label className="bui-label" htmlFor={id}>{label}{required && <span aria-hidden="true"> *</span>}</label>{children}{hint && <p id={id + '-hint'} className="bui-hint">{hint}</p>}{error && <p id={id + '-error'} className="bui-error" role="alert">{error}</p>}</div></FieldContext.Provider>;
 }
 export function Input({ className, density = 'comfortable', ...props }: ComponentProps<'input'> & { density?: 'comfortable' | 'compact' }) {
   const field = useContext(FieldContext);
-  return <input id={field?.id} aria-describedby={field?.description} aria-invalid={field?.invalid || undefined} required={field?.required} {...props} data-density={density} className={cx('bui-input', className)} />;
+  return <input id={field?.id} aria-invalid={field?.invalid || undefined} required={field?.required} disabled={field?.disabled} {...props} aria-describedby={describedBy(field?.description,props['aria-describedby'])} data-density={density} className={cx('bui-input', className)} />;
 }
 export function Textarea({ className, ...props }: ComponentProps<'textarea'>) {
   const field = useContext(FieldContext);
-  return <textarea id={field?.id} aria-describedby={field?.description} aria-invalid={field?.invalid || undefined} required={field?.required} rows={4} {...props} className={cx('bui-input', 'bui-textarea', className)} />;
+  return <textarea id={field?.id} aria-invalid={field?.invalid || undefined} required={field?.required} disabled={field?.disabled} rows={4} {...props} aria-describedby={describedBy(field?.description,props['aria-describedby'])} className={cx('bui-input', 'bui-textarea', className)} />;
 }
 export function InputGroup({leading,trailing,className,children,...props}:ComponentProps<'div'> & {leading?:ReactNode;trailing?:ReactNode}) {
   const field=useContext(FieldContext);
   return <div {...props} data-invalid={field?.invalid || undefined} className={cx('bui-input-group',className)}>{leading && <span className="bui-input-adornment">{leading}</span>}{children}{trailing && <span className="bui-input-adornment">{trailing}</span>}</div>;
 }
-export function Checkbox({ label, description, className, ...props }: Omit<ComponentProps<'input'>, 'type'> & { label: string; description?: string }) {
-  const hintId = useId();
-  return <label className={cx('bui-choice', className)}><input {...props} type="checkbox" className="bui-checkbox" aria-labelledby={props['aria-labelledby'] ?? (props['aria-label'] ? undefined : hintId + '-label')} aria-describedby={[description && hintId,props['aria-describedby']].filter(Boolean).join(' ') || undefined} /><span><span id={hintId + '-label'}>{label}</span>{description && <small id={hintId}>{description}</small>}</span></label>;
+export interface ChoiceFieldProps {label:string;/** Existing alias for hint. */description?:string;hint?:string;error?:string;inputRef?:Ref<HTMLInputElement>;onCheckedChange?:(checked:boolean)=>void}
+export type CheckboxProps=Omit<ComponentProps<'input'>,'type'> & ChoiceFieldProps & {/** Sets the native indeterminate property; checked remains boolean. */indeterminate?:boolean};
+export function Checkbox({ label, description, hint=description, error, inputRef, ref, indeterminate, onCheckedChange, onChange, className, ...props }: CheckboxProps) {
+  const generated=useId(),id=props.id||generated,node=useRef<HTMLInputElement|null>(null);
+  const attach=useCallback((input:HTMLInputElement|null)=>{node.current=input;if(input&&indeterminate!==undefined)input.indeterminate=indeterminate;setInputRef(ref,input);setInputRef(inputRef,input);},[ref,inputRef,indeterminate]);
+  useEffect(()=>{if(node.current&&indeterminate!==undefined)node.current.indeterminate=indeterminate;},[indeterminate,props.checked]);
+  return <label className={cx('bui-choice', className)} data-invalid={!!error||undefined}><input {...props} ref={attach} id={id} type="checkbox" className="bui-checkbox" aria-invalid={error?true:props['aria-invalid']} aria-labelledby={props['aria-labelledby'] ?? (props['aria-label'] ? undefined : id+'-label')} aria-describedby={describedBy(hint&&id+'-hint',error&&id+'-error',props['aria-describedby'])} onChange={event=>{onChange?.(event);onCheckedChange?.(event.currentTarget.checked);}}/><span><span id={id+'-label'}>{label}{props.required&&<span aria-hidden="true"> *</span>}</span>{hint&&<small id={id+'-hint'}>{hint}</small>}{error&&<small className="bui-error" id={id+'-error'} role="alert">{error}</small>}</span></label>;
 }
-export function Switch({ label, description, className, ...props }: Omit<ComponentProps<'input'>, 'type' | 'role'> & { label: string; description?: string }) {
-  const hintId = useId();
-  return <label className={cx('bui-choice', 'bui-switch-row', className)}><span><span id={hintId + '-label'}>{label}</span>{description && <small id={hintId}>{description}</small>}</span><input {...props} type="checkbox" role="switch" className="bui-switch" aria-labelledby={props['aria-labelledby'] ?? (props['aria-label'] ? undefined : hintId + '-label')} aria-describedby={[description && hintId,props['aria-describedby']].filter(Boolean).join(' ') || undefined} /></label>;
+export type SwitchProps=Omit<ComponentProps<'input'>,'type'|'role'> & ChoiceFieldProps;
+export function Switch({ label, description, hint=description, error, inputRef, ref, onCheckedChange, onChange, className, ...props }: SwitchProps) {
+  const generated=useId(),id=props.id||generated;
+  const attach=useCallback((input:HTMLInputElement|null)=>{setInputRef(ref,input);setInputRef(inputRef,input);},[ref,inputRef]);
+  return <label className={cx('bui-choice','bui-switch-row',className)} data-invalid={!!error||undefined}><span><span id={id+'-label'}>{label}{props.required&&<span aria-hidden="true"> *</span>}</span>{hint&&<small id={id+'-hint'}>{hint}</small>}{error&&<small className="bui-error" id={id+'-error'} role="alert">{error}</small>}</span><input {...props} ref={attach} id={id} type="checkbox" role="switch" className="bui-switch" aria-invalid={error?true:props['aria-invalid']} aria-labelledby={props['aria-labelledby'] ?? (props['aria-label'] ? undefined : id+'-label')} aria-describedby={describedBy(hint&&id+'-hint',error&&id+'-error',props['aria-describedby'])} onChange={event=>{onChange?.(event);onCheckedChange?.(event.currentTarget.checked);}}/></label>;
 }
-export interface Option { value: string; label: string; disabled?: boolean }
-export function RadioGroup({ label, options, name, value, defaultValue, onValueChange, disabled }: { label: string; options: Option[]; name?: string; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; disabled?: boolean }) {
-  const id = useId();
-  return <fieldset className="bui-radio-group" disabled={disabled}><legend className="bui-label">{label}</legend>{options.map(option => <label className="bui-choice" key={option.value}><input type="radio" name={name || id} value={option.value} checked={value === undefined ? undefined : value === option.value} defaultChecked={value === undefined ? defaultValue === option.value : undefined} disabled={option.disabled} onChange={() => onValueChange?.(option.value)} />{option.label}</label>)}</fieldset>;
+export interface Option {value:string;label:string;disabled?:boolean;icon?:LucideIcon;description?:string;group?:string;searchTerms?:string[]}
+export interface RadioGroupProps extends Omit<ComponentProps<'fieldset'>,'onChange'|'onBlur'|'defaultValue'> {label:string;options:Option[];name?:string;value?:string;defaultValue?:string;onValueChange?:(value:string)=>void;required?:boolean;hint?:string;error?:string;inputRef?:Ref<HTMLInputElement>;onBlur?:FocusEventHandler<HTMLInputElement>;form?:string}
+export function RadioGroup({label,options,name,value,defaultValue,onValueChange,disabled,required,hint,error,inputRef,onBlur,form,className,id:suppliedId,...props}:RadioGroupProps) {
+  const generated=useId(),id=suppliedId||generated,description=describedBy(hint&&id+'-hint',error&&id+'-error',props['aria-describedby']);
+  return <fieldset {...props} id={id} className={cx('bui-radio-group',className)} disabled={disabled} aria-invalid={error?true:props['aria-invalid']} aria-describedby={description}><legend className="bui-label">{label}{required&&<span aria-hidden="true"> *</span>}</legend>{hint&&<p className="bui-hint" id={id+'-hint'}>{hint}</p>}{options.map((option,index)=><label className="bui-choice" key={option.value}><input ref={index===options.findIndex(item=>!item.disabled)?inputRef:undefined} type="radio" aria-label={option.label} name={name||id} form={form} value={option.value} checked={value===undefined?undefined:value===option.value} defaultChecked={value===undefined?defaultValue===option.value:undefined} disabled={option.disabled} required={required} aria-invalid={error?true:undefined} aria-describedby={describedBy(description,option.description&&id+'-option-'+index)} onBlur={onBlur} onChange={()=>onValueChange?.(option.value)}/>{option.icon&&<Icon icon={option.icon}/>}<span><span>{option.label}</span>{option.description&&<small id={id+'-option-'+index}>{option.description}</small>}</span></label>)}{error&&<p className="bui-error" id={id+'-error'} role="alert">{error}</p>}</fieldset>;
 }
-export function Slider({ label, ...props }: Omit<ComponentProps<'input'>, 'type'> & { label: string }) {
+export type SliderProps=Omit<ComponentProps<'input'>,'type'> & {label:string;hint?:string;error?:string;inputRef?:Ref<HTMLInputElement>};
+export function Slider({ label,hint,error,inputRef,ref,...props }: SliderProps) {
   const id = useId();
   const min = Number(props.min ?? 0), max = Number(props.max ?? 100);
   const [internal, setInternal] = useState(props.defaultValue ?? (min + max) / 2);
+  const node=useRef<HTMLInputElement|null>(null),initial=useRef(internal);
+  useEffect(()=>{const owner=node.current?.form;if(!owner||props.value!==undefined)return;const reset=(event:Event)=>queueMicrotask(()=>{if(!event.defaultPrevented)setInternal(initial.current);});owner.addEventListener('reset',reset);return()=>owner.removeEventListener('reset',reset);},[props.form,props.value]);
   const current = Number(props.value ?? internal);
   const progress = max > min && Number.isFinite(current) ? Math.max(0, Math.min(100, (current - min) / (max - min) * 100)) : 0;
   const style = { '--bui-slider-progress': progress + '%', ...props.style } as CSSProperties;
-  return <div className="bui-field"><div className="bui-between"><label className="bui-label" htmlFor={props.id || id}>{label}</label><output htmlFor={props.id || id}>{props.value ?? internal}</output></div><input {...props} style={style} id={props.id || id} className={cx('bui-slider', props.className)} type="range" onChange={event => { setInternal(event.target.value); props.onChange?.(event); }} /></div>;
+  const attach=useCallback((input:HTMLInputElement|null)=>{node.current=input;setInputRef(ref,input);setInputRef(inputRef,input);},[ref,inputRef]);
+  return <div className="bui-field"><div className="bui-between"><label className="bui-label" htmlFor={props.id||id}>{label}</label><output htmlFor={props.id||id}>{props.value??internal}</output></div><input {...props} ref={attach} style={style} id={props.id||id} aria-invalid={error?true:props['aria-invalid']} aria-describedby={describedBy(hint&&(props.id||id)+'-hint',error&&(props.id||id)+'-error',props['aria-describedby'])} className={cx('bui-slider',props.className)} type="range" onChange={event=>{setInternal(event.target.value);props.onChange?.(event);}}/>{hint&&<p className="bui-hint" id={(props.id||id)+'-hint'}>{hint}</p>}{error&&<p className="bui-error" id={(props.id||id)+'-error'} role="alert">{error}</p>}</div>;
 }
 export function Badge({ tone = 'neutral', className, ...props }: ComponentProps<'span'> & { tone?: 'neutral' | 'accent' | 'success' | 'warning' | 'danger' }) { return <span {...props} className={cx('bui-badge', 'bui-tone--' + tone, className)} />; }
 export function Card({ className, ...props }: ComponentProps<'div'>) { return <div {...props} className={cx('bui-card', className)} />; }

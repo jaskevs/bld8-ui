@@ -14,6 +14,9 @@ inside the owner's BLD8 workspace, also read the parent `AGENTS.md` and
 - `scripts/prepare-api.mjs`: UI prop tables derived from public TypeScript exports.
 - `scripts/prepare-library.mjs`: source views, lean starter archives and the
   registry/release/documentation generation pipeline.
+- `apps/docs/src/lib/*-examples.ts`: literal complete example authorities, compiled
+  by `scripts/prepare-component-examples.mjs` into the actual previews and shared
+  human/agent source. Keep stable example IDs and meaningful keyboard/state notes.
 - `scripts/prepare-agent-docs.mjs`: Markdown and structured discovery data from
   those same sources, including TypeScript-derived block/template APIs.
 - `packages/mcp`: optional local read-only discovery over the generated public

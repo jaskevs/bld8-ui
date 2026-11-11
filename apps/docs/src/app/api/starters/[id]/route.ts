@@ -17,8 +17,8 @@ export async function GET(request:Request,{params}:{params:Promise<{id:string}>}
   const config=query.has('theme')?parseThemeConfig(query.get('theme')):{...DEFAULT_THEME};
   if(!config||!['nextjs','vite'].includes(framework)||!['light','dark'].includes(mode))return Response.json({error:'Invalid starter options.'},{status:400});
   try{
-    const directory=['public/downloads','apps/docs/public/downloads'].map(path=>join(process.cwd(),path)).find(existsSync);
-    if(!directory)throw Error('Starter assets are missing');
+    const directory=existsSync(join(process.cwd(),'public/downloads'))?join(process.cwd(),'public/downloads'):join(process.cwd(),'apps/docs/public/downloads');
+    if(!existsSync(directory))throw Error('Starter assets are missing');
     const base=unzip(await readFile(join(directory,id+(framework==='vite'?'-vite':'')+'.zip')));
     const output=zip(themeStarter(base,{framework:framework as 'nextjs'|'vite',config,mode:mode as 'light'|'dark',css:exportThemeCss(config),serialized:serializeThemeConfig(config)}));
     return new Response(Uint8Array.from(output),{headers:{'Content-Type':'application/zip','Content-Disposition':`attachment; filename="${id}-${framework}-themed.zip"`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});

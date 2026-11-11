@@ -596,3 +596,27 @@ test('upload insertion, failed acknowledgement and keyboard retry preserve conte
   const remove=queue.getByRole('button',{name:'Remove motion-review.txt',exact:true});await expect(remove).toBeFocused();await page.emulateMedia({reducedMotion:'reduce'});await page.keyboard.press('Enter');await expect(queue.getByRole('button',{name:'Browse files',exact:true})).toBeFocused();expect(await queue.locator('.bui-upload-queue-stage').evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');
   await page.getByLabel('Files to receive files',{exact:true}).setInputFiles({name:'reduced-review.txt',mimeType:'text/plain',buffer:Buffer.from('More useful material')});expect(await queue.locator('[data-upload-id]').evaluate(element=>getComputedStyle(element).animationName)).toBe('none');await expectContained(page);
 });
+
+
+test('icon customisation preserves gallery geometry and keyboard sheet focus under normal motion',async({page},info)=>{
+  await openQualityPage(page,'/icons',info);await page.getByRole('searchbox',{name:'Search icons'}).fill('camera');
+  const tile=page.getByRole('button',{name:'Camera',exact:true}),mobile=page.viewportSize()!.width<=760;
+  expect(await tile.evaluate(element=>getComputedStyle(element).transitionDuration)).not.toBe('0s');
+  await tile.focus();await page.keyboard.press('Enter');
+  const inspector=mobile?page.getByRole('dialog',{name:'Camera',exact:true}):page.getByRole('complementary',{name:'Selected icon'});await expect(inspector).toBeVisible();
+  const examples=inspector.getByRole('region',{name:'Icon button examples'}),gallery=page.locator('.icon-grid .icon-mask').first();
+  const heights=await examples.locator('button').evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).offsetHeight));
+
+  await inspector.getByRole('group',{name:'Preview size',exact:true}).getByRole('button',{name:'32px',exact:true}).click();
+  await inspector.getByRole('group',{name:'Stroke width',exact:true}).getByRole('button',{name:'2',exact:true}).click();
+  await expect(inspector.locator('.icon-showcase .icon-mask').first()).toHaveCSS('width','32px');
+  await expect(gallery).toHaveCSS('width','24px');expect(await gallery.evaluate(element=>getComputedStyle(element).maskImage)).toContain('camera-1.75.svg');
+  await expect(page.locator('.icon-search svg').first()).toHaveAttribute('stroke-width','1.75');
+  for(const mask of await examples.locator('.icon-mask').all()){await expect(mask).toHaveCSS('width','18px');expect(await mask.evaluate(element=>getComputedStyle(element).maskImage)).toContain('camera-2.svg');}
+  expect(await examples.locator('button').evaluateAll(buttons=>buttons.map(button=>(button as HTMLElement).offsetHeight))).toEqual(heights);
+  const box=(await inspector.boundingBox())!;expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  if(mobile){await page.keyboard.press('Escape');await expect(inspector).not.toBeVisible();await expect(tile).toBeFocused();}
+  expect(await tile.evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');
+  await expectContained(page);
+});

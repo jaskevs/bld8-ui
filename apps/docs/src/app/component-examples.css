@@ -1,0 +1,12 @@
+.component-examples{display:grid;gap:24px}.component-example{min-width:0;padding:clamp(20px,3vw,36px);background:var(--bui-bg);border-radius:var(--bui-radius-lg,12px)}.component-example>header h3{margin:0 0 8px}.component-example>header p{max-width:72ch;color:var(--bui-muted)}.component-example-preview{min-width:0;max-width:100%;padding-block:24px;overflow-wrap:anywhere}.component-example-preview>form,.component-example-preview>div{max-width:100%;min-width:0}.component-example-guidance{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding-block:20px;border-top:1px solid var(--bui-line)}.component-example-guidance h4{font-size:14px;margin:0 0 8px}.component-example-guidance ul{margin:0;padding-inline-start:20px;color:var(--bui-muted);font-size:14px;line-height:1.7}.component-example-start{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-block:24px}.component-example-start span{font-size:13px;color:var(--bui-muted)}.component-example-code>summary{cursor:pointer;padding-block:12px;font-size:14px;font-weight:600}.component-example-code .code-block{margin-top:16px}.component-related{display:flex;gap:12px;flex-wrap:wrap}.component-related a{padding:10px 14px;background:var(--bui-bg);border-radius:6px}.library-api{margin-block:40px}@media(max-width:600px){.component-example-guidance{grid-template-columns:1fr;gap:16px}.component-example-preview{padding-block:20px}}
+
+.component-example-preview>form{display:grid;gap:16px}.component-discovery-controls{display:flex;align-items:end;flex-wrap:wrap;gap:16px}.component-discovery-controls .bui-field{min-width:160px}.component-capabilities{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--bui-muted)}
+
+.component-discovery-controls{margin-block-end:24px}
+
+.api-section>p{max-width:100%;overflow-wrap:anywhere}.api-section>p>code{white-space:normal;overflow-wrap:anywhere}
+
+.component-example-ready{min-width:0;max-width:100%}.component-example-ready>form{display:grid;gap:16px}.component-example-ready[inert]{cursor:progress}
+.component-discovery-controls .bui-field{flex:0 1 280px;width:280px;min-width:0}
+@media(max-width:600px){.component-discovery-controls .bui-field{flex-basis:100%;width:100%}}
+@media(max-width:600px){.catalog-main>.catalog-toolbar{flex-direction:column;align-items:stretch;gap:8px}.catalog-main>.catalog-toolbar .bui-input{max-width:none}.catalog-main>.catalog-toolbar .bui-hint{margin:0}}

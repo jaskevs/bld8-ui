@@ -1,0 +1,55 @@
+/* Stateful menu entries, toggles and tags share the control tokens and motion language. */
+.bui-menu-rich { min-width:220px; max-width:calc(100vw - 24px); }
+.bui-menu-entry { justify-content:flex-start; gap:10px; transition:background-color var(--bui-duration-fast) var(--bui-ease),color var(--bui-duration-fast) var(--bui-ease),box-shadow var(--bui-duration-fast) var(--bui-ease); }
+.bui-menu-leading { display:grid; place-items:center; width:16px; min-width:16px; min-height:18px; }
+.bui-menu-label { display:flex; flex:1; flex-direction:column; min-width:0; gap:2px; }
+.bui-menu-description { font-size:var(--bui-text-meta); line-height:1.5; color:var(--bui-muted); font-weight:400; }
+.bui-menu-submenu-arrow { flex-shrink:0; margin-inline-start:auto; }
+.bui-menu-group-label { padding:8px 12px 6px; font-size:var(--bui-text-meta); color:var(--bui-muted); line-height:1.5; }
+.bui-menu-separator { height:1px; border:0; background:var(--bui-line); margin:6px 4px; }
+.bui-menu-choice-indicator { display:grid; place-items:center; transition:opacity var(--bui-duration-fast) var(--bui-ease); }
+.bui-menu-choice-indicator[data-starting-style],.bui-menu-choice-indicator[data-ending-style] { opacity:0; }
+.bui-toggle-field { display:flex; flex-direction:column; gap:8px; border:0; margin:0; padding:0; min-width:0; font-family:var(--bui-font); }
+.bui-toggle-field>legend { padding:0; margin-bottom:8px; }
+.bui-toggle-group { display:flex; align-items:center; flex-wrap:wrap; align-self:flex-start; max-width:100%; gap:4px; padding:4px; background:var(--bui-surface); border-radius:calc(var(--bui-radius) + 3px); }
+.bui-toggle-group[data-orientation=vertical] { flex-direction:column; align-items:stretch; }
+.bui-toggle-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:var(--bui-control-md); min-width:44px; border:0; border-radius:var(--bui-radius); padding:8px 12px; font:inherit; font-size:var(--bui-text-control); line-height:1.5; color:var(--bui-muted); background:transparent; cursor:pointer; transition:background-color var(--bui-duration) var(--bui-ease),color var(--bui-duration) var(--bui-ease),box-shadow var(--bui-duration) var(--bui-ease); }
+.bui-toggle-button[aria-pressed=true] { background:var(--bui-accent); color:var(--bui-accent-ink); box-shadow:var(--bui-shadow-choice); }
+.bui-toggle-button:disabled { opacity:.45; cursor:not-allowed; }
+.bui-toggle-button:focus-visible { outline:2px solid var(--bui-focus); outline-offset:2px; }
+.bui-toggle-group[aria-invalid=true] { box-shadow:0 0 0 1px var(--bui-danger); }
+.bui-tag-input { display:flex; align-items:center; flex-wrap:wrap; gap:6px; min-height:var(--bui-control-md); padding:5px 8px; border:1px solid var(--bui-line); border-radius:var(--bui-radius); background:var(--bui-bg); color:var(--bui-ink); box-shadow:var(--bui-shadow-control); cursor:text; transition:border-color var(--bui-duration) var(--bui-ease),box-shadow var(--bui-duration) var(--bui-ease); }
+.bui-tag-input:focus-within { border-color:var(--bui-focus); box-shadow:0 0 0 1px var(--bui-focus); }
+.bui-tag-input[data-invalid] { border-color:var(--bui-danger); }
+.bui-tag-input[data-disabled] { opacity:.5; cursor:not-allowed; }
+.bui-tag-input[data-readonly] { background:var(--bui-surface); }
+.bui-tag-list { display:contents; padding:0; margin:0; list-style:none; }
+.bui-tag { display:inline-flex; align-items:center; gap:6px; min-height:30px; max-width:100%; padding-inline:8px 3px; background:var(--bui-surface); border-radius:3px; font-size:var(--bui-text-control); line-height:1.5; animation:bui-tag-enter var(--bui-duration-fast) var(--bui-ease); }
+.bui-tag>span { min-width:0; overflow-wrap:anywhere; }
+.bui-tag-remove { display:grid; place-items:center; flex-shrink:0; width:24px; height:24px; min-width:24px; border:0; border-radius:3px; padding:0; background:transparent; color:var(--bui-muted); cursor:pointer; transition:background-color var(--bui-duration-fast) var(--bui-ease),color var(--bui-duration-fast) var(--bui-ease); }
+.bui-tag-remove:focus-visible { outline:2px solid var(--bui-focus); outline-offset:1px; }
+.bui-tag-remove:disabled { cursor:not-allowed; }
+.bui-tag-input-draft { display:block; flex:1 1 100px; min-width:0; width:100px; min-height:30px; border:0; border-radius:0; padding:2px 3px; background:transparent; color:inherit; box-shadow:none; outline:none; font:inherit; font-size:var(--bui-text-control); line-height:1.5; }
+.bui-tag-input-draft:focus { outline:none; box-shadow:none; }
+.bui-tag-input-draft::placeholder { color:var(--bui-muted); }
+@keyframes bui-tag-enter { from {opacity:0;translate:0 3px;} to {opacity:1;translate:0 0;} }
+@media(hover:hover) and (pointer:fine) {
+  .bui-toggle-button:hover:not(:disabled):not([aria-pressed=true]) { background:var(--bui-bg); color:var(--bui-ink); }
+  .bui-tag-remove:hover:not(:disabled) { background:var(--bui-raised); color:var(--bui-ink); }
+}
+@media(pointer:coarse) {
+  .bui-tag { min-height:44px; }
+  .bui-tag-remove { width:40px; height:40px; min-width:40px; }
+  .bui-tag-input-draft { min-height:40px; font-size:16px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .bui-menu-entry,.bui-menu-choice-indicator,.bui-toggle-button,.bui-tag-input,.bui-tag-remove { transition:none; }
+  .bui-tag { animation:none; }
+}
+@media(forced-colors:active) {
+  .bui-toggle-group,.bui-tag-input,.bui-tag { border:1px solid ButtonText; }
+  .bui-toggle-button[aria-pressed=true] { background:Highlight; color:HighlightText; box-shadow:none; }
+  .bui-toggle-button:focus-visible,.bui-tag-remove:focus-visible { outline:2px solid Highlight; }
+  .bui-tag-input:focus-within,.bui-tag-input[data-invalid] { outline:2px solid Highlight; box-shadow:none; }
+  .bui-tag-input-draft { forced-color-adjust:auto; }
+}

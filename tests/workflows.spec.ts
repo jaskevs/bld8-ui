@@ -77,8 +77,9 @@ test('planner validates and creates a reusable project record',async ({page})=>{
 test('resource library exports chosen records and reverses archive',async ({page})=>{
   await page.goto('/blocks/resources');await page.getByRole('checkbox',{name:'Select Research notes.txt',exact:true}).check();const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'Export CSV',exact:true}).click();const download=await downloading;expect(download.suggestedFilename()).toBe('resource-metadata.csv');
   const stream=await download.createReadStream();const chunks:Buffer[]=[];for await(const chunk of stream!) chunks.push(Buffer.from(chunk));expect(Buffer.concat(chunks).toString()).toContain('Research notes.txt');expect(Buffer.concat(chunks).toString()).not.toContain('Interface brief.pdf');
-  await page.getByRole('button',{name:'Archive',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'1 resources archived.'})).toBeVisible();await chooseOption(page,page.getByRole('combobox',{name:'Statuses'}),'Archived');await expect(page.getByRole('table')).toContainText('Research notes.txt');
-  await page.getByRole('button',{name:'Undo archive'}).click();await expect(page.getByRole('table')).not.toContainText('Research notes.txt');
+  const resourcesTable=page.getByRole('table',{name:'Resources',exact:true});
+  await page.getByRole('button',{name:'Archive',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'1 resources archived.'})).toBeVisible();await chooseOption(page,page.getByRole('combobox',{name:'Statuses'}),'Archived');await expect(resourcesTable).toContainText('Research notes.txt');
+  await page.getByRole('button',{name:'Undo archive'}).click();await expect(resourcesTable).not.toContainText('Research notes.txt');
 });
 test('Outline keeps local edits when switching views and command navigation works',async ({page})=>{
   await page.goto('/templates/outline');const nav=page.getByRole('navigation',{name:'Outline views'});await nav.getByRole('button',{name:'Settings',exact:true}).click();await page.getByRole('textbox',{name:'Display name',exact:true}).fill('A lasting draft');

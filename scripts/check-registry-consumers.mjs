@@ -80,8 +80,13 @@ visit('outline.json');
 const tableViewsAvailable=originals.has('table-view-state.json');
 if(tableViewsAvailable){visit('table-view-state.json');visit('issue-table.json');}
 const dataWorkspaceAvailable=originals.has('data-workspace.json');
+// New control files identify the 0.3 source API; retained 0.2 consumers keep their original fixture.
+const coreControlNames=['toggle-group','tag-input','range-slider','otp-input'];
+const availableCoreControls=coreControlNames.filter(name=>originals.has(name+'.json'));
+const richCoreControlsAvailable=coreControlNames.every(name=>originals.has(name+'.json'))&&originals.has('select.json')&&originals.has('dropdown.json');
+const coreControlInstallItems=[...availableCoreControls,...(richCoreControlsAvailable?['select','dropdown']:[])];
 const extendedControls=['async-combobox','async-multi-select','cascader','event-calendar','calendar-workspace','upload-queue','upload-http','data-grid','data-workspace-state','data-workspace'].filter(name=>originals.has(name+'.json'));
-for(const name of extendedControls)visit(name+'.json');
+for(const name of [...extendedControls,...coreControlInstallItems])visit(name+'.json');
 assert.ok(graph.size > 11, 'The representative workflow must install its transitive graph.');
 
 const temporaryParent = await realpath(tmpdir());
@@ -270,6 +275,7 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
         await page.keyboard.press('Escape');
         await expect(dialog).not.toBeVisible();
         await expect(trigger).toBeFocused();
+        await checkCoreConsumerControls(page);
         const files = page.getByRole('region', {name:'Installed file browser',exact:true});
         const tree = files.getByRole('tree',{name:'Workspace folders',exact:true});
         await expect(tree).toBeVisible();
@@ -384,6 +390,74 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
   } finally { await stopServer(child); }
 }
 
+
+function coreConsumerFixture(alias) {
+  if(!availableCoreControls.length)return {imports:'',source:''};
+  const has=name=>availableCoreControls.includes(name);
+  const imports=availableCoreControls.map(name=>{
+    const exported={'toggle-group':'ToggleGroup','tag-input':'TagInput','range-slider':'RangeSlider','otp-input':'OTPInput'}[name];
+    return "import {"+exported+"} from '"+alias+"/"+name+"';";
+  });
+  if(richCoreControlsAvailable)imports.push("import {Select} from '"+alias+"/controls';","import {DropdownMenu} from '"+alias+"/overlays';");
+  const names=[...(has('toggle-group')?['consumerAlignment']:[]),...(has('tag-input')?['consumerTopics']:[]),...(has('range-slider')?['consumerBudget']:[]),...(has('otp-input')?['consumerCode']:[]),...(richCoreControlsAvailable?['consumerDestination']:[])];
+  const fields=[
+    has('toggle-group')?'<ToggleGroup label="Installed alignment" name="consumerAlignment" defaultValue={["left"]} required options={[{value:"left",label:"Installed align left"},{value:"center",label:"Installed align center"},{value:"right",label:"Installed align right",disabled:true}]}/>':'',
+    has('tag-input')?'<TagInput label="Installed topics" name="consumerTopics" defaultValue={["React"]} required maxTags={3}/>':'',
+    has('range-slider')?'<RangeSlider label="Installed budget" name="consumerBudget" defaultValue={[20,80]} min={0} max={100} step={5} minGap={10} thumbLabels={["Installed minimum budget","Installed maximum budget"]}/>':'',
+    has('otp-input')?'<OTPInput label="Installed code" name="consumerCode" length={4} defaultValue="12" required showSlots/>':'',
+    richCoreControlsAvailable?'<Select label="Installed destination" name="consumerDestination" value={destination} onValueChange={setDestination} clearable options={[{value:"preview-node",label:"Preview node",group:"Delivery",description:"Checks before a release."},{value:"primary-node",label:"Primary node",group:"Delivery",description:"The live deployment destination."},{value:"retired-node",label:"Retired node",group:"History",disabled:true}]}/>':''
+  ].filter(Boolean).join('\n');
+  const menu=richCoreControlsAvailable?'<DropdownMenu trigger={<Button variant="secondary">Installed options</Button>} items={[{type:"checkbox",label:"Installed show labels",checked:showLabels,onCheckedChange:setShowLabels},{type:"radio-group",label:"Installed row spacing",value:spacing,onValueChange:setSpacing,items:[{value:"compact",label:"Installed compact rows"},{value:"comfortable",label:"Installed comfortable rows"}]},{type:"separator"},{type:"submenu",label:"Move installed record",items:[{label:"Installed inbox",onSelect:()=>setLocation("inbox")},{label:"Installed review queue",onSelect:()=>setLocation("review")}]}]}/><p role="status" aria-label="Installed menu state">{(showLabels?"labels on":"labels off")+" · "+spacing+" · "+location}</p>':'';
+  return {imports:imports.join('\n'),source:
+    'function InstalledCoreControls(){\n'+
+    'const [values,setValues]=useState("Not read");const [destination,setDestination]=useState<string|null>("preview-node");const [showLabels,setShowLabels]=useState(true);const [spacing,setSpacing]=useState("comfortable");const [location,setLocation]=useState("inbox");\n'+
+    'return <section aria-label="Installed core controls" style={{display:"grid",gap:16,marginBottom:32,maxWidth:560}}><h2>Installed core controls</h2><form style={{display:"grid",gap:16}} onReset={()=>{setValues("Not read");setDestination("preview-node");}} onSubmit={event=>{event.preventDefault();const data=new FormData(event.currentTarget);setValues(JSON.stringify(Object.fromEntries('+JSON.stringify(names)+'.map(name=>[name,data.getAll(name).map(String)]))));}}>'+fields+'<div style={{display:"flex",gap:8,flexWrap:"wrap"}}><Button type="submit">Read installed control values</Button><Button type="reset" variant="secondary">Reset installed controls</Button></div><output aria-label="Installed control values">{values}</output></form>'+menu+'</section>;\n}\n'};
+}
+
+async function checkCoreConsumerControls(page) {
+  if(!availableCoreControls.length)return;
+  const has=name=>availableCoreControls.includes(name),surface=page.getByRole('region',{name:'Installed core controls',exact:true}),expected={};
+  await expect(surface).toBeVisible();
+  if(has('toggle-group')){
+    const left=surface.getByRole('button',{name:'Installed align left',exact:true}),center=surface.getByRole('button',{name:'Installed align center',exact:true});
+    await left.focus();await left.press('ArrowRight');await expect(center).toBeFocused();await center.press('Space');await expect(center).toHaveAttribute('aria-pressed','true');
+    await expect(surface.getByRole('button',{name:'Installed align right',exact:true})).toBeDisabled();expected.consumerAlignment=['center'];
+  }
+  if(has('tag-input')){
+    const input=surface.getByRole('textbox',{name:'Installed topics',exact:true});await input.fill('TypeScript');await input.press('Enter');
+    await expect(surface.getByRole('list',{name:'Installed topics tags',exact:true}).getByRole('listitem')).toHaveCount(2);await expect(surface.getByLabel('Installed control values')).toHaveText('Not read');
+    expected.consumerTopics=['React','TypeScript'];
+  }
+  if(has('range-slider')){
+    const lower=surface.getByRole('slider',{name:'Installed minimum budget',exact:true});await lower.focus();await lower.press('ArrowRight');await expect(lower).toHaveValue('25');
+    await expect(surface.getByRole('slider',{name:'Installed maximum budget',exact:true})).toHaveValue('80');expected.consumerBudget=['25','80'];
+  }
+  if(has('otp-input')){
+    const code=surface.getByRole('textbox',{name:'Installed code',exact:true});await expect(code).toHaveAttribute('autocomplete','one-time-code');await expect(code).toHaveAttribute('inputmode','numeric');
+    await code.fill('1234');await code.evaluate(input=>input.setSelectionRange(1,3));await code.press('Backspace');await expect(code).toHaveValue('14');await code.fill('4321');expected.consumerCode=['4321'];
+  }
+  if(richCoreControlsAvailable){
+    const destination=surface.getByRole('combobox',{name:'Installed destination',exact:true});await destination.click();
+    const primary=page.getByRole('option',{name:'Primary node',exact:true});await expect(primary).toHaveAccessibleDescription('The live deployment destination.');await expect(page.getByRole('option',{name:'Retired node',exact:true})).toHaveAttribute('aria-disabled','true');
+    await primary.click();await expect(destination).toBeFocused();expected.consumerDestination=['primary-node'];
+    const trigger=surface.getByRole('button',{name:'Installed options',exact:true});await trigger.focus();await trigger.press('ArrowDown');
+    const labels=page.getByRole('menuitemcheckbox',{name:'Installed show labels',exact:true});await expect(labels).toBeFocused();await labels.press('Space');await expect(labels).toHaveAttribute('aria-checked','false');
+    const compact=page.getByRole('menuitemradio',{name:'Installed compact rows',exact:true});await compact.focus();await compact.press('Space');await expect(compact).toHaveAttribute('aria-checked','true');
+    await page.getByRole('menuitem',{name:'Move installed record',exact:true}).focus();await page.keyboard.press('ArrowRight');const submenu=page.getByRole('menu',{name:'Move installed record',exact:true});
+    await expect(submenu).toBeVisible();await submenu.getByRole('menuitem',{name:'Installed review queue',exact:true}).click();await expect(trigger).toBeFocused();
+    await expect(surface.getByRole('status',{name:'Installed menu state',exact:true})).toHaveText('labels off · compact · review');
+  }
+  await surface.getByRole('button',{name:'Read installed control values',exact:true}).click();
+  await expect(surface.getByLabel('Installed control values')).toHaveText(JSON.stringify(expected));
+  await surface.getByRole('button',{name:'Reset installed controls',exact:true}).click();await expect(surface.getByLabel('Installed control values')).toHaveText('Not read');
+  if(has('toggle-group'))await expect(surface.getByRole('button',{name:'Installed align left',exact:true})).toHaveAttribute('aria-pressed','true');
+  if(has('tag-input')){await expect(surface.getByRole('button',{name:'Remove React',exact:true})).toBeVisible();await expect(surface.getByRole('button',{name:'Remove TypeScript',exact:true})).toHaveCount(0);}
+  if(has('range-slider'))await expect(surface.getByRole('slider',{name:'Installed minimum budget',exact:true})).toHaveValue('20');
+  if(has('otp-input'))await expect(surface.getByRole('textbox',{name:'Installed code',exact:true})).toHaveValue('12');
+  if(richCoreControlsAvailable)await expect(surface.getByRole('combobox',{name:'Installed destination',exact:true})).toContainText('Preview node');
+  assert.ok(await surface.evaluate(element=>element.scrollWidth<=element.clientWidth+1),'Installed core controls must fit their source consumer container.');
+}
+
 async function prepare(framework, lean=false) {
   const target = join(workspace, (lean?'lean-':'')+framework);
   const next = framework === 'next';
@@ -413,6 +487,7 @@ async function prepare(framework, lean=false) {
     include: next ? ['**/*.ts', '**/*.tsx', '.next/types/**/*.ts', '.next/dev/types/**/*.ts'] : ['src', 'vite.config.ts'],
     exclude: ['node_modules'],
   });
+  const {imports:coreImports,source:coreSource}=coreConsumerFixture(alias);
   const component = lean ? `import {SignInForm} from '${alias}/blocks/sign-in';\nexport default function Setup(){return <SignInForm/>}\n` : `import {useState} from 'react';
 import {AnalyticsDashboard} from '${alias}/blocks/analytics-dashboard';
 import {FileBrowser} from '${alias}/blocks/file-browser';
@@ -424,12 +499,14 @@ ${dataWorkspaceAvailable?`import {DataWorkspace} from '${alias}/blocks/data-work
 import {OperationsTemplate} from '${alias}/blocks/operations-template';
 import {Button} from '${alias}/core';
 import {Dialog,UIProvider} from '${alias}/overlays';
+${coreImports}
+${coreSource}
 const queue=Array.from({length:240},(_,index)=>({id:'C-'+String(index).padStart(3,'0'),title:'Queue record '+index,status:index%2?'Later':'Current'}));
 const queueKey=(row:typeof queue[number])=>row.id;
 const queueGrouping={key:(row:typeof queue[number])=>row.status,label:(key:string)=>key};
 const queueColumns=[{key:'id',header:'ID',width:120,cell:(row:typeof queue[number])=>row.id},{key:'title',header:'Record',width:240,flex:1,cell:(row:typeof queue[number])=>row.title}];
 const loadConsumerIssues=async({signal}:{signal:AbortSignal})=>{if(signal.aborted)throw new DOMException('Cancelled','AbortError');return createSampleLargeIssues(80);};
-export default function Setup(){const[selected,setSelected]=useState<string[]>([]);return <UIProvider><section data-consumer-content><div className="theme-controls"><Button variant="accent">Theme accent</Button><Button>Theme primary</Button><Dialog title="Installed theme portal" description="Exported CSS inherited through a body-mounted portal." trigger={<Button variant="secondary">Open theme dialog</Button>}><Button variant="accent">Portal accent</Button><Button>Portal primary</Button></Dialog></div><div className="bblocks-root"><SessionSetup/></div><section aria-label="Installed file browser" className="bblocks-root"><FileBrowser/></section><section aria-label="Installed analytics" className="bblocks-root"><AnalyticsDashboard/></section><section aria-label="Installed windowed table"><h2>Installed queue</h2><WindowedTable caption="Installed queue" rows={queue} columns={queueColumns} rowKey={queueKey} grouping={queueGrouping} height={320} rowHeight={52} overscan={3} selectable selectedKeys={selected} onSelectedKeysChange={setSelected}/><p role="status" aria-label="Installed selection">{selected.length} selected</p></section><section aria-label="Installed large issue block" className="bblocks-root"><LargeIssueTable loadRows={loadConsumerIssues}/></section><section aria-label="Installed schedule" className="bblocks-root"><SchedulePlanner/></section>${dataWorkspaceAvailable?`<section aria-label="Installed data workspace" className="bblocks-root"><DataWorkspace/></section>`:''}<section aria-label="Installed Outline" className="bblocks-root"><OperationsTemplate/></section></section></UIProvider>}
+export default function Setup(){const[selected,setSelected]=useState<string[]>([]);return <UIProvider><section data-consumer-content>${availableCoreControls.length?'<InstalledCoreControls/>':''}<div className="theme-controls"><Button variant="accent">Theme accent</Button><Button>Theme primary</Button><Dialog title="Installed theme portal" description="Exported CSS inherited through a body-mounted portal." trigger={<Button variant="secondary">Open theme dialog</Button>}><Button variant="accent">Portal accent</Button><Button>Portal primary</Button></Dialog></div><div className="bblocks-root"><SessionSetup/></div><section aria-label="Installed file browser" className="bblocks-root"><FileBrowser/></section><section aria-label="Installed analytics" className="bblocks-root"><AnalyticsDashboard/></section><section aria-label="Installed windowed table"><h2>Installed queue</h2><WindowedTable caption="Installed queue" rows={queue} columns={queueColumns} rowKey={queueKey} grouping={queueGrouping} height={320} rowHeight={52} overscan={3} selectable selectedKeys={selected} onSelectedKeysChange={setSelected}/><p role="status" aria-label="Installed selection">{selected.length} selected</p></section><section aria-label="Installed large issue block" className="bblocks-root"><LargeIssueTable loadRows={loadConsumerIssues}/></section><section aria-label="Installed schedule" className="bblocks-root"><SchedulePlanner/></section>${dataWorkspaceAvailable?`<section aria-label="Installed data workspace" className="bblocks-root"><DataWorkspace/></section>`:''}<section aria-label="Installed Outline" className="bblocks-root"><OperationsTemplate/></section></section></UIProvider>}
 `;
   await write(target, next ? 'app/globals.css' : 'src/style.css', '*{box-sizing:border-box}body{position:relative;margin:0;padding:32px;font-family:var(--bui-font);background:var(--bui-canvas);color:var(--bui-ink)}main{max-width:1200px;margin:auto}.theme-controls{display:flex;gap:16px;margin-bottom:24px}\n');
   if (next) {
@@ -471,12 +548,13 @@ try {
     requests.clear();
     const target = await prepare(framework);
     await run(['install', '--no-audit', '--no-fund'], target);
-    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${installOrigin()}/r/session-setup.json`, `${installOrigin()}/r/theme-config.json`, `${installOrigin()}/r/file-browser.json`, `${installOrigin()}/r/chart.json`, `${installOrigin()}/r/analytics-dashboard.json`, `${installOrigin()}/r/windowed-table.json`, `${installOrigin()}/r/table-grouping.json`, `${installOrigin()}/r/large-issue-table.json`, `${installOrigin()}/r/day-agenda.json`, `${installOrigin()}/r/schedule-state.json`, `${installOrigin()}/r/schedule-planner.json`, `${installOrigin()}/r/outline.json`, ...(tableViewsAvailable?[`${installOrigin()}/r/table-view-state.json`,`${installOrigin()}/r/issue-table.json`]:[]), ...extendedControls.map(name=>`${installOrigin()}/r/${name}.json`), '--yes', '--overwrite'], target);
+    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${installOrigin()}/r/session-setup.json`, `${installOrigin()}/r/theme-config.json`, `${installOrigin()}/r/file-browser.json`, `${installOrigin()}/r/chart.json`, `${installOrigin()}/r/analytics-dashboard.json`, `${installOrigin()}/r/windowed-table.json`, `${installOrigin()}/r/table-grouping.json`, `${installOrigin()}/r/large-issue-table.json`, `${installOrigin()}/r/day-agenda.json`, `${installOrigin()}/r/schedule-state.json`, `${installOrigin()}/r/schedule-planner.json`, `${installOrigin()}/r/outline.json`, ...(tableViewsAvailable?[`${installOrigin()}/r/table-view-state.json`,`${installOrigin()}/r/issue-table.json`]:[]), ...[...extendedControls,...coreControlInstallItems].map(name=>`${installOrigin()}/r/${name}.json`), '--yes', '--overwrite'], target);
     if(!publishedVersion)for (const item of graph) assert.ok(requests.has(item), `shadcn did not request ${item}`);
     const uiDirectory = join(target, framework === 'next' ? 'components/ui/bld8' : 'src/ui/bld8');
     for (const file of ['blocks/outline-project-editor.tsx', 'blocks/outline-drafts.ts', 'drawer.tsx', 'day-agenda.tsx', 'schedule-state.ts', 'blocks/schedule-planner.tsx', 'windowed-table.tsx', 'table-grouping.ts', 'blocks/large-issue-table.tsx', 'blocks/issue-repository.ts', 'chart.tsx', 'chart-state.ts', 'blocks/analytics-dashboard.tsx', 'blocks/analytics-state.ts', 'blocks/file-browser.tsx', 'tree.tsx', 'blocks/session-setup.tsx', 'blocks/session-preferences.ts', 'time-options.ts', 'theme-config.ts', 'styles.css', 'tokens.css', 'tailwind.css', 'licenses/LICENSE', 'licenses/THIRD_PARTY_NOTICES.md']) {
       assert.ok((await readFile(join(uiDirectory, file))).length, `Missing installed source/style/notice: ${file}`);
     }
+    for(const name of availableCoreControls)assert.ok((await readFile(join(uiDirectory,name+'.tsx'))).length,'Missing installed core source: '+name);
     const installed = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'));
     assert.equal(installed.workspaces, undefined, 'A clean consumer must not use local workspace packages.');
     assert.ok(!Object.keys(installed.dependencies).some(name => name.startsWith('@bld8/')), 'Registry installation must use editable source.');

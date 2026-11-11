@@ -3,9 +3,11 @@ import {mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, posix, resolve} from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {blocks, templates} from './library-catalog.mjs';
+import {readComponentExamples} from './prepare-component-examples.mjs';
 
 const defaultRoot = fileURLToPath(new URL('../', import.meta.url));
 const guideFiles = [
+  ['core-components','Core controls and complete examples','docs/core-components.md'],
   ['data-workspace', 'Typed batch editing and durable data workflows', 'docs/data-workspace.md'],
   ['upload-workflows', 'Per-file upload and HTTP acknowledgement', 'docs/upload-workflows.md'],
   ['calendar-workflows', 'Week and month event workflows', 'docs/calendar-workflows.md'],
@@ -27,30 +29,8 @@ const read = (root, path) => readFileSync(join(root, path), 'utf8');
 
 // Read only literal catalogue data. Importing a TypeScript module here would also
 // execute unrelated code added to that module in a later change.
-export function readExportLiteral(source, name) {
-  const file = ts.createSourceFile('catalogue.ts', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  function literal(node) {
-    if (ts.isAsExpression(node) || ts.isSatisfiesExpression(node) || ts.isParenthesizedExpression(node)) return literal(node.expression);
-    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
-    if (ts.isNumericLiteral(node)) return Number(node.text);
-    if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
-    if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
-    if (node.kind === ts.SyntaxKind.NullKeyword) return null;
-    if (ts.isArrayLiteralExpression(node)) return node.elements.map(literal);
-    if (ts.isObjectLiteralExpression(node)) return Object.fromEntries(node.properties.map(property => {
-      if (!ts.isPropertyAssignment(property) || ts.isComputedPropertyName(property.name)) throw Error('Catalogue data must use literal properties.');
-      return [property.name.text, literal(property.initializer)];
-    }));
-    throw Error('Catalogue data must be a literal value.');
-  }
-  for (const statement of file.statements) {
-    if (!ts.isVariableStatement(statement) || !statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) continue;
-    for (const declaration of statement.declarationList.declarations) {
-      if (ts.isIdentifier(declaration.name) && declaration.name.text === name && declaration.initializer) return literal(declaration.initializer);
-    }
-  }
-  throw Error(`Missing exported catalogue data: ${name}`);
-}
+export {readExportLiteral} from './literal-data.mjs';
+import {readExportLiteral} from './literal-data.mjs';
 
 function blockApi(root) {
   const configPath = join(root, 'packages/blocks/tsconfig.json');
@@ -114,6 +94,7 @@ export function buildAgentCatalog({root=defaultRoot, origin}={}) {
   const components = readExportLiteral(read(root, 'apps/docs/src/lib/catalog.ts'), 'components');
   const api = readExportLiteral(read(root, 'apps/docs/src/lib/generated/api.ts'), 'api');
   const describeBlock = blockApi(root);
+  const examples=readComponentExamples(root);
   const entries = [
     ...components.map(item => ({...item, kind:'component'})),
     ...blocks.map(item => ({...item, title:item.name, kind:'block'})),
@@ -132,6 +113,7 @@ export function buildAgentCatalog({root=defaultRoot, origin}={}) {
       markdownUrl:`${homepage}/agent/${item.kind}/${item.id}.md`,
       registry:{name:registry.name, url:`${homepage}/r/${registry.name}.json`, dependencies:registry.dependencies ?? [], registryDependencies:registry.registryDependencies ?? [], files:(registry.files ?? []).map(({path, target, type}) => ({path, target, type}))},
       example:{language:'tsx', code:item.code ?? `<${item.exportName} />`, complete:false},
+      examples:item.kind==='component'?examples.filter(example=>example.componentId===item.id).map(({id,title,description,source,registrySource,keyboard,states})=>({id,title,description,language:'tsx',code:source,registryCode:registrySource,complete:true,keyboard,states})):[],
       api:declarations,
     };
   }).sort((a, b) => a.kind.localeCompare(b.kind) || a.id.localeCompare(b.id));
@@ -143,7 +125,7 @@ export function buildAgentCatalog({root=defaultRoot, origin}={}) {
     homepage, license:'MIT',
     installation:{
       requirements:['React 19', 'Initialise shadcn before registry installation.', 'Node 22 for the supplied starters and local documentation server.'],
-      notes:['BLD8 npm packages are private and unpublished; use editable registry source or a supplied starter.', 'Registry source is installed under bld8/ within your configured UI alias.', 'Wrap overlays in UIProvider from bld8/overlays and set body { position: relative; }.', 'Compiled CSS is included. New utility classes require your own Tailwind setup or ordinary CSS.', 'Keep all included third-party licence notices.', 'Examples are snippets; supply their data, callbacks, state and imports. The API tables describe the actual exported props.'],
+      notes:['BLD8 npm packages are private and unpublished; use editable registry source or a supplied starter.', 'Registry source is installed under bld8/ within your configured UI alias.', 'Wrap overlays in UIProvider from bld8/overlays and set body { position: relative; }.', 'Compiled CSS is included. New utility classes require your own Tailwind setup or ordinary CSS.', 'Keep all included third-party licence notices.', 'Quick-reference examples are snippets. Named examples are complete client modules, typechecked during the build; include the stylesheet once in your app. Workspace examples use @bld8/ui; registry examples use the default local UI alias. API tables describe the actual exported props.'],
       registryBase:`${homepage}/r`,
     },
     entries,
@@ -162,8 +144,13 @@ function apiMarkdown(declarations) {
   }).join('\n\n');
 }
 
+function examplesMarkdown(examples=[]) {
+  const fence=String.fromCharCode(96).repeat(3);
+  return examples.map(example=>['### '+example.title,example.description,'Example ID: '+example.id+'.',fence+'tsx\n'+example.code+'\n'+fence,'Registry source (adjust the default UI alias to your application):',fence+'tsx\n'+example.registryCode+'\n'+fence,'Keyboard: '+example.keyboard.join(' '),'States: '+example.states.join(' ')].join('\n\n')).join('\n\n')||'Complete integration source is available in the interactive documentation source panel and supplied starter.';
+}
+
 export function entryMarkdown(entry, catalog) {
-  return `# ${entry.title}\n\n${entry.description}\n\nKind: ${entry.kind}. Category: ${entry.category}. Licence: ${catalog.license}.\nSource version: ${catalog.release.version} (${catalog.release.status}); snapshot ${catalog.release.snapshot}.\n\n[Interactive documentation](${entry.documentationUrl}) · [Registry item](${entry.registry.url})\n\n## Install\n\nReact 19 and an initialised shadcn application are required.\n\n\`\`\`sh\nnpx shadcn@latest add ${entry.registry.url}\n\`\`\`\n\n${catalog.installation.notes.join('\n\n')}\n\nDirect runtime dependencies: ${entry.registry.dependencies.join(', ') || 'Resolved by the registry dependency graph.'}\nRegistry dependencies: ${entry.registry.registryDependencies.join(', ') || 'None.'}\n\n## Usage snippet\n\nThis snippet needs its named data, callbacks, state and imports. It is not a standalone application.\n\n\`\`\`tsx\n${entry.example.code}\n\`\`\`\n\n## Behaviour and boundaries\n\n${entry.notes}\n\n## Public API\n\nGenerated from the current public TypeScript exports. Native React props are marked explicitly.\n\n${apiMarkdown(entry.api)}\n`;
+  return `# ${entry.title}\n\n${entry.description}\n\nKind: ${entry.kind}. Category: ${entry.category}. Licence: ${catalog.license}.\nSource version: ${catalog.release.version} (${catalog.release.status}); snapshot ${catalog.release.snapshot}.\n\n[Interactive documentation](${entry.documentationUrl}) · [Registry item](${entry.registry.url})\n\n## Install\n\nReact 19 and an initialised shadcn application are required.\n\n\`\`\`sh\nnpx shadcn@latest add ${entry.registry.url}\n\`\`\`\n\n${catalog.installation.notes.join('\n\n')}\n\nDirect runtime dependencies: ${entry.registry.dependencies.join(', ') || 'Resolved by the registry dependency graph.'}\nRegistry dependencies: ${entry.registry.registryDependencies.join(', ') || 'None.'}\n\n## Usage snippet\n\nThis snippet needs its named data, callbacks, state and imports. It is not a standalone application.\n\n\`\`\`tsx\n${entry.example.code}\n\`\`\`\n\n## Complete named examples\n\n${examplesMarkdown(entry.examples)}\n\n## Behaviour and boundaries\n\n${entry.notes}\n\n## Public API\n\nGenerated from the current public TypeScript exports. Native React props are marked explicitly.\n\n${apiMarkdown(entry.api)}\n`;
 }
 
 export function prepareAgentDocs(options={}) {
@@ -174,6 +161,8 @@ export function prepareAgentDocs(options={}) {
     mkdirSync(dirname(target), {recursive:true});
     writeFileSync(target, value, 'utf8');
   };
+  const blockApis=Object.fromEntries(catalog.entries.filter(entry=>entry.kind!=='component').map(entry=>[entry.id,entry.api]));
+  const blockApiPath=join(root,'apps/docs/src/lib/generated/block-api.ts');mkdirSync(dirname(blockApiPath),{recursive:true});writeFileSync(blockApiPath,'export const blockApi = '+JSON.stringify(blockApis)+';\n');
   write('agent/catalog.json', JSON.stringify(catalog, null, 2) + '\n');
   const documents = catalog.entries.map(entry => ({entry, markdown:entryMarkdown(entry, catalog)}));
   for (const {entry, markdown} of documents) write(`agent/${entry.kind}/${entry.id}.md`, markdown);

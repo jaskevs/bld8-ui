@@ -82,8 +82,9 @@ test('team invitation rejects duplicates and creates an in-memory row', async ({
   await page.getByRole('button',{name:'Add invitation'}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByRole('searchbox',{name:'Search team members'}).fill('newperson');
-  await expect(page.locator('tbody tr')).toHaveCount(1);
-  await expect(page.locator('tbody')).toContainText('Invited');
+  const teamTable=page.getByRole('table',{name:'Team members',exact:true});
+  await expect(teamTable.locator('tbody tr')).toHaveCount(1);
+  await expect(teamTable.locator('tbody')).toContainText('Invited');
   await expect(page.getByRole('status').filter({hasText:'No email was sent.'})).toBeVisible();
 });
 

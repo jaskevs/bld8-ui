@@ -1,5 +1,54 @@
 # Development handoff - 11 November 2026
 
+## Complete core-component pass
+
+The owner authorised the complete core-component plan in one pass. It is
+implemented and verified locally as development 0.3.0/unreleased. The catalogue
+contains 63 component families, 76 complete named examples, eighteen blocks and
+three templates. Family, example, icon and registry counts are distinct.
+
+The icon directory keeps gallery and common-button geometry independent of
+selected size/stroke, and adds semantic/alias search, keyboard browsing, saved
+icons, shareable settings, licensed SVG export and complete React usage.
+Select, Combobox and MultiSelect now support rich stable-ID options and groups;
+Dropdown supports grouped, nested, checked and radio actions. Existing simple
+callers and the public MenuItem interface remain compatible.
+
+ToggleGroup, TagInput, RangeSlider and OTPInput are new families. Field states,
+native form values/reset, refs, validation and keyboard behaviour share documented
+conventions. The OTP control uses one native input; host applications still own
+code verification. Optional DataGrid layouts add order, visibility, resizing,
+logical pinning, density and touch/keyboard multi-sort while preserving canonical
+cell identity, drafts and outside focus.
+
+Literal complete examples compile as real client modules. The website runs that
+same source and exposes matching workspace/registry source, TypeScript APIs,
+keyboard guidance and states to people, agent docs and the existing read-only
+MCP server. Catalogue search/category/capability filters are URL-backed. Preview
+fields become interactive only after their actual handlers hydrate. Registry and
+starter CSS packaging include the shared control fragments.
+
+Production build, all workspace/quality types, all 76 example modules, 398 pinned
+browser-quality cases and clean Next.js/Vite source consumers passed. Themed
+Next.js/Vite ZIPs independently installed, rebuilt and retained their theme in
+real interactions. The 55-case affected-suite rerun passed after two stale test
+queries in the full core run were corrected. See verification.md for exact scopes,
+including the full-run result; no approved visual baseline was changed.
+
+The local preview is running at http://127.0.0.1:3120/components. The owner has
+authorised committing and pushing the verified source batch. Confirm GitHub
+checks and production promotion against the resulting revision before treating
+these additions as live. Verification was recorded against the working tree based
+on 8e489a117c79f309245d3091c9e0ad6fa0841407. No new retained release is
+requested; retained 0.2.0 bytes and personal identity/origin/hooks are unchanged. Private Workbench dates, exam window and
+135-hour baseline remain separate. Physical iPhone keyboard/zoom/autofill and
+screen-reader review remain real-device follow-up work.
+
+## Earlier evidence
+
+The sections below record preceding repairs and source handoffs. They are
+historical; the current local capabilities and publication state are above.
+
 ## Deployment check repair
 
 The approved batch was pushed as 96ec4ab. GitHub run 42906697903 failed

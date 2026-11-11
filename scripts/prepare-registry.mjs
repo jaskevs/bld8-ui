@@ -42,6 +42,7 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
 }
 add('bld8-block-styles', 'BLD8 block styles', [file('registry/bld8/blocks/styles.css', read('packages/blocks/src/styles.css'), '@ui/bld8/blocks/styles.css','registry:file')],[],['bld8-styles']);
 const groups = {
+  'toggle-group':['toggle-group'], 'tag-input':['tag-input'], 'range-slider':['range-slider'], 'otp-input':['otp-input'],
   'data-workspace-state':['data-workspace-state'], 'data-grid-state':['data-grid-state'], 'data-grid':['data-grid'], 'table-query':['table-query'],
   'upload-state':['upload-state'], 'upload-http':['upload-http'], 'upload-queue':['upload-queue'],
   'calendar-state':['calendar-state'], 'event-calendar':['event-calendar'],

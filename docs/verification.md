@@ -1,3 +1,153 @@
+# Complete core-component pass - 11 November 2026
+
+Local source acceptance for development 0.3.0/unreleased, based on HEAD
+8e489a117c79f309245d3091c9e0ad6fa0841407 plus the uncommitted core/icon pass.
+These results were recorded before the owner authorised the source handoff.
+GitHub checks and deployment must be verified separately against the pushed
+revision. No new retained release is requested. Existing 0.2.0 assets and
+repository-local ownership, SSH destination and hooks are unchanged. The isolated
+Windows development preview serves port 3120.
+
+## Implementation and build
+
+The catalogue contains 63 component families and 76 complete named examples;
+there are eighteen blocks, three templates, 206 registry entries and 1,877 pinned
+canonical icons. Agent discovery contains 84 entries and seventeen guides.
+Named examples, dependency entries and visual variants are not extra families.
+
+Production UI/docs/MCP builds, all workspace types, quality-suite types and
+strict TypeScript compilation of all 76 emitted example modules passed. Public
+APIs, examples, human/agent discovery and the registry regenerate from their
+source authorities. New families are ToggleGroup, TagInput, RangeSlider and
+OTPInput. Existing choice/menu/field/grid APIs remain compiled in real consumers.
+
+The Linux checks used Node 22.22.0 and the exact pinned image:
+
+    mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+
+The source was copied through an explicit allowlist into an isolated /work tree,
+without host credentials, environment files or node_modules. No company/global
+Git, npm, SSH, GitHub or Vercel configuration was changed.
+
+## Browser and regression evidence
+
+- All 398 quality checks passed: twenty unchanged approved visual comparisons,
+  eighteen touch checks and 360 normal-motion browser/theme/viewport cases.
+  The new core-control flows account for 48 of the latter. Chromium, Firefox and
+  WebKit ran in desktop/phone light/dark configurations; live reduced-motion
+  changes, focus, canonical forms, reset, rich options, containment and native
+  editor selection are covered. Snapshot updates were disabled.
+- The final full core execution passed 733 of 735 cases. Two failures were test
+  queries: an unscoped empty-state message also matched its new API example, and
+  programmatic label lookup targeted a deliberately inert prehydration field.
+  The queries were corrected to the visible status and accessible textbox with
+  actual focus assertions. No control/application code changed for those fixes.
+  All 55 cases in the three affected suites then passed. This is a focused rerun,
+  not a claim that a subsequent full 735-case execution was green.
+- Both ten-fresh-context hydration stress checks passed: generated rich Combobox
+  examples and the existing MultiSelect preview. Preview geometry remains
+  server-rendered; inert/aria-hidden readiness prevents interaction before the
+  component's real handlers commit. Focused grid layout/identity coverage passed.
+- A final docs production rebuild and thirty discovery/library cases passed after
+  the desktop capability-row spacing adjustment. Mobile search was subsequently
+  given its own full-width row; the final production rebuild and all six focused
+  responsive/filter checks passed. Evidence: core-plan-layout-final-linux.log.
+- Twenty normal-motion production review captures covered desktop and phone,
+  light/dark, rich choices, menu preferences, invalid tags, range/code controls,
+  and 320px grid layout/sort dialogs. Representative captures were visually
+  inspected. The review summary recorded no scenario failure, runtime error,
+  document overflow or dialog overflow. Intentional grid scrolling is separate.
+  Catalogue spacing was also inspected at 1440, 768, 390 and 320px in the local
+  preview. The final 390/320px light/dark Edge capture review also passed: search
+  fills its row, counts sit below, and no page error or document overflow occurred.
+  Four captures and final-discovery-mobile-summary.json are retained in review/.
+  Local navigation/DOM observations are not performance benchmarks.
+
+Desktop WebKit/phone emulation is not physical iPhone keyboard, autofill or zoom
+acceptance. Screen-reader and larger-text/manual assistive-technology review
+remain follow-up work; no accessibility certification is claimed.
+
+## Installed source and downloads
+
+Real clean shadcn registry installs passed independently in Next.js and
+custom-alias Vite consumers. The 115-item transitive graph built; both themes
+exercised native form/reset/ref/keyboard contracts and the four new controls.
+Lean sign-in still builds without unrelated calendar, drag, Base UI and motion
+dependencies. Receipt checks detected expected CLI transformations and local
+edits. Temporary consumers were removed and production registry bytes preserved.
+
+The themed Next.js Outline and Vite Schedule starter ZIPs independently installed,
+rebuilt and retained their selected fonts, colours and portal styles through real
+interactions. All raw/compiled CSS fragments are packaged for consumer rebuilds.
+Vite reported a non-failing large-chunk advisory; no loading/performance superiority
+is inferred from a successful build.
+
+Evidence logs under .local/: core-plan-build-linux.log,
+core-plan-all-linux-final.log, core-plan-affected-linux.log,
+core-plan-quality-linux.log, core-plan-consumers-linux.log,
+core-plan-themed-starters-linux.log, core-plan-discovery-final-linux.log,
+core-plan-layout-final-linux.log, core-plan-hydration-stress.log and
+core-plan-legacy-hydration-stress.log. Reports and review captures are in
+.local/core-plan-linux/d5643057-016f-428d-857d-24a8172020d9/.
+These are ignored local artifacts, not public release assets. The owned Linux
+test container was removed after retaining reports; the local preview stays up.
+
+Before the approved push, only the browser-quality job execution budget was
+raised from twenty to thirty minutes: its verified tests alone took 18.4 minutes.
+Per-test limits, assertions, retries, screenshots and the release gate are
+unchanged. Application source has not changed since final local acceptance.
+
+## Historical evidence
+
+The dated sections below describe preceding passes and are not the current
+publication state.
+
+---
+
+## Core component review and icon directory - 11 November 2026
+
+The owner prioritised core components and requested a whole-library review.
+next-work.md records the 59-family inventory, existing capabilities and planned
+choice/menu/field/example/new-control batches. Those future APIs are not claimed
+as implemented. This pass implements the icon directory and clearer entry copy.
+
+Pinned Linux/Node 22 acceptance passed production build, workspace types and
+quality-suite types, then all 16 core icon cases. Coverage includes existing
+light/dark Axe checks, four viewport widths, licensed sized SVG downloads,
+prefetch failure/retry, actual clipboard actions, aliases, saved persistence,
+share links and mobile focus recovery when an unsaved opener disappears.
+
+All 12 normal-motion icon workflows passed across Chromium, Firefox and WebKit,
+desktop/phone and both themes. They retain normal/live-reduced-motion checks,
+strict horizontal containment, standard gallery and toolbar stroke, stable
+button geometry, Sheet dismissal/focus and uncaught-browser-error guards.
+
+The first core run exposed a renamed canonical Trash alias (14/15); the Delete
+shortcut and metadata search were corrected, then 16/16 passed. The initial
+portable run passed its six desktop cases; six phone cases queried the correctly
+aria-hidden modal background with a role locator. Moving that noninteractive
+style measurement outside the modal interval preserved all assertions. A
+SHA256 authority check confirmed no app/core/dependency change before reusing
+the same build for the successful 12-case rerun. No timeout, error filter or
+approved visual baseline was changed.
+
+Six light/dark desktop, phone and phone-Sheet captures were produced; the
+desktop and Sheet layouts were visually reviewed. Capture evidence reports
+no page errors or horizontal document overflow in all four contexts. Desktop
+WebKit/phone emulation is not a physical iPhone native-keyboard acceptance.
+
+Evidence: .local/icons-focused-linux-final.log and icons-quality-final.log;
+core/build reports: .local/icons-linux/d0d46a61-82d4-41db-b1fd-7a609d76037d;
+final quality/captures: .local/icons-linux-final/
+aeddb2c8-f9eb-4ac3-b8c0-635fe33613de. Own retained container and temporary
+snapshot image were removed after success.
+
+No public UI API or dependency graph changed. This is local development
+0.3.0/unreleased, with no commit, push, hosted deployment or new source release.
+Retained 0.2.0 files and personal Git guards are unchanged.
+
+---
+
 ## CI deployment repair - 11 November 2026
 
 GitHub run 42906697903 for 96ec4ab passed its production build but failed

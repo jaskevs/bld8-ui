@@ -42,7 +42,8 @@ export function createSourceGraph(root) {
         }
         changes.push({start:node.getStart(),end:node.getEnd(),text:[...groups].map(([module,members])=>`import ${clause.isTypeOnly?'type ':''}{${members.join(',')}} from '${prefix}${module}';`).join('\n')});
       }else if(specifier.startsWith('@bld8/ui/')){
-        const module=specifier.slice('@bld8/ui/'.length);filename('ui',module);modules.add(module);
+        const module=specifier.slice('@bld8/ui/'.length);
+        if(!['styles.css','tokens.css','tailwind.css'].includes(module)){filename('ui',module);modules.add(module);}
         changes.push({start:node.moduleSpecifier.getStart(),end:node.moduleSpecifier.getEnd(),text:`'${prefix}${module}'`});
       }
     }

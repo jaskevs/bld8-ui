@@ -1,4 +1,4 @@
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {basename,join} from 'node:path';
 import {createSourceGraph} from './source-graph.mjs';
 
@@ -33,7 +33,7 @@ export function createStarterPackages(root) {
       const entry=[...modules.keys()].map(key=>`export * from './${key}.js';`).join('\n')+'\n';
       const client=/^['"]use client['"]/.test(read(folder+'/src/index.ts').toString())?"'use client';\n":'';
       files[folder+'/src/index.ts']=client+entry;files[folder+'/dist/index.js']=client+entry;files[folder+'/dist/index.d.ts']=entry;
-      for(const file of kind==='ui'?['styles.css','tokens.css','tailwind.css']:['styles.css']){
+      for(const file of kind==='ui'?readdirSync(join(root,folder,'src')).filter(name=>name.endsWith('.css')):['styles.css']){
         files[folder+'/src/'+file]=read(folder+'/src/'+file);files[folder+'/dist/'+file]=read(folder+'/dist/'+file);
       }
     }
