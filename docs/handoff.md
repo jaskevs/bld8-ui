@@ -1,3 +1,26 @@
+## Dependency-free release preflight — 12 November 2026
+
+Commit d2e30c4 passed all 877 core cases and 650 browser-quality cases in GitHub
+run 43173433397, including real clean Next.js/Vite installations and themed
+downloads. Publication then failed before dependency installation: the publisher
+statically imported preparation, which loaded the TypeScript literal reader.
+A clean checkout reproduced ERR_MODULE_NOT_FOUND for typescript. Vercel correctly
+kept production gated on the failed aggregate; the Git link was working.
+
+Preparation is now imported only after the preflight/no-upload returns and the
+clean reviewed Git revision check. Full licence, artifact and immutable-source
+checks still run before upload. An isolated subprocess with only three publisher
+modules, no preparation module or node_modules and GET-only HTTP fixtures proves
+the real --check path and context guards. Both subprocesses have ten-second
+bounds. CLI failures also emit bounded, token-redacted GitHub error annotations.
+
+All 11 retained-release cases, 38 licence fixtures and the generated integrity
+guard pass. The 0.3.0-5f011dca44c3c8b6 candidate is unchanged. Evidence:
+.local/core-plan-linux/b061328b-04b9-4865-888b-3bf28f73ff5f/publisher-preflight-repair.log.
+There are now 878 core cases. The next normal main push must pass the complete
+pipeline before immutable 0.3.0 publication and production promotion are claimed.
+No application API, release asset, gate setting or unrelated project changed.
+
 ## Function references and catalogue regression checks — 12 November 2026
 
 Final review found a documentation-generation defect: multi-argument bulk helpers

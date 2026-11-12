@@ -28,7 +28,7 @@ Linux environment. See [visual quality](visual-quality.md) and
 [clean registry consumers](registry-consumer-checks.md).
 
 Core and browser-quality jobs have 45-minute execution budgets. The expanded
-local suite contains 877 core and 650 browser-quality cases. The earlier
+local suite contains 878 core and 650 browser-quality cases. The earlier
 764-case core acceptance took 9.0 minutes with three workers (CI uses two);
 the earlier 398-case quality run took 18.4 minutes with two workers. Core also
 builds eight independent Vite downloads, clean Next.js/Vite registry consumers

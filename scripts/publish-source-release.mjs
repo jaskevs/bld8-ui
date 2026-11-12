@@ -4,7 +4,6 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {resolve,join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 import {byteHash} from './source-release.mjs';
-import {prepareSourceRelease} from './prepare-source-release.mjs';
 import {releaseRepository,versionPattern,validateVersionCatalog,assertRetainedVersions,readPreparedRelease,publishPreparedRelease,verifyPublishedRelease,releaseAssetName} from './release-hosting.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -70,10 +69,21 @@ export async function publisherMain(args,env=process.env){
   }
   if(!state.needsPublish){console.log('The source version is already published and verified; nothing was changed.');return;}
   if(execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim()!==env.GITHUB_SHA||execFileSync('git',['status','--porcelain'],{cwd:root,encoding:'utf8'}).trim())throw Error('Publication needs the clean reviewed source revision.');
+  // Preflight runs on a clean checkout before npm ci; preparation needs build dependencies.
+  const {prepareSourceRelease}=await import('./prepare-source-release.mjs');
   const {destination}=prepareSourceRelease({bundle:true,version:state.version,status:'released',sourceRevision:env.GITHUB_SHA}),prepared=readPreparedRelease(destination);
   console.log(`Publishing ${prepared.assets.length} verified artifacts for ${state.version}.`);
   const release=await publishPreparedRelease(prepared,client,{pause:()=>delay(1100),onProgress:progress=>{if(progress.completed%20===0||progress.completed===progress.total)console.log(`Verified ${progress.completed}/${progress.total} assets.`);}});
   const manifest=await verifyPublishedRelease(release,state.version,client);await publicReleaseAcceptance(state.version,manifest);
   console.log(`Immutable BLD8 UI ${state.version} published from ${env.GITHUB_SHA}.`);
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){try{await publisherMain(process.argv.slice(2));}catch(error){console.error(error.message);process.exitCode=1;}}
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
+  try{await publisherMain(process.argv.slice(2));}
+  catch(error){
+    const token=process.env.BLD8_RELEASE_TOKEN;let message=String(error?.message??error);
+    if(token)message=message.replaceAll(token,'[redacted]');message=message.slice(0,2000);
+    console.error(message);
+    if(process.env.GITHUB_ACTIONS==='true')console.error('::error::'+message.replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A'));
+    process.exitCode=1;
+  }
+}

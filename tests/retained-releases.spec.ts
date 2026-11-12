@@ -1,7 +1,9 @@
 import {test,expect} from '@playwright/test';
-import {mkdirSync,mkdtempSync,writeFileSync,readFileSync,rmSync,lstatSync,symlinkSync} from 'node:fs';
+import {mkdirSync,mkdtempSync,writeFileSync,readFileSync,rmSync,lstatSync,symlinkSync,existsSync,copyFileSync} from 'node:fs';
 import {join,resolve,sep,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {tmpdir} from 'node:os';
+import {spawnSync} from 'node:child_process';
 import {createManifest,byteHash} from '../scripts/source-release.mjs';
 import {releaseAssetName,versionAssetUrl,assertRetainedVersions,readPreparedRelease,publishPreparedRelease,verifyPublishedRelease} from '../scripts/release-hosting.mjs';
 import {publicationState,assertPublisherContext,publicReleaseAcceptance,githubReleaseClient} from '../scripts/publish-source-release.mjs';
@@ -80,4 +82,41 @@ test('versioned HTTP routes redirect to retained assets and reject unsafe paths'
   const response=await request.get('/releases/0.2.0/r/button.json',{maxRedirects:0});expect(response.status()).toBe(308);expect(response.headers().location).toBe('https://github.com/jaskevs/bld8-ui/releases/download/v0.2.0/r--button.json');expect(response.headers()['cache-control']).toContain('immutable');
   expect((await request.get('/releases/99.0.0/r/button.json',{maxRedirects:0})).status()).toBe(404);
   expect((await request.get('/releases/0.2.0/r/private.key',{maxRedirects:0})).status()).toBe(404);
+});
+
+test('publisher preflight runs before installation without build dependencies or preparation modules',()=>{
+  const parent=resolve(tmpdir()),directory=mkdtempSync(join(parent,'bld8-publisher-preflight-'));
+  try{
+    mkdirSync(join(directory,'scripts'));mkdirSync(join(directory,'releases'));
+    for(const name of ['publish-source-release.mjs','source-release.mjs','release-hosting.mjs'])copyFileSync(join(root,'scripts',name),join(directory,'scripts',name));
+    const fixtureCatalog={schemaVersion:1,versions:[{version:'0.2.0',tag:'v0.2.0',title:'Retained'},{version:'0.3.0',tag:'v0.3.0',title:'Requested'}]};
+    writeFileSync(join(directory,'releases/catalog.json'),JSON.stringify(fixtureCatalog));writeFileSync(join(directory,'releases/publish.json'),JSON.stringify({version:'0.3.0'}));
+    const output=join(directory,'actions-output'),runner=join(directory,'preflight-fixture.mjs');
+    const fixture=`import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {publisherMain} from './scripts/publish-source-release.mjs';
+const root=process.cwd(),output=join(root,'actions-output'),calls=[],token='fixture-only-scoped-token';
+assert.equal(existsSync(join(root,'node_modules')),false);assert.equal(existsSync(join(root,'scripts/prepare-source-release.mjs')),false);
+globalThis.fetch=async(url,options={})=>{
+  const parsed=new URL(url);assert.equal(parsed.origin,'https://api.github.com');assert.equal(options.method,'GET');assert.equal(options.headers.Authorization,'Bearer '+token);calls.push(parsed.pathname);
+  if(parsed.pathname==='/repos/jaskevs/bld8-ui/releases'){assert.equal(parsed.searchParams.get('per_page'),'100');assert.equal(parsed.searchParams.get('page'),'1');return Response.json([{tag_name:'v0.2.0',draft:false,immutable:true}]);}
+  if(parsed.pathname==='/repos/jaskevs/bld8-ui/releases/tags/v0.3.0')return new Response('{}',{status:404});
+  throw Error('Unexpected preflight request: '+parsed.pathname);
+};
+const env={GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:'jaskevs/bld8-ui',GITHUB_REF:'refs/heads/main',GITHUB_EVENT_NAME:'push',GITHUB_SHA:'a'.repeat(40),BLD8_RELEASE_TOKEN:token,GITHUB_OUTPUT:output};
+await assert.rejects(publisherMain(['--check'],{...env,GITHUB_EVENT_NAME:'pull_request'}),/main-branch/);assert.equal(calls.length,0);
+await assert.rejects(publisherMain(['--check'],{...env,BLD8_RELEASE_TOKEN:''}),/repository-scoped/);assert.equal(calls.length,0);
+await publisherMain(['--check'],env);assert.equal(readFileSync(output,'utf8'),['needsPublish=true',''].join(String.fromCharCode(10)));assert.deepEqual(calls,['/repos/jaskevs/bld8-ui/releases','/repos/jaskevs/bld8-ui/releases/tags/v0.3.0','/repos/jaskevs/bld8-ui/releases']);
+writeFileSync(join(root,'releases/publish.json'),JSON.stringify({version:null}));await publisherMain(['--check'],env);assert.equal(readFileSync(output,'utf8'),['needsPublish=true','needsPublish=false',''].join(String.fromCharCode(10)));
+console.log('Dependency-free preflight and context protection passed with GET-only fixtures.');
+`;
+    writeFileSync(runner,fixture);const result=spawnSync(process.execPath,[runner],{cwd:directory,encoding:'utf8',timeout:10000,env:{SystemRoot:process.env.SystemRoot??'',PATH:process.env.PATH??''}});
+    expect(result.error).toBeUndefined();expect(result.status,result.stderr).toBe(0);expect(result.stdout).toContain('Dependency-free preflight and context protection passed');expect(readFileSync(output,'utf8')).toBe(['needsPublish=true','needsPublish=false',''].join(String.fromCharCode(10)));
+    expect(existsSync(join(directory,'node_modules'))).toBe(false);expect(existsSync(join(directory,'scripts/prepare-source-release.mjs'))).toBe(false);
+    const failure=spawnSync(process.execPath,[join(directory,'scripts/publish-source-release.mjs'),'--unsupported'],{cwd:directory,encoding:'utf8',timeout:10000,env:{SystemRoot:process.env.SystemRoot??'',GITHUB_ACTIONS:'true',BLD8_RELEASE_TOKEN:'fixture-cli-token'}});
+    expect(failure.status).toBe(1);expect(failure.stderr).toContain('::error::Supported publisher option: --check');expect(failure.stderr).not.toContain('fixture-cli-token');
+  }finally{
+    const target=resolve(directory);if(!target.startsWith(parent+sep)||!target.slice(parent.length+1).startsWith('bld8-publisher-preflight-')||lstatSync(target).isSymbolicLink())throw Error('Unexpected publisher fixture.');rmSync(target,{recursive:true,force:true});
+  }
 });
