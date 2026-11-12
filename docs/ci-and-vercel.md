@@ -28,7 +28,7 @@ Linux environment. See [visual quality](visual-quality.md) and
 [clean registry consumers](registry-consumer-checks.md).
 
 Core and browser-quality jobs have 45-minute execution budgets. The expanded
-local suite contains 876 core and 650 browser-quality cases. The earlier
+local suite contains 877 core and 650 browser-quality cases. The earlier
 764-case core acceptance took 9.0 minutes with three workers (CI uses two);
 the earlier 398-case quality run took 18.4 minutes with two workers. Core also
 builds eight independent Vite downloads, clean Next.js/Vite registry consumers
@@ -110,3 +110,12 @@ as a required production alias check, including source publication. A Git-link
 repair must reconnect only jaskevs/bld8-ui and preserve the existing project,
 domains, settings, checks and personal isolated authentication. Verify the next
 ordinary source push creates the deployment before considering events repaired.
+
+## Public failure diagnostics
+
+The core and quality test steps add Playwright's built-in GitHub reporter with
+--add-reporter=github. Existing list and HTML reporters, artifact paths, assertions
+and test limits stay configured as before. Failed tests produce check annotations
+with their location and error, so public repository diagnostics do not depend
+solely on the authenticated Actions log view. No account token or additional
+workflow permission is needed to emit those annotations.

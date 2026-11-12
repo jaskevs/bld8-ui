@@ -154,7 +154,7 @@ const cell = value => String(value).replaceAll('|', '\\|').replaceAll('\n', ' ')
 function apiMarkdown(declarations) {
   return declarations.map(declaration => {
     const rows = declaration.properties.map(property => `| \`${cell(property.name)}\` | \`${cell(property.type)}\` | ${property.required ? 'Yes' : 'No'} | \`${cell(property.defaultValue)}\` | ${cell(property.description)}${property.native ? ' (Native React prop.)' : ''} |`);
-    return `### ${declaration.name}\n\n${declaration.kind}.\n\n${declaration.definition ? '\x60\x60\x60ts\ntype '+declaration.name+' = '+declaration.definition+';\n\x60\x60\x60\n\n' : ''}${rows.length ? '| Prop | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |\n' + rows.join('\n') : 'No props.'}`;
+    return `### ${declaration.name}\n\n${declaration.kind}.\n\n${declaration.definition ? '\x60\x60\x60ts\ntype '+declaration.name+' = '+declaration.definition+';\n\x60\x60\x60\n\n' : ''}${rows.length ? '| '+(declaration.kind==='Function parameters'?'Parameter':'Prop')+' | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |\n' + rows.join('\n') : 'No props.'}`;
   }).join('\n\n');
 }
 

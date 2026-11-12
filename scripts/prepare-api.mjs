@@ -56,6 +56,13 @@ function describe(name){
   const value=checker.getTypeOfSymbolAtLocation(symbol,declaration);
   const call=value.getCallSignatures()[0];
   const parameter=call?.getParameters()[0];
+  if(call&&call.getParameters().length>1){
+    const properties=call.getParameters().map(parameter=>{
+      const location=parameter.valueDeclaration??declaration;
+      return {name:parameter.name,type:checker.typeToString(checker.getTypeOfSymbolAtLocation(parameter,location),location,ts.TypeFormatFlags.NoTruncation|ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope),required:!location.questionToken&&!location.initializer,defaultValue:location.initializer?.getText()??'—',description:ts.displayPartsToString(parameter.getDocumentationComment(checker)),native:false};
+    });
+    return {name,kind:'Function parameters',definition:checker.typeToString(value,declaration,ts.TypeFormatFlags.NoTruncation|ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope),properties};
+  }
   const type=parameter?checker.getTypeOfSymbolAtLocation(parameter,parameter.valueDeclaration ?? declaration):checker.getDeclaredTypeOfSymbol(symbol);
   const initial=defaults(declaration);
   const scalar=part=>!!(part.flags & (ts.TypeFlags.StringLike|ts.TypeFlags.NumberLike|ts.TypeFlags.BooleanLike|ts.TypeFlags.Null|ts.TypeFlags.Undefined));

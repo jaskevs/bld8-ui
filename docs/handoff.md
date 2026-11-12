@@ -1,3 +1,36 @@
+## Function references and catalogue regression checks — 12 November 2026
+
+Final review found a documentation-generation defect: multi-argument bulk helpers
+were being described using the Array members of their first argument. The API
+generator now emits real parameters and a complete function type/return value.
+Human tables and agent Markdown label these as parameters; ordinary component
+prop tables retain their existing behavior. Core helper implementations and
+installable source are unchanged.
+
+Production build, all workspace/quality types and 16 focused human/agent/MCP
+reference cases pass. The 38 licence tests and complete generated guard pass.
+Preparing the source candidate reuses the exact existing
+0.3.0-5f011dca44c3c8b6 inventory: this correction changes no installable artifact
+bytes. Evidence: .local/function-reference-build.log and
+.local/core-plan-linux/b061328b-04b9-4865-888b-3bf28f73ff5f/function-reference-{docs,guard}.log.
+
+The first normal push, 0155aa6, passed all 650 cloud browser-quality cases but
+failed the core interaction step in run 43168663395. Detailed logs required
+authentication. A full local run with CI's two workers reproduced two stale
+catalogue assumptions: offscreen Form and Timeline previews were queried before
+discovery. The other 875 core cases passed. Tests now use search and viewport
+entry before the unchanged functional assertions; colour alignment also waits
+for real mounted controls. All 29 cases across the three affected specifications
+pass. Evidence: function-reference-{core,fixtures}.log in the same output folder.
+
+The next normal run adds Playwright's built-in GitHub reporter alongside the
+existing reporters. Its additive option was exercised locally. Assertions,
+retries, screenshots, permissions and release gates are unchanged. README now
+directs installers to published versions rather than a reserved release path.
+There are 877 core cases. Actual publication and promotion still depend on the
+passing regular pipeline; remote outcome evidence belongs in
+.local/release-0.3.0-acceptance.json.
+
 ## Core workflows and regular 0.3.0 release — 12 November 2026
 
 The owner authorised the complete core workflow pass and regular publication.

@@ -41,6 +41,8 @@ test('timeline rail follows logical alignment in a right-to-left container',asyn
 test('timeline stays visible and contained in the component catalogue',async({page})=>{
   await page.goto('/components');
   const card=page.locator('.component-card').filter({has:page.getByRole('link',{name:'Timeline',exact:true})});
+  await page.getByRole('searchbox',{name:'Search components',exact:true}).fill('timeline');
+  await expect(card).toHaveCount(1);await card.scrollIntoViewIfNeeded();
   const list=card.getByRole('list',{name:'Release steps'});
   await expect(list).toBeVisible();
   expect((await list.boundingBox())!.width).toBeGreaterThan(150);

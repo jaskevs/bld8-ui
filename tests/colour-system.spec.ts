@@ -107,6 +107,13 @@ test('feedback and avatar colours stay readable and stable across light and dark
 test('catalogue composition previews share a top baseline while simple controls stay centred',async({page})=>{
   await page.setViewportSize({width:1440,height:1100});await page.goto('/components');await page.evaluate(()=>document.fonts.ready);
   const card=(id:string)=>page.locator('.component-card').filter({has:page.locator('.component-bottom a[href="/components/'+id+'"]')});
+  // Discover and mount each real specimen before measuring; catalogue metadata
+  // stays available while offscreen live previews are intentionally deferred.
+  for(const id of ['chart','tree','button']){
+    await card(id).scrollIntoViewIfNeeded();
+    const specimen=id==='chart'?card(id).getByRole('figure',{name:'Weekly requests',exact:true}):id==='tree'?card(id).getByRole('tree',{name:'Project files',exact:true}):card(id).getByRole('button',{name:'Save changes',exact:true});
+    await expect(specimen).toBeVisible();
+  }
   await expect(card('chart')).toBeVisible();await expect(card('tree')).toBeVisible();
   // Async specimens above these cards can resize. Compare one rendered frame.
   const placements=await page.locator('.component-grid').evaluate(grid=>Object.fromEntries(['chart','tree','button'].map(id=>{

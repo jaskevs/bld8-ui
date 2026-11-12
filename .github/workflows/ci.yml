@@ -58,7 +58,7 @@ jobs:
       - name: Build and exercise themed Next.js and Vite downloads
         run: npm run check:starters:themes
       - name: Run interaction and accessibility checks
-        run: npm test -- --workers=2
+        run: npm test -- --workers=2 --add-reporter=github
       - name: Save failure reports
         if: failure()
         uses: actions/upload-artifact@v7
@@ -97,7 +97,7 @@ jobs:
         env:
           # The image runs as root; Firefox needs that user's own home directory.
           HOME: /root
-        run: npm run test:quality
+        run: npm run test:quality -- --add-reporter=github
       - name: Save quality reports
         if: failure()
         uses: actions/upload-artifact@v7

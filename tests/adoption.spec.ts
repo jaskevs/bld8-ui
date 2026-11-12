@@ -4,7 +4,20 @@ import AxeBuilder from '@axe-core/playwright';
 import {createOutlineRepository,OutlineValidationError,outlineSeed} from '../packages/blocks/dist/outline-repository.js';
 
 test('the form workflow is usable in both the catalogue and its detail page',async({page})=>{
-  for(const route of ['/components','/components/form']){await page.goto(route);await page.getByRole('button',{name:'Save workspace',exact:true}).click();await expect(page.getByText('Use at least three characters.',{exact:true})).toBeVisible();await page.getByRole('textbox',{name:'Workspace name',exact:true}).fill('Useful work');await page.getByRole('button',{name:'Save workspace',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'Saved for this preview.'})).toBeVisible();}
+  for(const route of ['/components','/components/form']){
+    await page.goto(route);
+    const card=page.locator('.component-card').filter({has:page.locator('.component-bottom a[href="/components/form"]')});
+    if(route==='/components'){
+      await page.getByRole('searchbox',{name:'Search components',exact:true}).fill('form workflow');
+      await expect(card).toHaveCount(1);await card.scrollIntoViewIfNeeded();
+    }
+    const surface=route==='/components'?card:page;
+    await surface.getByRole('button',{name:'Save workspace',exact:true}).click();
+    await expect(surface.getByText('Use at least three characters.',{exact:true})).toBeVisible();
+    await surface.getByRole('textbox',{name:'Workspace name',exact:true}).fill('Useful work');
+    await surface.getByRole('button',{name:'Save workspace',exact:true}).click();
+    await expect(surface.getByRole('status').filter({hasText:'Saved for this preview.'})).toBeVisible();
+  }
 });
 
 test('playground reflects props in the live control and copied usage',async({page})=>{

@@ -15,7 +15,7 @@ npx shadcn@latest add https://ui.bld8.dev/r/button.json
 npx shadcn@latest add https://ui.bld8.dev/r/outline.json
 ```
 
-For a retained version, replace `/r/` with `/releases/0.3.0/r/`. Save its source manifest and capture a clean-install receipt before customising. [Source versions and receipts](https://ui.bld8.dev/releases) explain updates.
+For retained source, choose a published version from [Source versions and receipts](https://ui.bld8.dev/releases) and use its versioned registry URL. Save its source manifest and capture a clean-install receipt before customising.
 
 The registry installs editable source under your configured UI directory in `bld8/`, resolves runtime dependencies and includes compiled styles and licences. It respects custom aliases and keeps existing components separate. For default aliases:
 
