@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /** Framework-independent grouping and bounded table-window helpers. */
 export interface TableGrouping<T> {
   key: (row: T) => string;

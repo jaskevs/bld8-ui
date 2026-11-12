@@ -19,16 +19,20 @@ async function readable(field:Locator) {
   expect(await field.evaluate(element=>parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
 }
 
-test('touch editing keeps readable text, native focus and unrestricted zoom',async({page},info)=>{
+test('touch catalogue search keeps native focus and unrestricted zoom',async({page},info)=>{
   expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
   await openQualityPage(page,'/components',info);
   const viewport=page.locator('meta[name="viewport"]');
   await expect(viewport).toHaveAttribute('content',/width=device-width/);
   expect(await viewport.getAttribute('content')).not.toMatch(/user-scalable\s*=\s*(no|0)|maximum-scale\s*=/i);
-  const search=page.getByRole('searchbox',{name:'Find a component',exact:true});
+  const search=page.getByRole('searchbox',{name:'Search components',exact:true});
   await readable(search);await search.fill('input');await expect(search).toBeFocused();
   await search.blur();await expect(search).not.toBeFocused();await expectContained(page);
-
+  // Desktop WebKit cannot reproduce UIKit keyboard zoom. Check its trigger and
+  // native viewport contract here; a physical iPhone remains the release check.
+});
+test('touch foundation fields and dialog keep native text readable',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
   await openQualityPage(page,'/foundations#control-states',info);
   const controls=page.getByRole('region',{name:'Control standards',exact:true});
   for(const field of [controls.getByRole('textbox',{name:'Project title',exact:true}),controls.getByRole('combobox',{name:'Disciplines',exact:true}),controls.getByRole('combobox',{name:'Find a discipline',exact:true})]){
@@ -39,23 +43,29 @@ test('touch editing keeps readable text, native focus and unrestricted zoom',asy
   const notes=dialog.getByRole('textbox',{name:'Review context',exact:true});
   await readable(notes);await notes.fill('Readable on touch devices.');await expect(notes).toBeFocused();
   await dialog.getByRole('button',{name:'Done',exact:true}).click();await expectContained(page);
-
+});
+test('touch number entry keeps readable native text and focus',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
   await openQualityPage(page,'/components/number-field',info);
   const quantity=page.locator('.bui-number-input').first();await readable(quantity);await quantity.focus();await expect(quantity).toBeFocused();await quantity.blur();await expectContained(page);
+});
+test('touch compact inputs preserve readable text and larger custom text',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
   await openQualityPage(page,'/components/input',info);
   const compact=page.getByRole('textbox',{name:'Workspace ID',exact:true});await readable(compact);
   const email=page.getByRole('textbox',{name:'Email address',exact:true});await readable(email);
   await email.evaluate(element=>element.style.setProperty('--bui-text-control','20px'));
   expect(await email.evaluate(element=>getComputedStyle(element).fontSize)).toBe('20px');
   await email.fill('reader@example.test');await email.blur();await expectContained(page);
+});
+test('touch theme link fallback keeps readable text and native focus',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
   await openQualityPage(page,'/themes',info);
   const accent=page.getByRole('textbox',{name:'Accent colour',exact:true});await readable(accent);
   expect(await accent.evaluate(element=>element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw new DOMException('Clipboard is blocked','NotAllowedError');}}});});
   await page.getByRole('button',{name:'Copy theme link',exact:true}).click();
   const link=page.getByRole('textbox',{name:'Theme link',exact:true});await readable(link);await link.focus();await expect(link).toBeFocused();await link.blur();await expectContained(page);
-  // Desktop WebKit cannot reproduce UIKit keyboard zoom. Check its trigger and
-  // native viewport contract here; a physical iPhone remains the release check.
 });
 
 test('preview and template marks stay vector shapes in both themes',async({page},info)=>{
@@ -75,4 +85,38 @@ test('preview and template marks stay vector shapes in both themes',async({page}
   await expect(wordmark.locator('svg')).toHaveAttribute('data-bui-icon','mark');
   await expect(wordmark.locator('svg path')).toHaveAttribute('d',headerPath!);
   await expectContained(page);
+});
+
+
+test('touch single-date editing keeps native text readable and zoom unrestricted',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
+  await openQualityPage(page,'/components/date-picker',info);
+  const date=page.locator('[data-example-id="date-entry-lifecycle"]').getByRole('textbox',{name:'Review date',exact:true});
+  await readable(date);await date.focus();await expect(date).toBeFocused();await date.blur();await expectContained(page);
+  expect(await page.locator('meta[name="viewport"]').getAttribute('content')).not.toMatch(/user-scalable\s*=\s*(no|0)|maximum-scale\s*=/i);
+});
+test('touch range editing keeps both native fields readable and zoom unrestricted',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
+  await openQualityPage(page,'/components/date-range',info);
+  const range=page.locator('[data-example-id="date-range-presets"]');
+  for(const name of ['Start reporting period','End reporting period']){const field=range.getByRole('textbox',{name,exact:true});await readable(field);await field.focus();await expect(field).toBeFocused();await field.blur();}
+  await expectContained(page);
+  expect(await page.locator('meta[name="viewport"]').getAttribute('content')).not.toMatch(/user-scalable\s*=\s*(no|0)|maximum-scale\s*=/i);
+});
+test('touch hierarchical search keeps native text readable and zoom unrestricted',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
+  await openQualityPage(page,'/components/tree-select',info);
+  const tree=page.locator('[data-example-id="tree-select-native"]');await tree.getByRole('button',{name:'Team access',exact:true}).tap();
+  const popup=page.getByRole('dialog',{name:'Team access choices',exact:true}),search=popup.getByRole('searchbox');await readable(search);await search.focus();await expect(search).toBeFocused();await page.keyboard.press('Escape');
+  await expect(popup).toBeHidden();await expectContained(page);
+  expect(await page.locator('meta[name="viewport"]').getAttribute('content')).not.toMatch(/user-scalable\s*=\s*(no|0)|maximum-scale\s*=/i);
+});
+test('touch grid date editing retains native focus cancellation and unrestricted zoom',async({page},info)=>{
+  expect(await page.evaluate(()=>matchMedia('(any-pointer:coarse)').matches)).toBe(true);
+  await openQualityPage(page,'/components/data-grid',info);
+  const grid=page.locator('[data-example-id="grid-editor-mixed"]').getByRole('grid',{name:'Delivery editor grid',exact:true}),cell=grid.getByRole('gridcell',{name:'Due date for REC-1',exact:true});
+  await cell.evaluate(element=>element.scrollIntoView({block:'center',inline:'center',behavior:'instant'}));await cell.tap();await cell.press('Enter');
+  const panel=page.getByRole('dialog',{name:'Edit due date',exact:true}),field=panel.getByRole('textbox',{name:'Due date for REC-1',exact:true});await readable(field);await field.focus();await expect(field).toBeFocused();
+  await panel.getByRole('button',{name:'Cancel',exact:true}).tap();await expect(panel).toBeHidden();await expect(cell).toBeFocused();await expectContained(page);
+  expect(await page.locator('meta[name="viewport"]').getAttribute('content')).not.toMatch(/user-scalable\s*=\s*(no|0)|maximum-scale\s*=/i);
 });

@@ -8,27 +8,34 @@ a Vercel token or application credentials.
 ## Validation jobs
 
 - **UI core validation** installs the locked dependencies, builds the production
-  site, checks workspace types, builds eight standalone Vite archives, installs
+  site, checks complete licence notices and reviewed dependency versions, runs negative licence fixtures, checks workspace types, builds eight standalone Vite archives, installs
   the real registry into clean Next.js and Vite consumers, builds and exercises
   actual themed downloads in both frameworks, and runs the existing
   interaction/accessibility suite in Chromium.
 - **UI browser quality** builds and compares approved screenshots and runs focused
-  normal-motion interactions in Chromium, Firefox and WebKit. It uses the pinned
+  normal-motion interactions in Chromium, Firefox and WebKit, with generated licence integrity checked after its build. It uses the pinned
   Linux Playwright image and browser versions documented in visual-quality.md.
 - **UI PR checks** or **UI Release checks** is the final aggregate. It runs after
   both jobs, including when either failed or was skipped. It succeeds only when
   both results are success. Keep these public check names stable: the production
   gate depends on the release name.
 
+Run `npm run test:licenses` and `npm run check:licenses` after a build to check original MIT ownership, complete third-party notices, registry dependency closures, all actual starter archives, themed fonts, copied human/agent source and the release manifest. Dependency additions or changed versions/licences require review of `licenses/inventory.json`. Root workspace patterns, package identity/MIT metadata and lockfile workspace paths/links are reviewed too; additional or nested layouts require an explicit policy update. The release generator checks portable licence artifacts before hashing; CI repeats the complete gate before any frozen-source publication.
+
 Missing or changed visual baselines fail normal comparison. CI does not create
 or approve replacement images. Review a deliberate update in the same pinned
 Linux environment. See [visual quality](visual-quality.md) and
 [clean registry consumers](registry-consumer-checks.md).
 
-The browser-quality job has a 30-minute execution budget. The expanded 398-case
-local pinned run took 18.4 minutes for tests alone; setup, installation and build
-also need room. Per-test limits, retries, screenshot tolerances and the release
-gate remain unchanged.
+Core and browser-quality jobs have 45-minute execution budgets. The expanded
+local suite contains 876 core and 650 browser-quality cases. The earlier
+764-case core acceptance took 9.0 minutes with three workers (CI uses two);
+the earlier 398-case quality run took 18.4 minutes with two workers. Core also
+builds eight independent Vite downloads, clean Next.js/Vite registry consumers
+and themed downloads. Setup, installation and build require room beyond test
+execution. Job ceilings are not predicted runtimes. Per-test expectations,
+retries, screenshot tolerances, source publication and the production gate are
+unchanged; monitor the actual full run before promotion.
 
 ## Current connection and gate
 

@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import ts from 'typescript';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {zip,unzip} from '../scripts/starter-archive.mjs';
@@ -38,7 +39,11 @@ for(const framework of ['nextjs','vite'] as const)for(const typography of ['stan
   expect(files['font-licenses/manrope-OFL.txt'].toString()).toContain('SIL OPEN FONT LICENSE');
   expect(files['packages/ui/src/kanban.tsx']).toBeUndefined();expect(files['packages/ui/src/calendar.tsx']).toBeUndefined();expect(files['packages/blocks/src/schedule-planner.tsx']).toBeUndefined();
   expect(files['packages/blocks/src/sign-in.tsx']).toBeTruthy();
-  expect(files['packages/ui/src/index.ts'].toString()).toMatch(/^'use client';/);expect(files['packages/ui/dist/index.js'].toString()).toMatch(/^'use client';/);
+  for(const path of ['packages/ui/src/index.ts','packages/ui/dist/index.js']) {
+    const source=ts.createSourceFile(path,files[path].toString(),ts.ScriptTarget.Latest,true,path.endsWith('.js')?ts.ScriptKind.JS:ts.ScriptKind.TS);
+    const first=source.statements[0];
+    expect(ts.isExpressionStatement(first)&&ts.isStringLiteral(first.expression)&&first.expression.text==='use client',path+' keeps the client directive as its first statement after licence comments').toBe(true);
+  }
   const ui=JSON.parse(files['packages/ui/package.json'].toString());expect(ui.dependencies['@dnd-kit/core']).toBeUndefined();expect(ui.dependencies['react-day-picker']).toBeUndefined();expect(ui.exports['./schedule-state']).toBeUndefined();
   expect(JSON.parse(files['package.json'].toString()).dependencies.next!==undefined).toBe(framework==='nextjs');
 });

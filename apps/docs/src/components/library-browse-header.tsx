@@ -1,0 +1,4 @@
+import Link from 'next/link';
+export function LibraryBrowseHeader({mode,families,examples}:{mode:'components'|'examples';families:number;examples:number}){
+  return <header className="library-browse-header"><p className="eyebrow">UI LIBRARY</p><div className="library-browse-heading"><h1>{mode==='components'?'Components':'Examples'}</h1><nav aria-label="Component library"><Link href="/components" aria-current={mode==='components'?'page':undefined}>Components <span>{families}</span></Link><Link href="/components/examples" aria-current={mode==='examples'?'page':undefined}>Examples <span>{examples}</span></Link></nav></div><p>{mode==='components'?'Find a control, try its behaviour and take the source into your app.':'Working patterns with data, state and imports. Preview, then install the source.'} <span>React · Next.js · Vite · MIT</span></p></header>;
+}

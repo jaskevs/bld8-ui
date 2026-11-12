@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /** Framework-independent theme values. No remote fonts, document access or CSS input. */
 export type ThemeMode = 'light' | 'dark';
 export type ThemeTypography = 'standard' | 'geometric' | 'system';

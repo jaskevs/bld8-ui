@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import type { LucideIcon } from 'lucide-react';
 
 export interface TreeNode {

@@ -19,7 +19,7 @@ const script = `
 set -euo pipefail
 mkdir -p /work /opt/bld8-node22
 # Do not mount host credentials or reuse Windows native dependencies/build output.
-tar -C /source --exclude=node_modules --exclude=.git --exclude=.local --exclude='.env*' --exclude=.npmrc --exclude=.vercel --exclude=.next --exclude=dist --exclude=.cache --exclude=.turbo --exclude=coverage --exclude='.ssh' --exclude='.aws' --exclude='.codex' --exclude='.agents' --exclude='*.tgz' --exclude='*.zip' --exclude='*.pem' --exclude='*.key' --exclude=test-results --exclude=playwright-report --exclude=apps/docs/public/downloads --exclude=apps/docs/public/r --exclude=apps/docs/public/sources --exclude=apps/docs/public/releases --exclude=apps/docs/public/icon-assets --exclude=apps/docs/src/lib/generated -cf - apps packages scripts examples quality-tests tests docs releases CHANGELOG.md package.json package-lock.json playwright.config.ts playwright.quality.config.ts tsconfig.quality.json README.md CONTRIBUTING.md LICENSE SECURITY.md .gitignore | tar -xf - -C /work
+tar -C /source --exclude=node_modules --exclude=.git --exclude=.local --exclude='.env*' --exclude=.npmrc --exclude=.vercel --exclude=.next --exclude=dist --exclude=.cache --exclude=.turbo --exclude=coverage --exclude='.ssh' --exclude='.aws' --exclude='.codex' --exclude='.agents' --exclude='*.tgz' --exclude='*.zip' --exclude='*.pem' --exclude='*.key' --exclude=test-results --exclude=playwright-report --exclude=apps/docs/public/downloads --exclude=apps/docs/public/r --exclude=apps/docs/public/agent --exclude=apps/docs/public/llms.txt --exclude=apps/docs/public/llms-full.txt --exclude=apps/docs/public/sources --exclude=apps/docs/public/releases --exclude=apps/docs/public/icon-assets --exclude=apps/docs/src/lib/generated -cf - apps packages scripts examples quality-tests tests docs releases licenses BRAND.md CHANGELOG.md package.json package-lock.json playwright.config.ts playwright.quality.config.ts tsconfig.quality.json README.md CONTRIBUTING.md LICENSE SECURITY.md .gitignore | tar -xf - -C /work
 cd /work
 # The browser image currently includes Node 24. Use the repository's Node 22.
 curl -fsSL https://nodejs.org/dist/v22.22.0/node-v22.22.0-linux-x64.tar.gz -o /tmp/node22.tar.gz
@@ -31,6 +31,8 @@ node --version
 npm ci --no-audit --no-fund
 npm run typecheck:quality
 npm run build
+npm run test:licenses
+npm run check:licenses
 # Preserve failure diagnostics as well as successful reports on the host.
 trap 'cp -a /work/test-results /output/ 2>/dev/null || true; cp -a /work/playwright-report /output/ 2>/dev/null || true' EXIT
 ${update ? "npx playwright test --config=playwright.quality.config.ts --project='visual-*' --update-snapshots=changed" : ''}

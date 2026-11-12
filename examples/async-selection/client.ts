@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {validateAsyncPage,validateResolvedOptions,type AsyncOptionsLoader,type AsyncOptionsResolver} from '@bld8/ui/async-options';
 import type {DirectoryPerson,DirectorySource} from './directory';
 

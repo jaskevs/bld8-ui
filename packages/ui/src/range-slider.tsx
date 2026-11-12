@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useId,useRef,useState,type FocusEventHandler,type Ref} from 'react';
 import {Slider as PrimitiveSlider} from '@base-ui/react/slider';

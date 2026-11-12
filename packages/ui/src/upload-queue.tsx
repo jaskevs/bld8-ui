@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useId,useLayoutEffect,useRef,useState,type ChangeEvent} from 'react';
 import {Check,File as FileIcon,Upload} from 'lucide-react';

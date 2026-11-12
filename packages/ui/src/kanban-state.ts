@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export interface KanbanItem { id:string; columnId:string; title:string }
 export interface KanbanColumn { id:string; title:string; description?:string; limit?:number }
 /** beforeId is null to append; fromColumnId guards against a stale move. */

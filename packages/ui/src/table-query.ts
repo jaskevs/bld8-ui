@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export interface TableSort { key:string; descending:boolean }
 /** Query state shared by ordinary tables and host-owned saved views. Pages are one-based. */
 export interface TableQuery {

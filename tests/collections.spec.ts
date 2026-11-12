@@ -5,7 +5,7 @@ import { library } from '../apps/docs/src/lib/generated/catalog';
 test('blocks filter by collection, use and search', async ({page}) => {
   await page.goto('/blocks');
   await expect(page.locator('.library-card')).toHaveCount(library.blocks.length);
-  await page.getByRole('group',{name:'Collection',exact:true}).getByRole('button',{name:'Premium',exact:true}).click();
+  await page.getByRole('group',{name:'Collection',exact:true}).getByRole('button',{name:'Complete',exact:true}).click();
   await expect(page.locator('.library-card')).toHaveCount(library.blocks.filter(item=>item.tier==='Premium').length);
   await page.getByRole('searchbox',{name:'Search blocks'}).fill('team');
   await expect(page.locator('.library-card')).toHaveCount(1);

@@ -1,4 +1,8 @@
-import {parseDataTsv,stringifyDataTsv,type DataColumn,type DataEdit,type DataRecord} from './data-workspace-state.js';
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
+import {DATA_WORKSPACE_LIMITS,dataValuesEqual,parseDataValue,parseDataTsv,stringifyDataTsv,type DataColumn,type DataEdit,type DataRecord} from './data-workspace-state.js';
 
 export interface GridPoint { row:number; column:number }
 export interface GridRange { anchor:GridPoint; focus:GridPoint }
@@ -32,4 +36,43 @@ export function gridPasteEdits<T extends DataRecord>(rows:readonly T[],columns:r
   const targetColumns=columns.slice(start.column,start.column+values[0].length);
   if(targetColumns.some(column=>column.editable!==true||column.key==='id'||column.key==='revision'))throw new Error('The pasted range contains a read-only column. Choose editable cells.');
   return values.flatMap((row,rowIndex)=>row.map((value,columnIndex)=>({id:rows[start.row+rowIndex].id,key:targetColumns[columnIndex].key,value})));
+}
+
+
+/** Validate the loaded rectangle before resolving any bulk edit. No range is truncated. */
+function bulkBounds<T extends DataRecord>(rows:readonly T[],columns:readonly DataColumn<T>[],range:GridRange){
+  if(!rows.length||rows.length>DATA_WORKSPACE_LIMITS.rows||!columns.length||columns.length>DATA_WORKSPACE_LIMITS.columns||new Set(rows.map(row=>row.id)).size!==rows.length||new Set(columns.map(column=>column.key)).size!==columns.length)throw new Error('Use a loaded page with unique records and columns.');
+  for(const point of [range.anchor,range.focus])if(!Number.isInteger(point.row)||!Number.isInteger(point.column)||point.row<0||point.column<0||point.row>=rows.length||point.column>=columns.length)throw new Error('The selected range must fit within the loaded rows and columns.');
+  const bounds=gridRangeBounds(range);
+  if((bounds.bottom-bounds.top+1)*(bounds.right-bounds.left+1)>DATA_WORKSPACE_LIMITS.clipboardCells)throw new Error('Change up to 2,000 selected cells at a time.');
+  return bounds;
+}
+
+function bulkEdits<T extends DataRecord>(rows:readonly T[],columns:readonly DataColumn<T>[],range:GridRange,source:(column:number)=>unknown,fillDown:boolean):DataEdit<T>[]{
+  const bounds=bulkBounds(rows,columns,range),edits:DataEdit<T>[]=[];
+  for(let rowIndex=bounds.top+(fillDown?1:0);rowIndex<=bounds.bottom;rowIndex++)for(let columnIndex=bounds.left;columnIndex<=bounds.right;columnIndex++){
+    const row=rows[rowIndex],column=columns[columnIndex];
+    if(column.editable!==true||column.key==='id'||column.key==='revision')continue;
+    const parsed=parseDataValue(column,source(columnIndex));
+    if(parsed.error)throw new Error(column.label+' for '+row.id+': '+parsed.error);
+    if(!dataValuesEqual(row[column.key],parsed.value))edits.push({id:row.id,key:column.key,value:parsed.value});
+  }
+  return edits;
+}
+
+/** Repeat the top selected row down each editable column. The source row is unchanged.
+ * Resolve and validate the complete operation before calling the host once. Read-only
+ * columns and unchanged values are omitted; arrays retain independent canonical values.
+ */
+export function gridFillDownEdits<T extends DataRecord>(rows:readonly T[],columns:readonly DataColumn<T>[],range:GridRange):DataEdit<T>[]{
+  const top=gridRangeBounds(range).top;
+  return bulkEdits(rows,columns,range,column=>rows[top][columns[column].key],true);
+}
+
+/** Apply one canonical source value to every editable selected destination.
+ * Each destination's own column rules must accept it. Mixed types can reject the
+ * whole operation; no host edits are emitted until every value has been resolved.
+ */
+export function gridApplySelectionEdits<T extends DataRecord>(rows:readonly T[],columns:readonly DataColumn<T>[],range:GridRange,value:unknown):DataEdit<T>[]{
+  return bulkEdits(rows,columns,range,()=>value,false);
 }

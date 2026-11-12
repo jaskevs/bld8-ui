@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export type UploadStatus='queued'|'uploading'|'processing'|'complete'|'error'|'cancelled';
 export interface UploadProgress {loaded:number;total?:number}
 /** A service acknowledgement, not a promise of durable storage. */

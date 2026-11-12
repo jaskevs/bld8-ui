@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /** A stable form value and its display data. Extend this object for rich option rows. */
 export interface AsyncOption {value:string;label:string;description?:string;disabled?:boolean}
 export interface AsyncOptionsRequest {query:string;cursor:string|null;signal:AbortSignal}

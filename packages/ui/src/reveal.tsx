@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useLayoutEffect,useRef,useState,type ReactNode} from 'react';
 import {cn} from './utils.js';

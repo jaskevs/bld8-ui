@@ -1,4 +1,6 @@
 'use client';
+import {FacetedFilter,Fieldset,CheckboxGroup} from '@bld8/ui';
+import {TreeSelectDemo} from './tree-select-demo';
 import {CoreControlDemo} from './core-controls-demo';
 import {DataGridDemo} from './data-workspace-demo';
 import {UploadHttpDemo} from './upload-http-demo';
@@ -48,6 +50,7 @@ export function ComponentDemo({ id }: { id: string }) {
   if(newExamples[id])return <CoreControlDemo id={id}/>;
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch(id) {
+    case 'tree-select': return <TreeSelectDemo/>;
     case 'data-grid': return <DataGridDemo/>;
     case 'upload-queue': return <UploadHttpDemo />;
     case 'event-calendar': return <EventCalendarDemo />;
@@ -94,7 +97,7 @@ export function ComponentDemo({ id }: { id: string }) {
     case 'breadcrumb': return <Breadcrumb items={[{label:'Examples',href:'/examples'},{label:'Projects',href:'/examples'},{label:'Interface studies'}]} />;
     case 'pagination': return <Pagination page={page} totalPages={4} onPageChange={setPage} />;
     case 'dialog': return <ProjectDialog />;
-    case 'sheet': return <Sheet trigger={<Button variant="secondary">Open project details <Icon /></Button>} title="Interface studies" description="The details behind a small project."><div className="stack"><Badge tone="accent">In progress</Badge><Field label="Project description"><Textarea defaultValue="Exploring the small decisions that make an interface feel considered." /></Field><Switch label="Follow updates" defaultChecked /><DialogClose>Done</DialogClose></div></Sheet>;
+    case 'sheet': return <Sheet trigger={<Button variant="secondary">Open project details <Icon /></Button>} title="Interface studies" description="The details behind a small project."><div className="stack"><Badge tone="accent">In progress</Badge><Field label="Project description"><Textarea defaultValue="Reviewing spacing, keyboard interaction and clear feedback." /></Field><Switch label="Follow updates" defaultChecked /><DialogClose>Done</DialogClose></div></Sheet>;
     case 'popover': return <Popover trigger={<Button variant="secondary">View preferences <Icon name="chevron" /></Button>} title="View preferences"><div className="stack"><Switch label="Show completed" defaultChecked /><Switch label="Compact rows" /></div></Popover>;
     case 'tooltip': return <Tooltip content="Create a new project"><IconButton label="New project"><Icon name="plus" /></IconButton></Tooltip>;
     case 'dropdown': return <div className="stack"><DropdownMenu trigger={<Button variant="secondary">Project actions <Icon name="chevron" /></Button>} items={[{label:'Duplicate',onSelect:() => setMenuAction('Project duplicated')},{label:'Move to folder',onSelect:() => setMenuAction('Move action selected')},{label:'Transfer ownership',disabled:true},{label:'Archive',destructive:true,onSelect:() => setMenuAction('Project archived')}]} /><span className="bui-hint" role="status">{menuAction}</span></div>;
@@ -106,6 +109,9 @@ export function ComponentDemo({ id }: { id: string }) {
     case 'empty': return created ? <Alert title="Your first project is ready" tone="success" live>Use the projects example to explore a complete workflow.</Alert> : <EmptyState title="A little room to build." action={<Button size="sm" onClick={() => setCreated(true)}>Create project <Icon name="plus" /></Button>}>Your projects will appear here.</EmptyState>;
     case 'avatar': return <div className="actions"><Avatar name="Alex Morgan" size="sm" /><Avatar name="Sam Lee" /><Avatar name="Taylor Kim" size="lg" /></div>;
     case 'card': return <Card><div className="bui-between"><span className="bui-label">Interface studies</span><Badge tone="accent">Draft</Badge></div><Separator /><p className="demo-copy">One quiet frame for the things that belong together.</p></Card>;
+    case 'faceted-filter': return <FacetedFilter label="Teams" showChips defaultValue={['design']} options={[{value:'design',label:'Design',group:'Product',count:3},{value:'engineering',label:'Engineering',group:'Product',count:5},{value:'research',label:'Research',group:'Operations',count:2}]}/>;
+    case 'fieldset': return <Fieldset legend="Contact details" hint="A shared label for related fields."><Field label="Name"><Input defaultValue="Maya Chen"/></Field><Field label="Team"><Input defaultValue="Design"/></Field></Fieldset>;
+    case 'checkbox-group': return <CheckboxGroup label="Updates" defaultValue={['email']} options={[{value:'email',label:'Email',description:'A summary in your inbox.'},{value:'app',label:'In-app',description:'Keep updates in the workspace.'}]}/>;
     case 'table': return <DataTable caption="Projects" rows={initialProjects} columns={projectColumns} rowKey={row => row.id} searchText={row => row.name + ' ' + row.owner} pageSize={3} />;
     default: return null;
   }

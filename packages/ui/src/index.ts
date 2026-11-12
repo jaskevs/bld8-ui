@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 export * from './core.js';
 export * from './controls.js';
@@ -71,3 +75,14 @@ export * from './otp-input.js';
 export * from './toggle-group.js';
 
 export * from './tag-input.js';
+
+export * from './autocomplete.js';
+export * from './toolbar.js';
+export * from './alert-dialog.js';
+export * from './navigation-menu.js';
+export * from './preview-card.js';
+export * from './tree-select.js';
+
+export * from './faceted-filter.js';
+export * from './fieldset.js';
+export * from './checkbox-group.js';

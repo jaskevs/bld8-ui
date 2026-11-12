@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useId,useLayoutEffect,useMemo,useRef,useState,type KeyboardEvent} from 'react';
 import {ChevronLeft,ChevronRight,ArrowUpRight} from 'lucide-react';

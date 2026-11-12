@@ -1,3 +1,8 @@
+/*!
+ * SPDX-FileCopyrightText: 2023 shadcn
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 // CVA composition follows shadcn's MIT Button pattern; see SHADCN_LICENSE.
 import { cva } from 'class-variance-authority';
 export const buttonVariants = cva('bui-button bui:shrink-0 bui:select-none', {

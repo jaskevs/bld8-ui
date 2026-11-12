@@ -5,7 +5,36 @@
 Development manifests now use the next planning version. Retained 0.2.0 assets
 and their dependencies stay unchanged. This does not publish another version.
 
+### Fixed
+
+- Async dropdowns keep nearby form actions accessible; selected-chip removal restores picker focus and reordered checkbox validation clears the previous anchor.
+- Catalogue URL filters restore before viewport-activated live previews, avoiding the observed hydration delay; mobile bulk actions use paired 44px targets.
+
+- Date editor recovery keeps the latest native input while validation feedback changes, without moving Apply or committing an invalid value.
+
+- Even compact calendar selection insets, stable event-count/date alignment and persistent selected hover colour.
+
 ### Added
+
+- FacetedFilter, native Fieldset and CheckboxGroup, linked form errors and conditional/repeatable React Hook Form examples.
+- Async choice external form ownership, read-only values, native reset and stale-request cancellation.
+- Opt-in DataGrid Fill down/apply-to-selection with complete validation, protected cells and one host history batch; enabled in Data Workspace.
+- Real Next.js/Vite installation acceptance for five new complete workflows, plus structured installation feedback.
+
+- Autocomplete, Toolbar, AlertDialog, NavigationMenu and PreviewCard on Base UI, with complete examples, typed APIs, keyboard/focus behavior and shared motion.
+- Searchable complete-example pages and per-example registry installations derived from the canonical preview source; separate family and example counts.
+- Focused dependent-lookup, upload-acknowledgement and Kanban-save recovery examples.
+- Exact example Markdown, read-only MCP search_examples/get_example tools and example resources, including install metadata and portable notices.
+
+- Portable source attribution, upstream provenance and full notices across copied examples, registry items, starters and agent responses; content-based licence gates and negative fixtures.
+- A documentation hub and clearer catalogue navigation, factual licence labels and a white marketing homepage with interactive component previews and reduced-motion support.
+
+- Checked TreeSelect with ancestor search context, mixed parent states, abortable
+  lazy children, retry and explicit loaded-leaf selection semantics.
+- Editable date entry, native form/reset ownership, range presets and optional
+  Apply/Cancel, preserving existing DatePicker/DateRangePicker calls.
+- Date, boolean and multi-value grid editors with canonical clipboard values,
+  public custom display/editor contexts and complete composition examples.
 
 - TagInput, ToggleGroup, RangeSlider and OTPInput with native form, ref and keyboard contracts.
 - Rich stable-ID local choices and composable action, checked and radio submenus.
@@ -28,6 +57,13 @@ and their dependencies stay unchanged. This does not publish another version.
   shared range validation and preserved advanced groups.
 
 ### Changed
+
+- Components and Examples share compact local navigation and labelled, aligned filters; the competing category sidebar is removed.
+
+- Complete-example browsing now has aligned searchable group/family/category multi-selection, mixed parent states, stable mobile summaries and shareable repeated-key filters.
+
+- Complete example registry modules are copied verbatim, preserving copyright and full MIT permission notices through actual CLI installation.
+- Header actions wait for mounted handlers; copy feedback avoids empty status roles, and compact toolbars keep single-line labels in a contained scroller.
 
 - Icon browsing keeps a fixed gallery while selected previews expose size/stroke
   settings, common button examples, saved icons, share links and correctly sized

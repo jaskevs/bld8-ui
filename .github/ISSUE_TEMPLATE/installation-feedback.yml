@@ -1,0 +1,65 @@
+name: Share installation feedback
+description: Tell us what worked and where adopting BLD8 UI was difficult.
+body:
+  - type: markdown
+    attributes:
+      value: Share a real installation result. Keep keys, credentials, private repositories and application data out of this public issue.
+  - type: input
+    id: source-version
+    attributes:
+      label: Source version or revision
+      description: The retained version or exact current-source revision, plus the registry item or starter name.
+      placeholder: 0.3.0, example-async-form-lifecycle
+    validations:
+      required: true
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Application framework
+      options:
+        - Next.js App Router
+        - React with Vite
+        - Another React setup
+    validations:
+      required: true
+  - type: dropdown
+    id: install-path
+    attributes:
+      label: How did you install?
+      options:
+        - shadcn registry item or complete example
+        - Next.js starter download
+        - Vite starter download
+        - Copied documented source
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Installation outcome
+      options:
+        - Working in my application
+        - Working after adjustments
+        - Blocked during installation or build
+        - Installed but an interaction is not working
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: What should improve?
+      description: Describe the concrete step, contract or interaction that helped or caused friction. Include expected behavior and any keyboard, focus or mobile details.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Relevant versions and steps
+      description: React/framework/Node versions, install command, browser and reproduction steps where relevant. Remove private paths and credentials.
+    validations:
+      required: true
+  - type: input
+    id: public-example
+    attributes:
+      label: Optional public reproduction
+      description: A public repository or minimal example. Sharing your application is not required.

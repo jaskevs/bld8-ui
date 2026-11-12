@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export interface TimeOption { value:string; label:string; disabled?:boolean }
 export interface TimeOptions {
   minTime?:string; maxTime?:string; interval?:5|10|15|20|30|60;

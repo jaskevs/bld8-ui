@@ -27,7 +27,9 @@
     "docs:agents": "node scripts/prepare-agent-docs.mjs",
     "mcp": "node packages/mcp/dist/index.js",
     "check:starter:uploads": "node scripts/check-upload-starter.mjs",
-    "check:starters:data-workspace": "node scripts/check-data-workspace-starters.mjs"
+    "check:starters:data-workspace": "node scripts/check-data-workspace-starters.mjs",
+    "check:licenses": "node scripts/check-licenses.mjs",
+    "test:licenses": "node --test scripts/check-licenses.test.mjs scripts/license-distributions.test.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
@@ -36,5 +38,6 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "typescript": "~5.9.3"
-  }
+  },
+  "license": "MIT"
 }

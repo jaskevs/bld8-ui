@@ -43,7 +43,7 @@ test('loading another page retains the query, selected records and deliberate fo
 
 test('a failed first query retries without losing the saved selection',async({page})=>{
   await page.goto(example);await expect(page.getByRole('combobox',{name:'Assignee',exact:true})).toHaveValue('Maya Chen');await page.getByRole('checkbox',{name:'Fail next search',exact:true}).check();
-  const list=await open(page,'Assignee');await expect(page.getByRole('alert')).toContainText('Options could not be loaded');await expect(list.getByRole('option')).toHaveCount(0);await expect(page.getByRole('combobox',{name:'Assignee',exact:true})).toHaveValue('Maya Chen');
+  const list=await open(page,'Assignee');await expect(page.locator('.bui-async-popup').getByRole('alert')).toContainText('Options could not be loaded');await expect(list.getByRole('option')).toHaveCount(0);await expect(page.getByRole('combobox',{name:'Assignee',exact:true})).toHaveValue('Maya Chen');
   await page.getByRole('button',{name:'Retry assignee search',exact:true}).click();await expect(list.getByRole('option')).toHaveCount(20);await expect(page.getByRole('combobox',{name:'Assignee',exact:true})).toBeFocused();
 });
 

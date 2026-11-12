@@ -136,7 +136,7 @@
 .library-detail-notes .plain-link { margin-right:1.5rem; }
 .library-faq { display:grid; grid-template-columns:1fr 1.4fr; gap:4rem; padding-block:4rem; border-top:1px solid var(--bui-line); margin-top:4rem; }
 .library-faq h2 { margin:1rem 0; }.library-faq>div>p:last-child { color:var(--bui-muted); font-size:.8125rem; }
-.site-footer>nav { display:flex; gap:1rem; }.site-footer>nav a { text-decoration:none; }
+.site-footer>nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); min-width:0; gap:1.5rem; }.site-footer>nav a { text-decoration:none; font-size:.75rem; line-height:1.6; overflow-wrap:anywhere; }.footer-link-group { display:flex; flex-direction:column; min-width:0; align-items:flex-start; gap:.55rem; }.footer-link-group>span { margin-bottom:.4rem; font-size:.625rem; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--bui-ink); }
 @media(hover:hover) and (pointer:fine) { .library-card:has(a:hover) {box-shadow:0 8px 28px #1919190a;}.library-card h2 a:hover svg {transform:translate(2px,-2px);} }
 @media(max-width:1050px) { .library-grid--featured {grid-template-columns:repeat(2,minmax(0,1fr));}.library-grid--featured>.library-card:last-child {grid-column:1/-1;}.library-layout {gap:1.5rem;}.library-home-hero {gap:2rem;} }
 @media(max-width:760px) {

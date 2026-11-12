@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ComponentProps, type CSSProperties, type FocusEventHandler, type ReactNode, type Ref } from 'react';
 import {CircleAlert, CircleCheck, Info, TriangleAlert, type LucideIcon} from 'lucide-react';

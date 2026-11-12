@@ -1,6 +1,6 @@
 # Updating copied source
 
-BLD8 installs source you own and can customise. There is no automatic overwrite,
+BLD8 installs editable source you can customise under the included licences. There is no automatic overwrite,
 merge or update service. The source release version is separate from the private
 workspace package versions; no BLD8 package is published to npm.
 

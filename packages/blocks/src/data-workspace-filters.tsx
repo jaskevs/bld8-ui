@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {ArrowLeft,CalendarDays,Check,Hash,ListFilter,Search,SlidersHorizontal,Type,X} from 'lucide-react';

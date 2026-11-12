@@ -42,7 +42,7 @@ test('activity block shows loading, a recoverable error and a true empty state',
 });
 
 test('React and Next guide, community entry points and source downloads are discoverable',async({page,request})=>{
-  await page.goto('/');await page.getByRole('link',{name:'React, Vite & Next.js guide',exact:true}).click();
+  await page.goto('/');await page.getByRole('link',{name:'React, Next.js & Vite guide',exact:true}).click();
   await expect(page).toHaveURL(/\/frameworks$/);
   await page.getByRole('link',{name:'Next.js setup',exact:true}).click();await expect(page).toHaveURL(/#nextjs$/);
   await expect(page.getByRole('heading',{name:'Next.js App Router'})).toBeVisible();

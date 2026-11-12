@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import {LayoutGroup,motion} from 'motion/react';

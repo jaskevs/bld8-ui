@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {createTableViewState,normalizeTableViewState,parseTableViewState,type TableViewState} from '@bld8/ui/table-view-state';
 import {emptyFilterQuery,filterRecords,isFilterDate,parseFilterQuery,serializeFilterQuery,filterQueryKey,type FilterField,type AnyFilterQuery,type FilterValue} from '@bld8/ui/filter-query';
 

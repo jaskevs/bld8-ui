@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useId,useImperativeHandle,useLayoutEffect,useRef,useState,type ComponentProps,type Ref} from 'react';
 import {X} from 'lucide-react';

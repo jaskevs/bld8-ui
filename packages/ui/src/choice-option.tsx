@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useLayoutEffect,useRef,useState,type ReactNode,type RefObject} from 'react';
 import {Combobox} from '@base-ui/react/combobox';
@@ -31,21 +35,24 @@ export function useChoiceValue<T>(value:T|undefined,defaultValue:T,onChange:((va
     const root=owner.current;
     const associated=form?root?.ownerDocument.getElementById(form):undefined;
     const native=root?.querySelector<HTMLInputElement|HTMLSelectElement>('input,select');
-    const formElement=associated?.tagName==='FORM'?associated as HTMLFormElement:native?.form;
+    const formElement=associated?.tagName==='FORM'?associated as HTMLFormElement:native?.form??root?.closest('form');
     if(!uncontrolled||!formElement)return;
-    const reset=(event:Event)=>queueMicrotask(()=>{if(!event.defaultPrevented)setInternal(initial.current);});
+    // UA-dispatched events can run microtasks before React's delegated onReset.
+    // A task observes cancellation only after every reset listener has finished.
+    const pending=new Set<ReturnType<typeof setTimeout>>();
+    const reset=(event:Event)=>{const timer=setTimeout(()=>{pending.delete(timer);if(!event.defaultPrevented)setInternal(initial.current);},0);pending.add(timer);};
     formElement.addEventListener('reset',reset);
-    return()=>formElement.removeEventListener('reset',reset);
+    return()=>{formElement.removeEventListener('reset',reset);for(const timer of pending)clearTimeout(timer);};
   },[uncontrolled,owner,form]);
   return [value===undefined?internal:value,(next:T)=>{if(uncontrolled)setInternal(next);onChange?.(next);}] as const;
 }
 
-interface ChoicePopupProps {open:boolean;actions:RefObject<{unmount:()=>void}|null>;onOpenChangeComplete?:(open:boolean)=>void;children:ReactNode}
+interface ChoicePopupProps {open:boolean;actions:RefObject<{unmount:()=>void}|null>;onOpenChangeComplete?:(open:boolean)=>void;className?:string;id?:string;ariaBusy?:boolean;children:ReactNode}
 /** Outside-input comboboxes keep native input focus and never hide unrelated page controls. */
 export function ChoiceComboboxPopup(props:ChoicePopupProps){
   return <Combobox.Portal><Combobox.Positioner className="bui-positioner" sideOffset={6} disableAnchorTracking={!props.open} render={(positioner,state)=><div {...positioner}><ChoicePopupShell {...props} side={state.side}/></div>}/></Combobox.Portal>;
 }
-function ChoicePopupShell({open,actions,onOpenChangeComplete,children,side}:ChoicePopupProps&{side:string}){
+function ChoicePopupShell({open,actions,onOpenChangeComplete,children,side,className,id,ariaBusy}:ChoicePopupProps&{side:string}){
   const element=useRef<HTMLDivElement>(null),callback=useRef(onOpenChangeComplete);callback.current=onOpenChangeComplete;
   const [starting,setStarting]=useState(open);
   useLayoutEffect(()=>{if(!starting)return;void element.current?.getBoundingClientRect();const frame=requestAnimationFrame(()=>setStarting(false));return()=>cancelAnimationFrame(frame);},[starting]);
@@ -56,5 +63,5 @@ function ChoicePopupShell({open,actions,onOpenChangeComplete,children,side}:Choi
     const wait=()=>{if(!active||!element.current)return;Promise.all(element.current.getAnimations().map(animation=>animation.finished)).then(finish,()=>{if(active)wait();});};
     wait();return()=>{active=false;};
   },[open,starting,actions]);
-  return <div ref={element} className="bui-popup bui-select-popup bui-choice-options bui-choice-shell" role="presentation" data-side={side} data-starting-style={starting?'':undefined} data-ending-style={!open?'':undefined} aria-hidden={!open||undefined} inert={!open||undefined}>{children}</div>;
+  return <div ref={element} id={id} aria-busy={ariaBusy||undefined} className={["bui-popup bui-select-popup bui-choice-options bui-choice-shell",className].filter(Boolean).join(" ")} role="presentation" data-side={side} data-starting-style={starting?'':undefined} data-ending-style={!open?'':undefined} aria-hidden={!open||undefined} inert={!open||undefined}>{children}</div>;
 }

@@ -1,0 +1,99 @@
+{
+  "repository": "https://github.com/shadcn-ui/ui",
+  "revision": "30a58d4498f270af1c1e981a7d78a15cf5740841",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2023 shadcn",
+  "licenseFile": "SHADCN_LICENSE",
+  "files": [
+    {
+      "source": "apps/v4/registry/bases/base/ui/sidebar.tsx",
+      "sha256": "f0f4c21b8fa1b4750711711ac7a6833c713cf93a23f1d2143cf5ec26f1661d56",
+      "adaptedIn": "src/sidebar.tsx"
+    },
+    {
+      "source": "apps/v4/registry/bases/base/ui/drawer.tsx",
+      "sha256": "7180299dff3cc1659ab75130f0521ba485e18b38625b904e1da4049f23479060",
+      "adaptedIn": "src/drawer.tsx"
+    },
+    {
+      "source": "apps/v4/registry/bases/base/ui/context-menu.tsx",
+      "sha256": "e4359306eb2242681388aa1b3a541de49dce46c375db1593f8d3362f6bb023ca",
+      "adaptedIn": "src/context-menu.tsx"
+    },
+    {
+      "source": "apps/v4/registry/bases/base/ui/button.tsx",
+      "sha256": "74f982d7ad7a764e3c95a519fc063a671e66ad758ea31dc89d747838e20c2487",
+      "adaptedIn": "src/variants.ts"
+    }
+  ],
+  "notes": "Adapted provider/composition patterns, not a fork. Original BLD8 tokens, public APIs, motion and prefixed Tailwind classes. Reconcile upstream manually; shadcn CLI update is not supported. Canonical source paths and distribution-specific locations are described above. The notices for original upstream work and BLD8 modifications are both retained.",
+  "sourcePathScope": "Canonical source paths relative to packages/ui in the BLD8 repository. adaptedIn identifies the original BLD8 source authority; it does not assert that this source path exists in every distribution.",
+  "distributionMappings": {
+    "starter": {
+      "relativeTo": "directory containing UPSTREAM.json",
+      "files": {
+        "src/sidebar.tsx": [
+          "src/sidebar.tsx",
+          "dist/sidebar.js",
+          "dist/sidebar.d.ts"
+        ],
+        "src/drawer.tsx": [
+          "src/drawer.tsx",
+          "dist/drawer.js",
+          "dist/drawer.d.ts"
+        ],
+        "src/context-menu.tsx": [
+          "src/context-menu.tsx",
+          "dist/context-menu.js",
+          "dist/context-menu.d.ts"
+        ],
+        "src/variants.ts": [
+          "src/variants.ts",
+          "dist/variants.js",
+          "dist/variants.d.ts"
+        ]
+      },
+      "notes": "Starters contain only selected modules and their dependencies. Mappings give locations when the corresponding module is included."
+    },
+    "npm": {
+      "relativeTo": "directory containing UPSTREAM.json",
+      "files": {
+        "src/sidebar.tsx": [
+          "dist/sidebar.js",
+          "dist/sidebar.d.ts"
+        ],
+        "src/drawer.tsx": [
+          "dist/drawer.js",
+          "dist/drawer.d.ts"
+        ],
+        "src/context-menu.tsx": [
+          "dist/context-menu.js",
+          "dist/context-menu.d.ts"
+        ],
+        "src/variants.ts": [
+          "dist/variants.js",
+          "dist/variants.d.ts"
+        ]
+      },
+      "notes": "The UI package includes compiled modules in dist; original src files are not part of its files allowlist."
+    },
+    "registry": {
+      "relativeTo": "directory containing UPSTREAM.json",
+      "files": {
+        "src/sidebar.tsx": [
+          "../sidebar.tsx"
+        ],
+        "src/drawer.tsx": [
+          "../drawer.tsx"
+        ],
+        "src/context-menu.tsx": [
+          "../context-menu.tsx"
+        ],
+        "src/variants.ts": [
+          "../variants.ts"
+        ]
+      },
+      "notes": "The ledger is installed in bld8/licenses while source modules are installed in the parent bld8 directory. Only modules in the installed dependency graph are present."
+    }
+  }
+}

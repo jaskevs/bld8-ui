@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useId,useRef,type ReactElement} from 'react';
 import {AnimatePresence,motion,useIsPresent} from 'motion/react';

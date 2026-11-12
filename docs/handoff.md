@@ -1,3 +1,382 @@
+## Core workflows and regular 0.3.0 release — 12 November 2026
+
+The owner authorised the complete core workflow pass and regular publication.
+This source requests 0.3.0 through the protected main-branch pipeline. These
+committed notes record local acceptance; actual publication is established by
+the exact GitHub Actions run, immutable release and production manifest, not
+by local preparation. Local remote-outcome evidence, when available, is recorded
+separately in .local/release-0.3.0-acceptance.json.
+
+### Delivered
+
+- Components and Examples share a compact library heading and clear link
+  navigation. Category, capability and search controls form one aligned panel;
+  the competing sidebar is removed. URL restoration precedes live previews.
+  Offscreen previews activate on viewport entry or card focus, then retain state
+  while their keyed card remains visible through filtering. Metadata stays
+  server-rendered. No five-second readiness assertion was relaxed.
+- FacetedFilter reuses checked hierarchy behavior for supplied groups, counts,
+  compact summaries and removable selections. Group scope includes every supplied
+  enabled option, even when search hides it; partial groups are mixed. Stable
+  values, native reset/form ownership, read-only values and chip-removal focus
+  are explicit. Complete table, resource and people examples show OR within a
+  facet and AND between facets.
+- Fieldset and CheckboxGroup provide native grouping, repeated canonical values,
+  external forms, read-only/disabled handling, required/min/max group validation
+  and reset cancellation. Validation anchors clear when options reorder. Linked
+  FormErrorSummary messages focus the relevant field. A complete React Hook Form
+  request includes conditional reviewers, repeatable rows, retained drafts,
+  server-error recovery and an abortable local save; no message is sent.
+- AsyncCombobox and AsyncMultiSelect add external form/readOnly parity. Native
+  reset restores only uncontrolled defaults without a change callback; cancelled
+  reset preserves state. The shared nonmodal popup keeps nearby Reset/Lock
+  controls accessible, while query generations prevent stale responses.
+- Opt-in DataGrid Fill down and Apply value resolve all destination validation
+  before one host edit batch. Identity/revision/read-only cells are preserved;
+  ranges stay within loaded bounds, one Undo reverses the batch and persistence
+  stays explicit. DataWorkspace enables these actions. Mobile actions pair into
+  aligned 44px targets rather than full-width rows for every button.
+- 72 component families, 117 complete examples, 344 registry items, 93 agent
+  entries and 18 guides. Human API/example pages, exact registry source and
+  read-only MCP discovery derive from those same authorities. No new dependency
+  was added; 0.2.0 remains immutable.
+- The regular release intent names 0.3.0. Core/quality job budgets are 45 minutes
+  based on measured suite growth; assertions, retries, visual tolerances, source
+  publication and production checks remain enforced. Community feedback has a
+  version/framework/install-path issue form, without claiming reports or users
+  that do not exist.
+
+### Local evidence
+
+- Final production UI/docs/MCP build, workspace types and quality types pass.
+- Broad core sweep: 869 passed of 875. All six failures were stale guide/category
+  labels or unscoped Kanban fixtures after adding complete examples; preserving
+  the behavioral assertions, the repaired specs pass 56 + 9 cases. The final
+  catalogue/facet/grid/filter run passes 34, including a new viewport-activation
+  state-retention case. There are now 876 core cases for CI.
+- Broad quality sweep: 649 passed of 650, including all 20 approved visuals and
+  every async/form/grid workflow. The sole failure exposed mounting 72 catalogue
+  demos before query restoration. After deferral, all 102 targeted navigation,
+  grouped-discovery and touch cases pass across Chromium/Firefox/WebKit, both
+  themes and desktop/phone. Three fresh local Firefox contexts observed 461,
+  337 and 276ms readiness with restored queries, no overflow or page errors;
+  these are observations, not a controlled benchmark. No golden was changed.
+- Additional focused form acceptance passes 9; async acceptance passes 21;
+  composed five-example adoption workflows pass 12 cross-engine cases.
+- Real shadcn 4.21.4 installs pass in clean Next.js and custom-alias Vite consumers:
+  147-item graphs, 14 actual installed complete examples, independent production
+  builds, both themes, source byte/full-notice checks and receipt conflict proofs.
+- Themed Outline/Next.js and Schedule/Vite downloads independently install,
+  rebuild and retain selected tokens/fonts through real interactions.
+- 38 licence tests and the generated-artifact guard pass: 162 reviewed
+  dependencies, 12 full notices, all source/registry/agent payloads and 47 ZIPs.
+- Final visual review covers 10 repaired desktop/320/390 states with no overflow,
+  label clipping or page errors. Emulation is not physical-phone or assistive
+  technology certification.
+
+Evidence is .local/core-plan-linux/b061328b-04b9-4865-888b-3bf28f73ff5f/:
+adoption-{core,quality,focused,async,consumers,starters,licences,candidate}.log,
+adoption-final-quality.log, repair-core-fixtures-final.log, repair-vite-fixture.log,
+form-workflows-focused.log, form-workflows-quality.log, corresponding reports,
+adoption-firefox-readiness.json and bulk-facet-nav-visual/final/.
+The final build log is .local/release-pass-build.log. Source review records no
+credential/private-path findings in .local/adoption-tree-review.json. Personal
+identity, isolated SSH/hooks and the ordinary commit-time rule are preserved.
+
+## Grouped example filters acceptance — 12 November 2026
+
+The example browser filter form is complete locally. Development remains
+0.3.0/unreleased. No commit, push, deployment or publication was performed.
+
+- Search, component families and categories share aligned 48px controls in a
+  white panel. Layout stacks at narrow widths; long selected labels preserve
+  their leading text and truncate at the end. Selected-picker clear actions
+  have 44px targets and chevrons remain aligned at the right.
+- Both pickers accept multiple selections. Family parents select every family
+  in the group, including members hidden by a picker search. Partial parents
+  expose mixed checked states. Choices stay open for successive selections;
+  Done/Escape closes and restores focus.
+- Alternatives within one filter are combined with OR; families, categories
+  and query terms narrow results together. Repeated component/category URL
+  keys preserve single-value links, reload and Back/Forward. Unrelated repeated
+  parameters and fragments survive. Search updates replace history; choices
+  add history entries. Empty results allow category-only or full recovery.
+- Pure filter normalization/search/URL logic is separated from the form.
+  Invalid IDs recover, duplicate values collapse and query length is bounded.
+  Controls wait for initial URL restoration before accepting edits.
+- Final pinned-Linux acceptance passes: production build, workspace and quality
+  types; 17 focused browser/source/filter cases; 24 Chromium/Firefox/WebKit
+  catalogue cases across light/dark and desktop/phone; 38 licence tests and the
+  full generated-artifact licence guard. No visual baseline was changed.
+- The final 14-view visual review follows the initial 30-view desktop/390px/320px sweep.
+  The sweep found a Button-wrapper summary alignment issue and singular-count
+  wording; both were repaired and covered by focused regressions.
+
+Evidence: .local/core-plan-linux/d35dc714-736c-4515-ac0a-6f6210b01b15/
+catalog-filters-{core,quality,licences}.log, Playwright reports and
+catalog-filters-visual captures. Native local preview returns HTTP 200 on
+http://127.0.0.1:3120/components/examples. These are local/emulated checks;
+CI, production and physical-phone verification have not run this pass.
+
+This is app-only reuse of the existing TreeSelect; public APIs, dependencies,
+69 family/107 example counts and retained 0.2.0 assets are unchanged. The next
+source-grounded priorities are recorded at the top of next-work.md: reusable
+faceted selection, the shared form contract, remote-choice form parity, bounded
+grid bulk edits and an explicitly authorised reviewed release.
+
+## Component and example expansion acceptance — 12 November 2026
+
+The approved core-library batch is complete locally. Development remains
+0.3.0/unreleased. Nothing was committed, pushed, deployed or published. Retained
+0.2.0 assets and unrelated repositories are unchanged.
+
+### Delivered source and discovery
+
+- Five Base UI compositions: Autocomplete, Toolbar, AlertDialog, NavigationMenu
+  and PreviewCard. Each has explicit public types, styles, complete examples and
+  keyboard/focus contracts. Autocomplete is optional free-text suggestion entry;
+  Combobox remains a selected-record control. No dependency upgrade was needed.
+- 69 component families and 107 complete named examples, counted separately.
+  The example catalogue searches behavior, IDs, keyboard notes and covered
+  states. Family/category/query URLs restore across reload and history. Exact
+  pages use /components/<family>/examples/<example>, and source is generated from
+  the same modules as the live preview.
+- Every complete example has a real example-<id> registry composition. Modules
+  install under bld8/examples with relative imports and their actual dependency
+  graph, including custom UI aliases. Source imports and client boundaries are
+  checked in clean Next.js and Vite applications.
+- Three focused local recovery examples: dependent reviewer lookup with parent
+  invalidation and cancellation; measured file reading/hash with explicit
+  processing acknowledgement, cancel and stable retry identity; and optimistic
+  Kanban saves with rollback, exact-intent retry and cancellation. These are
+  labelled local adapters; authentication and durable services remain host-owned.
+- Human APIs include all public parts of the new controls. Exact example
+  Markdown, lightweight discovery metadata, global search and sitemap routes
+  share the canonical example authorities. MCP adds bounded search_examples and
+  get_example tools plus bld8://example/<id> resources without changing existing
+  entry kinds. Exact source responses retain full notices and provenance.
+
+### Repairs and verification
+
+- Production UI/docs/MCP build, all workspace types, quality types and 107
+  complete example modules pass on Node 22 in the pinned Linux environment.
+- 94 focused browser/source cases pass, covering the new controls/workflows,
+  exact examples, source registry, agent/MCP discovery and existing menu/form/
+  table/command behavior. Ten additional focused Edge Autocomplete cases pass.
+- 92 quality cases pass: 72 normal-motion checks across Chromium, Firefox and
+  WebKit, light/dark and desktop/phone sizes, plus all 20 approved visual
+  comparisons. No golden was changed. The last distribution/API-reference
+  adjustment changed no control implementation; core and licence checks were
+  rerun after it.
+- 38 licence policy/distribution cases and the full generated-artifact guard
+  pass: 162 reviewed dependencies, 12 canonical notices, all registry closures,
+  47 starter ZIPs and their theme/font transformations, SVG exports, source/
+  agent payloads and source-manifest hashes.
+- Real shadcn 4.21.4 installations, independent production builds and both-theme
+  interactions pass in clean Next.js and Vite consumers. Nine installed example
+  entries cover all five new controls and the three recovery workflows.
+  Complete example source must remain byte-identical after the CLI copies it.
+- Themed Outline/Next.js and Schedule planner/Vite downloads install, rebuild
+  and retain selected tokens/fonts in real interactions. The existing Vite
+  chunk-size advisory remains; no new package dependency was added.
+- Repaired Autocomplete acceptance, native Tab/blank-click dismissal and IME
+  behavior through public primitive events; dirty-exit focus returns to the
+  appropriate enabled action. Header actions wait for attached handlers. Copy
+  feedback keeps a persistent live region without exposing empty status roles.
+- Mobile toolbars retain single-line toggle labels in their own horizontal
+  scroller. Reviewed 13 desktop/mobile views and two repaired 320/390 toolbar
+  captures; repaired toolbars are 50px tall with no page overflow or errors.
+- A real CLI install proved that code transformation stripped a leading licence
+  comment. Complete examples now use registry:file delivery inside their
+  registry:block composition: relative imports need no rewriting, source bytes
+  and full copyright/permission text survive. No notice check was weakened.
+
+Evidence: .local/core-plan-linux/f9ade5c7-f2ca-4b57-8240-8c4c96f15b24/component-expansion-{core,quality,licences,consumers,starters}.log,
+the corresponding Playwright reports, component-expansion-visual captures and
+notice-cli-proof before/after files. Edge evidence is
+.local/autocomplete-proof/final.log. Browser emulation is not a physical iPhone
+keyboard/zoom check or assistive-technology certification. CI and production have
+not run this local batch. The local development preview is on port 3120.
+
+## Licence integrity and marketing acceptance — 12 November 2026
+
+The authorised MIT hardening and initial copy/navigation/marketing pass are
+complete locally. Original MIT terms and upstream authorship are preserved;
+no visible-credit requirement, access key or anti-fork condition was added.
+Development remains 0.3.0/unreleased. No commit, push, deployment, npm publication
+or retained release was performed. Retained 0.2.0 files and catalogue are unchanged.
+
+### Source and distribution
+
+122 UI/block/canonical example modules carry SPDX attribution; the four shadcn
+adaptations retain their original copyright alongside BLD8 modifications.
+Complete copied modules retain full permission notices. Registry, starters,
+source JSON, complete examples, playground exports, icon React usage and
+individual agent/MCP responses carry the applicable notices and provenance.
+Portable provenance distinguishes canonical source paths from starter/npm/
+registry installation paths. Search/catalog MCP summaries share notices once
+instead of repeating them in every entry. The local MCP package has a LICENSE.
+
+The review inventory and CI guard pin workspace patterns and linked package
+identities, dependency metadata, full notice contents and provenance mappings.
+Checks run after generation and before publication; release preparation checks
+portable artifacts before hashing. Future source bundles include the licence
+inventory/policy and brand guidance, without changing retained asset names.
+
+### Website and documentation
+
+The homepage uses white surfaces, near-black type and #FFD900 accents, with
+real form/table/checklist previews. Preview height changes use shared easing,
+retain the currently rendered height on interruption and cancel for live
+reduced motion. Natural layout and popup overflow return after settling.
+Section reveals remain readable without animation and reveal on keyboard focus.
+
+Primary navigation is Components, Blocks, Templates, Icons, Themes and Docs.
+The Docs hub groups installation, styling, workflows and reference. The footer
+has Library/Documentation/Project groups. Public badges say MIT · Free;
+Focused/Complete indicate scope while existing machine tier IDs stay compatible.
+The usage page explains notices and commercial use without implying copyright
+transfer. /licensing redirects to the existing /plans page for portable links.
+The ordered next copy/navigation pass is in next-work.md. Contributor and agent
+licensing instructions are in AGENTS.md, licensing.md and agents.md.
+
+### Verification and repairs
+
+- Node 22 production UI/docs/MCP builds, workspace and quality types, and all
+  83 complete example modules pass.
+- 38 licence-policy/distribution tests pass. The full guard passes for 162
+  reviewed locked dependencies, 12 canonical notices, 211 registry items and
+  their closures, all 47 ZIPs plus six theme/mode transformations each, font
+  notices, 5,631 SVG exports, source/agent payloads and manifest notice hashes.
+- The affected 14-suite browser/source sweep passed 132 cases after repairs.
+  It covers navigation, collections/accessibility, icons, adoption, starter
+  exports, source updates/retained assets, agent/MCP data, complete examples and
+  generated playground code. This sweep precedes the final measured preview
+  height animation and the date recovery repair; the following checks cover
+  those later changes. No full core or full browser matrix is claimed.
+- Final marketing/documentation checks passed 51 cases across Chromium,
+  Firefox and WebKit. They cover 320/390/768/1440px layouts in both themes,
+  native form validation/reset, keyboard tabs, source-scope labels, card/title
+  alignment, single-line checklist indices, interrupted height animation and
+  live reduced motion. The portable /licensing alias also passes its three-browser follow-up checks.
+- Seven viewport/theme captures were reviewed, including tablet layout, form
+  and workflow states. No document overflow or uncaught page errors occurred.
+  Marketing screenshots/metrics are in the evidence directory below.
+- Real shadcn CLI source installations into clean Next.js and configured-alias
+  Vite applications passed their independent builds and both-theme interactions.
+  The 122-item graph, lean sign-in dependency boundary, receipt checks, current
+  typed editors, source provenance and stylesheet/provider behaviour were kept.
+
+Initial local failures were retained as evidence. The expanded footer overflowed
+at tablet width; grouped responsive footer columns fixed it. Intrinsic artwork
+heights and wrapping checklist indices were corrected with shared grid rows and
+nonshrinking indices. Starter tests incorrectly required use-client to be the
+first bytes; TypeScript AST checks now require it to remain the first statement
+after licence comments. No client boundary assertion was removed.
+
+The first marketing cross-browser pass hit WebKit errors when forced document
+navigation aborted same-origin Next route prefetches. Each tested document now
+stays alive through its layout/error assertions; the full page-error guard
+remains, and no errors are filtered. The 51-case rerun passes.
+
+A clean Vite dark install exposed a genuine date editor race: capture-phase
+measurement updates restored old controlled input text before its change handler.
+Native input/setter tracing reproduced it; moving measurement to the bubbling
+input handler fixes the ordering. The shared recovery helper now checks the new
+native value immediately, and a deterministic pending-frame regression preserves
+the invalid-value guard, unchanged Apply position, canonical commit and focus.
+Three focused core cases and all twelve normal-motion browser/theme/viewport
+mixed-grid cases pass. A final proper-dark native trace confirms all three valid
+recovery values reach the input bubble unchanged, with zero browser errors.
+The initial standalone trace used the wrong theme attribute and represents
+default light; the original installed-source failure was Vite dark.
+
+Evidence: .local/license-marketing-*-linux.log and
+.local/core-plan-linux/2ae10063-ee09-42d7-bb84-c189c879eb9c/.
+The marketing-review/ directory contains captures and metrics;
+date-recovery-accepted/ contains core/quality logs and the fixed native trace.
+Browser reports and failure traces are retained before removing the owned
+verification container. No approved visual baseline was changed.
+
+Local preview: http://127.0.0.1:3120/ and /docs. The existing dev service is
+preserved. Hosted CI/production promotion and physical iPhone/assistive-technology
+review are separate; emulated browser checks are not device certification.
+Private Workbench dates, exam window and 135-hour baseline remain unchanged.
+
+---
+
+# Development handoff - 12 November 2026
+
+## Calendar selection spacing - 12 November 2026
+
+The compact event calendar now keeps a 2px selection inset on every edge.
+Stretching its date tile fixes the former 2px top/sides and 8px bottom mismatch.
+Event counts sit below the centred date without shifting its baseline; selected
+accent colour remains stable while hovered. Month/week views, gallery cards and
+320/390px detail layouts share the same geometry in light and dark.
+
+Production UI/docs/MCP builds, workspace types, quality types and all 83 complete
+examples passed. All eighteen focused calendar checks passed: twelve existing
+Chromium calendar/state/accessibility cases and six geometry cases spanning
+Chromium, Firefox and WebKit in both themes. The first geometry run passed 15/18;
+its three light-theme setups incorrectly assumed an explicit theme attribute.
+The application defaults to light when that attribute is absent; correcting the
+setup preserved every geometry, hover, focus and error assertion. The final
+18-case run passed without retries, timeout extensions or baseline updates.
+The full core and browser matrices were not repeated for this scoped CSS repair.
+
+Evidence: .local/calendar-spacing-build-linux.log,
+.local/calendar-spacing-tests-accepted-linux.log and the before/after images and
+metrics in .local/calendar-spacing-20261112/. Reports are under the owned
+60741bd7-525a-4619-8fc2-e56932b287bd verification directory. No API/dependency,
+retained-release, commit, push or deployment changes were made for this repair.
+
+## Dates, typed grid editing and checked hierarchies
+
+All three authorised core priorities are implemented and verified locally as
+0.3.0/unreleased, based on fcc1de91ffc5a0d593a73ff572f90d253cb3ca72.
+No new commit, push, deployment or retained release was requested for this pass.
+The catalogue now contains 64 families and 83 complete named examples; eighteen
+blocks, three templates, 211 registry items and 1,877 canonical icons remain
+distinct counts. Agent discovery contains 85 entries and seventeen guides.
+
+DataGrid adds buffered date and multi-assignee editors, native checkbox editing,
+canonical parsing/quoted TSV round trips and typed display/editor hooks. A custom
+TreeSelect editor demonstrates portal ownership, Apply/Cancel, validation and
+outside-focus handling. Live permission/schema checks and edit-session identities
+reject stale callbacks; host applications still own revisions and atomic saves.
+
+DatePicker supports opt-in ISO keyboard entry with native form ownership,
+required/bounds validation, refs, controlled values and prevented reset.
+DateRangePicker adds host-supplied presets and explicit Apply/Cancel drafts while
+preserving immediate selection by default. The guide explains native validation
+and form-controller boundaries without changing existing button ref contracts.
+
+TreeSelect adds leaf-ID selection, mixed parents, loaded-item/alias search,
+keyboard navigation and bounded abortable lazy children with retry. Parent actions
+select loaded enabled leaves only; they never silently select future children.
+Required validation for this button-triggered control remains host-owned.
+
+Production UI/docs/MCP builds, all workspace/quality types and all 83 complete
+example modules pass. All 764 core cases pass. The 518-case browser matrix passed
+511 cases; seven browser-check issues were repaired, and all 36 affected cases
+then passed across the twelve configurations. Twenty approved visual baselines
+remain unchanged. Clean Next.js and custom-alias Vite registry consumers installed and built the 122-item graph,
+running the real examples and test-only stale-editor/permission fixture in both
+themes. Lean sign-in keeps its independent dependency boundary. Themed Next.js
+Outline and Vite Schedule downloads also installed, built and retained their
+colours/fonts/portal styling through real interactions. See verification.md for
+initial failures, repairs, exact evidence and the final focus-only CSS check.
+
+Local editing preview: http://127.0.0.1:3120/components. New detail routes are
+/components/tree-select, /components/date-picker, /components/date-range and
+/components/data-grid. Human and agent documentation and registry source are
+generated from the same authorities. Retained 0.2.0 files, repository-local
+personal identity/origin/hooks and sibling projects are unchanged. Real iPhone
+keyboard/zoom/autofill and assistive-technology review remain follow-up work.
+
+## Historical handoffs
+
 # Development handoff - 11 November 2026
 
 ## Complete core-component pass

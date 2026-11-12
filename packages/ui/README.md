@@ -1,30 +1,76 @@
-# Current scope
+# BLD8 UI
 
-The local library has 53 component guidance entries, sixteen reusable blocks, three templates, the Lucide directory, component playground, theme lab, shadcn registry and 40 ZIP starters.
+React controls, typed helpers and styles for forms, choices, navigation, overlays,
+date fields, uploads, tables and data editing. Interactive components preserve
+client boundaries; pure helper subpaths can be used independently. Public APIs,
+complete examples and service contracts are documented in the
+[component guide](https://ui.bld8.dev/components).
 
-The library includes native forms, Base UI selection/navigation/overlays, command search, date/range fields, file selection and upload callbacks, feedback, tables, drawer, context menus and responsive sidebar. Source and both collection tiers are free under MIT.
+## Install source
 
-The playground configures fourteen representative controls and supports validated shareable URLs. Other component pages retain interactive demos and installation commands. The registry covers all catalogue IDs and templates; shared modules resolve through its dependency graph.
+The npm package is private and unpublished. Use the
+[framework guide](https://ui.bld8.dev/frameworks), editable
+[registry source](https://ui.bld8.dev/registry), or a supplied Next.js or React +
+Vite starter. Starters include the required packages as local workspaces.
 
-Outline is the browser-persisted reference application for forms and tables. Its project flows include validation, recovery, edits, deletion, filtering, sort, page selection, bulk changes and CSV export. Profile preferences and resource metadata also survive reloads. A separate HTTP example includes a temporary session-scoped sample API. Production accounts, cloud sync and uploaded file storage are not included.
+In a React 19 application with shadcn initialised:
 
-Tables support externally controlled queries, resizing, pinned columns and optional row grouping. WindowedTable is a separate fixed-height display view for up to 20,000 complete supplied records. LargeIssueTable keeps its edit draft outside rows and provides an ordinary paged alternative; existing IssueRepository service page limits remain unchanged. The form adapter does not replace schema validation or a server's validation rules. Browser storage is suitable for this example, not shared multi-user persistence. The repository interface is the integration boundary for a real service.
+```sh
+npx shadcn@latest add https://ui.bld8.dev/r/button.json
+```
 
-Automated accessibility and browser checks cover the included examples. Manual assistive-technology and broader cross-browser review remain necessary before making certification claims. The npm packages are still private and unpublished; use the registry or source starters.
+Import from the installed files using your configured UI alias. For the default
+alias, Button is available from @/components/ui/bld8/button. Registry components
+import their supplied CSS. In a local workspace, import @bld8/ui/styles.css once.
+Wrap overlays in UIProvider from bld8/overlays (or @bld8/ui in a local workspace)
+and keep body { position: relative; } in the host stylesheet. Shipped Tailwind
+utilities are compiled without Preflight; new utility classes need your own
+Tailwind build or ordinary CSS.
 
+## Complete examples
 
-The current extension adds complete TypeScript-derived prop tables, inline table
-editing, a typed Outline HTTP adapter, a runnable session-scoped API example and
-optional React Hook Form bindings. The two integration starters include the
-sample API. Production authentication and database storage are application work.
+The [example catalogue](https://ui.bld8.dev/components/examples) gives each complete
+pattern its own preview and install command. Install example-<id>.json through
+the registry to receive bld8/examples/<id>.tsx plus its actual component modules.
+Relative imports follow your configured UI alias. Workspace/starter code uses
+@bld8/ui; the npm package is not published.
 
-Optional integration items include `react-hook-form`, `react-hook-form-example`,
-`editable-cell` and `outline-http`. The form adapter adds React Hook Form only
-when explicitly installed. The form example includes client bindings and its
-HTTP adapter; the standalone HTTP/form starters supply a runnable reference
-server. Use the service contract to connect a different backend.
+Autocomplete accepts free text; Combobox commits a selected record. Toolbar
+groups mixed keyboard actions. AlertDialog confirms a consequential action with
+Cancel-first focus and abortable retry. NavigationMenu groups destination links;
+PreviewCard adds supplementary visual context without replacing the destination.
+
+## Integration boundaries
 
 EditableCell supports explicit text/date/select edits, async save recovery and
-an edit-start revision for concurrency checks. React Hook Form bindings are
-optional: import RHFField/RHFControl from @bld8/ui/react-hook-form. Input refs,
-blur and field errors connect native and controlled inputs to the host form.
+an edit-start revision for concurrency checks. DataTable supports controlled
+queries, resizing, pinned columns and optional grouping. WindowedTable displays
+complete supplied records in a bounded scrolling view; LargeIssueTable keeps
+its detail draft outside rows and supplies a paged alternative.
+
+React Hook Form bindings are optional: import RHFField and RHFControl from
+@bld8/ui/react-hook-form in a local workspace. Input refs, blur and field errors
+connect native and controlled inputs to the host form. Registry items
+react-hook-form and react-hook-form-example add that dependency explicitly.
+The adapter does not replace application or server validation.
+
+Authentication, authorised ownership, durable data, uploaded file storage and
+service writes belong to the consuming application. Use the documented typed
+callbacks and repository contracts to connect those services. See
+[developer and agent guidance](https://ui.bld8.dev/agents) and
+[source versions](https://ui.bld8.dev/releases) before updating customised source.
+
+## Licence and provenance
+
+All original source is free under the [MIT licence](LICENSE), copyright 2026
+Jaison. Preserve the copyright and full permission notices with copies or
+substantial portions of the software. No visible BLD8 logo, footer credit or
+link is required.
+
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) identifies upstream dependencies
+and their included licence files. [UPSTREAM.json](UPSTREAM.json) records the
+pinned shadcn/ui adaptations and maps canonical source paths to starter, npm and
+registry locations. Selected distributions include only their required modules.
+Keep the applicable original upstream notices, including
+[SHADCN_LICENSE](SHADCN_LICENSE), when redistributing adapted source. The
+[licensing guide](https://ui.bld8.dev/licensing) explains these boundaries.

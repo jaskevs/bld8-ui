@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useId, useState, type ReactElement, type ReactNode, type RefObject } from 'react';
 import { Dialog as PrimitiveDialog } from '@base-ui/react/dialog';

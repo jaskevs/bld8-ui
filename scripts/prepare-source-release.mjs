@@ -3,6 +3,8 @@ import {join,dirname,resolve,sep} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createManifest,byteHash,validateManifest} from './source-release.mjs';
 import {blocks,templates} from './library-catalog.mjs';
+import {distributionNotices} from './license-policy.mjs';
+import {checkLicenses} from './check-licenses.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=path=>readFileSync(join(root,path));
@@ -70,7 +72,11 @@ export function prepareSourceRelease({bundle=false,version,status,sourceRevision
   artifacts['check-source-updates.mjs']=read('scripts/check-source-updates.mjs');
   artifacts['source-release.mjs']=read('scripts/source-release.mjs');
   artifacts['capture-installation.mjs']=read('scripts/capture-installation.mjs');
-  artifacts['CHANGELOG.md']=read('CHANGELOG.md');artifacts['UPDATING.md']=read('docs/updating-source.md');artifacts['LICENSE']=read('LICENSE');
+  artifacts['CHANGELOG.md']=read('CHANGELOG.md');artifacts['UPDATING.md']=read('docs/updating-source.md');artifacts['LICENSE']=read('LICENSE');artifacts['BRAND.md']=read('BRAND.md');
+  Object.assign(artifacts,distributionNotices({root}),{'licenses/inventory.json':read('licenses/inventory.json'),'scripts/license-policy.mjs':read('scripts/license-policy.mjs')});
+  // Validate freshly generated portable copies before hashing. Agent documents
+  // are produced afterwards because they identify this resulting snapshot.
+  checkLicenses({root,generated:true,includeAgent:false,checkManifest:false,releaseArtifacts:artifacts});
   const manifest=createManifest({version,status,registryBase,items,artifacts,sourceRevision});
   if(bundle){
     const parent=join(root,'.local/release-candidates');mkdirSync(parent,{recursive:true});

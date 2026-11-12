@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useId, useState } from 'react';
 import { Badge, Button, Dialog, Icon } from '@bld8/ui';

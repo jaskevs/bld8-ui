@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 .bui-choice[data-invalid] .bui-checkbox,.bui-choice[data-invalid] .bui-switch { outline:1px solid var(--bui-danger); outline-offset:3px; }
 .bui-choice small.bui-error { color:var(--bui-danger); }
 .bui-radio-group>.bui-hint { margin-bottom:var(--bui-space-2); }

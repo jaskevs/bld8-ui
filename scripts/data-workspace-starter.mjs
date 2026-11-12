@@ -30,7 +30,7 @@ export {handle as GET,handle as PATCH};
 Use Node 22. Install with npm install. This is a complete local single-writer
 reference: one typed issue source, nested filters, ordered multi-sort, paging,
 editable cell ranges, review, atomic revision-checked saves and conflict recovery.
-Both collections are free under MIT. Keep the included licences.
+BLD8 components, blocks and templates are free under MIT. Keep the included copyright and licence notices.
 
 Records and replay receipts are stored in .local/issues.json. DATA_FILE may point
 to a path controlled by the server operator. This file and its directory must

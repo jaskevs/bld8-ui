@@ -4,9 +4,10 @@ import { components } from '../apps/docs/src/lib/catalog';
 
 test('catalog filters by category and query, with working detail pages', async ({ page }) => {
   await page.goto('/components');
-  await page.getByRole('button', { name: 'Forms', exact: false }).click();
+  await page.getByRole('combobox', { name: 'Category', exact: true }).click();
+  await page.getByRole('option', { name: 'Forms', exact: true }).click();
   await expect(page.locator('.component-card')).toHaveCount(components.filter(item => item.category === 'Forms').length);
-  await page.getByRole('searchbox', { name: 'Find a component' }).fill('combobox');
+  await page.getByRole('searchbox', { name: 'Search components' }).fill('combobox');
   await expect(page.locator('.component-bottom').getByRole('link', { name: 'Async combobox', exact:true })).toBeVisible();
   await expect(page.locator('.component-bottom').getByRole('link', { name: 'Combobox', exact:true })).toBeVisible();
   await expect(page.locator('.component-card').filter({hasNotText:/combobox/i})).toHaveCount(0);

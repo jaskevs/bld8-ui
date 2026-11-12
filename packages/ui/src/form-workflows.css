@@ -1,0 +1,13 @@
+/*! SPDX-FileCopyrightText: 2026 Jaison; SPDX-License-Identifier: MIT */
+.bui-fieldset{border:0;padding:0;margin:0;min-width:0;display:grid;gap:.625rem}
+.bui-fieldset-legend{padding:0;margin-bottom:.625rem;font-size:.875rem;font-weight:500;line-height:1.5;color:var(--bui-ink)}
+.bui-fieldset-content{display:grid;gap:1rem;min-width:0}
+.bui-fieldset>.bui-hint{margin-bottom:.375rem}
+.bui-fieldset:disabled{opacity:.55}
+.bui-checkbox-group .bui-fieldset-content{gap:.875rem}
+.bui-checkbox-group[data-readonly] .bui-choice{cursor:default}
+.bui-form-error-summary ul{margin:.625rem 0 0;padding-inline-start:1.25rem;display:grid;gap:.5rem}
+.bui-form-error-summary a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px;border-radius:2px;transition:opacity var(--bui-duration-fast) var(--bui-ease)}
+.bui-form-error-summary a:hover{opacity:.75}
+.bui-form-error-summary a:focus-visible{outline:2px solid var(--bui-focus);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.bui-form-error-summary a{transition:none}}

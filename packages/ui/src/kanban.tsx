@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useId,useRef,useState,type ReactNode,type FormEvent} from 'react';
 import {DndContext,DragOverlay,MouseSensor,TouchSensor,closestCenter,pointerWithin,useDroppable,useSensor,useSensors,type DragOverEvent,type CollisionDetection} from '@dnd-kit/core';

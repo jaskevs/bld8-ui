@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useMemo,useRef,useState,type FormEvent} from 'react';
 import {motion} from 'motion/react';

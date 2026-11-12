@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useId,useMemo,useRef,type Ref,type FocusEventHandler,type ReactNode} from 'react';
 import {Combobox} from '@base-ui/react/combobox';

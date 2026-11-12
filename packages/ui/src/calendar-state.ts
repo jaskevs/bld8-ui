@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {formatScheduleTime,getScheduleDay} from './schedule-state.js';
 
 export type CalendarView='week'|'month';

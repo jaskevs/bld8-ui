@@ -11,6 +11,7 @@
     "LUCIDE_LICENSE",
     "DAY_PICKER_LICENSE",
     "THIRD_PARTY_NOTICES.md",
+    "UPSTREAM.json",
     "SHADCN_LICENSE",
     "MOTION_LICENSE",
     "DND_KIT_LICENSE"
@@ -141,6 +142,26 @@
     "./table-query": {
       "types": "./dist/table-query.d.ts",
       "import": "./dist/table-query.js"
+    },
+    "./autocomplete": {
+      "types": "./dist/autocomplete.d.ts",
+      "import": "./dist/autocomplete.js"
+    },
+    "./toolbar": {
+      "types": "./dist/toolbar.d.ts",
+      "import": "./dist/toolbar.js"
+    },
+    "./alert-dialog": {
+      "types": "./dist/alert-dialog.d.ts",
+      "import": "./dist/alert-dialog.js"
+    },
+    "./navigation-menu": {
+      "types": "./dist/navigation-menu.d.ts",
+      "import": "./dist/navigation-menu.js"
+    },
+    "./preview-card": {
+      "types": "./dist/preview-card.d.ts",
+      "import": "./dist/preview-card.js"
     }
   },
   "sideEffects": [

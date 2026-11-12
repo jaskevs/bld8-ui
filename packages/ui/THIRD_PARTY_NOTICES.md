@@ -37,7 +37,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Selected composition patterns are adapted from shadcn/ui (MIT, copyright 2023 shadcn). Pinned upstream revision: 30a58d4498f270af1c1e981a7d78a15cf5740841. The full notice is in SHADCN_LICENSE. Drawer, context-menu and sidebar compositions and the button variant pattern retain BLD8 styling and focused APIs. Provenance and source hashes: docs/upstream.json in the repository.
+Selected composition patterns are adapted from shadcn/ui (MIT, copyright 2023 shadcn). Pinned upstream revision: 30a58d4498f270af1c1e981a7d78a15cf5740841. The full notice is in SHADCN_LICENSE. Drawer, context-menu and sidebar compositions and the button variant pattern retain BLD8 styling and focused APIs. Portable provenance and original upstream source hashes are in UPSTREAM.json beside this notice; docs/upstream.json is the repository source ledger. The adapted source files retain both the upstream copyright and the copyright for BLD8 modifications.
 
 Tailwind CSS 4.3.0 and its CLI are build dependencies (MIT). clsx, class-variance-authority and tailwind-merge are runtime dependencies (MIT). Their notices accompany installed npm distributions. Compiled utilities are included; consuming applications do not need Tailwind.
 

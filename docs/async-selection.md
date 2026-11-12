@@ -105,3 +105,17 @@ active input and open popup without disabling any accessibility rule. Keyboard
 checks verify that Tab dismisses the popup and never leaves focus inside an
 aria-hidden ancestor. These checks are not accessibility certification; physical
 device and assistive-technology review remain necessary.
+
+## Native form ownership and reset
+
+Both remote controls accept form for an external owning form and readOnly for
+focusable, submitted canonical values that cannot be edited. A read-only field
+does not open its search popup or expose clear/remove actions. Disabled controls
+are excluded from native submission. Selected-label resolution can still provide
+readable labels without opening search.
+
+An uncancelled native reset restores uncontrolled initial IDs, clears transient
+search text, closes the popup and cancels stale queries. Controlled values remain
+application-owned. A prevented reset keeps values and query intact. Reset does
+not report a user onValueChange. Exact examples cover external forms, controlled
+ownership, retained labels, read-only transitions and held-request cancellation.

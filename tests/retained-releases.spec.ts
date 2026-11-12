@@ -18,6 +18,7 @@ function clientFixture(){
 test('version paths are fixed, bounded and remain identical when another version is added',()=>{
   const before=versionAssetUrl(catalog,'0.2.0','r/button.json'),after=versionAssetUrl({...catalog,versions:[...catalog.versions,{version:'0.3.0',tag:'v0.3.0',title:'Next'}]},'0.2.0','r/button.json');expect(after).toBe(before);expect(sourceVersionAsset('0.2.0','r/button.json')).toBe(before);
   for(const value of ['../key','r/../../key','r/a.json?token=x','https://example.com','downloads/a.zip/extra','r/a%2fb.json'])expect(()=>releaseAssetName(value)).toThrow();
+  for(const path of ['BRAND.md','licenses/inventory.json','scripts/license-policy.mjs','packages/ui/UPSTREAM.json','packages/ui/SHADCN_LICENSE','packages/blocks/LICENSE'])expect(sourceVersionAsset('0.2.0',path)).toBe(versionAssetUrl(catalog,'0.2.0',path));
   expect(sourceVersionAsset('unknown','manifest.json')).toBeNull();expect(sourceVersionAsset('0.2.0','../secret')).toBeNull();
   expect(()=>assertRetainedVersions({schemaVersion:1,versions:[]},[{tag_name:'v0.2.0',immutable:true,draft:false}])).toThrow('drop a retained');
 });

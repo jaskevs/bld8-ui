@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {handleOutlineDemo} from '@/lib/outline-demo-api';
 export const dynamic='force-dynamic';
 export const runtime='nodejs';

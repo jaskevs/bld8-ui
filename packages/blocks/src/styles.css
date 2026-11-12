@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 .bblocks-root { container-type:inline-size; container-name:bld8-preview; }
 .bblocks-panel { background:var(--bui-bg); border-radius:var(--bui-panel-radius); padding:clamp(1.25rem,3vw,2rem); }
 .bblocks-stack { display:flex; flex-direction:column; gap:1.5rem; min-width:0; }

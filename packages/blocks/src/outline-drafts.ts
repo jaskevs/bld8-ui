@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import type {OutlineProject,OutlineValues} from './outline-repository.js';
 
 export const outlineFields=['name','due','notes','status'] as const;

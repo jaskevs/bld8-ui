@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useSyncExternalStore} from 'react';
 const query='(prefers-reduced-motion: reduce)';

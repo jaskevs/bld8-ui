@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /* Local choices share existing control geometry and preserve room for selected checks. */
 .bui-popup.bui-choice-shell { display:flex; flex-direction:column; overflow:hidden; }
 .bui-choice-list { flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; scrollbar-width:thin; }

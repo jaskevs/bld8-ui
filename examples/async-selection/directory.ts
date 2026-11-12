@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export type DirectorySource='product'|'research';
 export interface DirectoryPerson {value:string;label:string;description:string;role:string;initials:string;disabled?:boolean}
 

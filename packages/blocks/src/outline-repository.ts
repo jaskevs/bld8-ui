@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import type { FormErrors, TableQuery } from '@bld8/ui';
 
 export interface OutlineValues {name:string; due:string; notes:string; status:'Planned'|'Ready'|'Archived'}

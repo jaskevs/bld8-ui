@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import { useState } from 'react';
 
 /** A controlled value never falls back to internal state when it is empty. */

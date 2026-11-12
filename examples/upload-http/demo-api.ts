@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {createHash,randomUUID} from 'node:crypto';
 import type {UploadReceipt} from '@bld8/ui/upload-state';
 

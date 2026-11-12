@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /** Bounded scheduling over supplied UTC instants. Wall-clock conversion belongs to the host. */
 export interface ScheduleSlot {id:string;start:string;end:string}
 export interface ScheduleEvent extends ScheduleSlot {title:string;revision:number}

@@ -1,3 +1,8 @@
+/*!
+ * SPDX-FileCopyrightText: 2023 shadcn
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 // Adapted from shadcn/ui's Base UI composition. See SHADCN_LICENSE and docs/upstream.json.
 import type { ReactElement, ReactNode, RefObject } from 'react';

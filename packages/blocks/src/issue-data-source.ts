@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {emptyFilterQuery,filterRecords,type FilterValue} from '@bld8/ui/filter-query';
 import {isDataId,isDataObject,parseDataQuery,validateDataChanges,type BatchResult,type DataBatchRequest,type DataColumn,type DataQuery,type DataSource} from '@bld8/ui/data-workspace-state';
 import {issueFields,issuePeople,issuePriorities,issueSeed,issueStatuses,type Issue} from './issue-repository.js';

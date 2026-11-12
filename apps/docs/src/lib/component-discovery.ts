@@ -17,18 +17,24 @@ export interface ComponentFilters {query:string;category:Category;capability:Com
 export const defaultComponentFilters:ComponentFilters={query:'',category:'All components',capability:'all'};
 
 const capabilitySets:Record<ComponentCapability,readonly string[]>={
-  forms:['input','input-group','textarea','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','number-field','time-picker','slider','range-slider','otp-input','toggle-group','tag-input','date-picker','date-range','file-upload','form','react-hook-form'],
-  validation:['input','input-group','textarea','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','number-field','time-picker','range-slider','otp-input','toggle-group','tag-input','form','react-hook-form','data-grid','editable-cell','filter-builder','upload-queue'],
-  search:['combobox','multi-select','async-combobox','async-multi-select','command','table','advanced-table'],
-  async:['async-combobox','async-multi-select','cascader','form','editable-cell','file-upload','upload-queue'],
-  multiple:['multi-select','async-multi-select','toggle-group','tag-input'],
-  nested:['dropdown','context-menu','cascader','tree','filter-builder'],
+  forms:['faceted-filter','checkbox-group','fieldset','autocomplete','input','input-group','textarea','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','number-field','time-picker','slider','range-slider','otp-input','toggle-group','tag-input','date-picker','date-range','file-upload','form','react-hook-form','tree-select'],
+  validation:['checkbox-group','fieldset','autocomplete','input','input-group','textarea','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','number-field','time-picker','range-slider','otp-input','toggle-group','tag-input','form','react-hook-form','data-grid','editable-cell','filter-builder','upload-queue','tree-select','date-picker','date-range'],
+  search:['faceted-filter','autocomplete','combobox','multi-select','async-combobox','async-multi-select','command','table','advanced-table','tree-select'],
+  async:['autocomplete','alert-dialog','async-combobox','async-multi-select','cascader','form','editable-cell','file-upload','upload-queue','tree-select'],
+  multiple:['faceted-filter','checkbox-group','multi-select','async-multi-select','toggle-group','tag-input','tree-select'],
+  nested:['faceted-filter','navigation-menu','dropdown','context-menu','cascader','tree','filter-builder','tree-select'],
   ranges:['range-slider','date-range','data-grid'],
   ordering:['kanban','table','advanced-table'],
-  keyboard:['button','icon-button','input-group','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','slider','range-slider','otp-input','toggle-group','tag-input','tabs','accordion','pagination','dialog','sheet','drawer','popover','tooltip','dropdown','context-menu','command','sidebar','tree','kanban','stepper','data-grid','windowed-table','calendar','date-picker','date-range','day-agenda','event-calendar','time-picker','number-field','filter-builder','chart'],
+  keyboard:['faceted-filter','checkbox-group','autocomplete','toolbar','alert-dialog','navigation-menu','preview-card','button','icon-button','input-group','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','slider','range-slider','otp-input','toggle-group','tag-input','tabs','accordion','pagination','dialog','sheet','drawer','popover','tooltip','dropdown','context-menu','command','sidebar','tree','kanban','stepper','data-grid','windowed-table','calendar','date-picker','date-range','day-agenda','event-calendar','time-picker','number-field','filter-builder','chart','tree-select'],
   windowed:['windowed-table'],
 };
 const searchAliases:Record<string,string>={
+  autocomplete:'free text suggestions typeahead query grouped email search abort retry native form',
+  toolbar:'mixed controls action bar roving focus orientation toggle link separator',
+  'alert-dialog':'confirmation destructive delete pending retry cancel safe focus',
+  'navigation-menu':'site links flyout shared viewport touch current hierarchy',
+  'preview-card':'hover linked supplementary profile document reference context',
+  'tree-select':'hierarchy hierarchical searchable checked multiple tri state mixed lazy leaves branches',
   'input':'text field label hint error required', 'input-group':'input adornment prefix suffix clear search', 'textarea':'multiline long text field',
   'otp-input':'otp verification one time password pin code digits', 'tag-input':'tags tokens chips free text labels commit paste',
   'toggle-group':'segmented pressed toolbar single multiple choice', 'range-slider':'minimum maximum interval two thumbs numeric range',
@@ -36,16 +42,16 @@ const searchAliases:Record<string,string>={
   'multi-select':'multiple choices chips tags searchable', 'async-combobox':'remote autocomplete paging retry retained labels',
   'async-multi-select':'remote multiple choices paging retry retained labels', 'cascader':'hierarchy path dependent choices lazy children',
   'dropdown':'action menu submenu checkbox radio groups separator', 'context-menu':'right click menu submenu checkbox radio groups',
-  'data-grid':'spreadsheet cells editing clipboard tsv ranges undo redo drafts', 'windowed-table':'virtual virtualized virtualised bounded rows scrolling window',
+  'data-grid':'spreadsheet cells editing clipboard tsv ranges undo redo drafts date checkbox boolean multiple assignees custom editors', 'windowed-table':'virtual virtualized virtualised bounded rows scrolling window',
   'table':'records columns visibility pinning resizing sorting pagination selection export', 'advanced-table':'records drag reorder saved layouts grouping facets',
-  'date-range':'dates start end interval', 'calendar':'date month day picker', 'event-calendar':'week month appointments timezone events overlap',
+  'date-picker':'dates keyboard editable iso native form bounds validation ref reset', 'date-range':'dates start end interval presets apply cancel draft keyboard native forms', 'calendar':'date month day picker', 'event-calendar':'week month appointments timezone events overlap',
   'upload-queue':'files progress cancel retry transport', 'file-upload':'files drag drop browse transfer', 'tree':'folders hierarchy expand collapse',
   'react-hook-form':'rhf controller forms integration', 'loading':'spinner skeleton busy pending', 'empty':'zero results empty state',
 };
 const families=[
   ['input','textarea','input-group','number-field','otp-input','slider','range-slider'],
-  ['select','combobox','multi-select','async-combobox','async-multi-select','cascader','radio','checkbox','switch','toggle-group','tag-input'],
-  ['dropdown','context-menu','command'], ['dialog','sheet','drawer','popover','tooltip'],
+  ['autocomplete','select','combobox','multi-select','async-combobox','async-multi-select','cascader','tree-select','radio','checkbox','switch','toggle-group','tag-input'],
+  ['dropdown','context-menu','command','toolbar','navigation-menu'], ['dialog','alert-dialog','sheet','drawer','popover','tooltip','preview-card'],
   ['table','advanced-table','data-grid','windowed-table','editable-cell','filter-builder'],
   ['calendar','date-picker','date-range','event-calendar','day-agenda','time-picker'],
   ['tabs','accordion','breadcrumb','pagination','sidebar','stepper'], ['file-upload','upload-queue'],
@@ -77,6 +83,7 @@ export function filterComponents(filters:ComponentFilters,candidates:readonly Co
 }
 export function getRelatedComponents(id:string,limit=4):ComponentEntry[]{
   const selected=components.find(item=>item.id===id);if(!selected)return [];
+  if(id==='tree-select')return ['tree','cascader','multi-select','async-multi-select'].flatMap(key=>components.filter(item=>item.id===key)).slice(0,Math.max(0,limit));
   const family=families.find(group=>group.includes(id));
   const related=components.filter(item=>item.id!==id&&(family?family.includes(item.id):item.category===selected.category));
   return related.slice(0,Math.max(0,limit));

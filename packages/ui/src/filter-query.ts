@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export type FilterKind = 'text' | 'select' | 'number' | 'date';
 export type FilterOperator = 'contains' | 'notContains' | 'equals' | 'notEquals' | 'anyOf' | 'noneOf' | 'gt' | 'gte' | 'lt' | 'lte' | 'before' | 'after' | 'between' | 'empty' | 'notEmpty';
 export interface FilterField { id:string; label:string; kind:FilterKind; options?:readonly {value:string;label:string}[] }

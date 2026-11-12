@@ -32,18 +32,18 @@ test('multi-select uses stable values, removal and disabled options',async ({pag
   await page.keyboard.press('Escape');await expect(page.getByRole('combobox',{name:'Read-only preview',exact:true})).toBeDisabled();
 });
 test('calendar bounds, keyboard navigation and date-only values work',async ({page})=>{
-  await page.goto('/components/date-picker');const trigger=page.getByRole('button',{name:'Review date',exact:true});await trigger.click();
+  await page.goto('/components/date-picker');const preview=page.getByRole('region',{name:'Date picker live preview',exact:true});const trigger=preview.getByRole('button',{name:'Review date',exact:true});await trigger.click();
   const early=page.getByRole('button',{name:/Sunday, October 4th, 2026/});await expect(early).toBeDisabled();
   const day=page.getByRole('button',{name:/Tuesday, October 13th, 2026/});await day.focus();await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');
-  await expect(trigger).toContainText('14 Oct 2026');await expect(trigger).toBeFocused();await expect(page.locator('input[name="reviewDate"]')).toHaveValue('2026-10-14');
-  await page.getByRole('button',{name:'Clear review date',exact:true}).click();await expect(page.locator('input[name="reviewDate"]')).toHaveValue('');await expect(trigger).toBeFocused();
-  await expect(page.getByRole('button',{name:'Locked review date',exact:true})).toBeDisabled();
+  await expect(trigger).toContainText('14 Oct 2026');await expect(trigger).toBeFocused();await expect(preview.locator('input[name="reviewDate"]')).toHaveValue('2026-10-14');
+  await preview.getByRole('button',{name:'Clear review date',exact:true}).click();await expect(preview.locator('input[name="reviewDate"]')).toHaveValue('');await expect(trigger).toBeFocused();
+  await expect(preview.getByRole('button',{name:'Locked review date',exact:true})).toBeDisabled();
 });
 test('range selection keeps both endpoints and clears together',async ({page})=>{
-  await page.goto('/components/date-range');const trigger=page.getByRole('button',{name:'Reporting period',exact:true});await trigger.click();
+  await page.goto('/components/date-range');const preview=page.getByRole('region',{name:'Date range picker live preview',exact:true});const trigger=preview.getByRole('button',{name:'Reporting period',exact:true});await trigger.click();
   await page.getByRole('button',{name:/Tuesday, October 13th, 2026/}).click();await page.getByRole('button',{name:/Friday, October 16th, 2026/}).click();await page.getByRole('button',{name:'Done',exact:true}).click();
-  await expect(trigger).toBeFocused();await expect(page.locator('input[name="period.from"]')).toHaveValue('2026-10-13');await expect(page.locator('input[name="period.to"]')).toHaveValue('2026-10-16');
-  await page.getByRole('button',{name:'Clear reporting period'}).click();await expect(page.locator('input[name="period.from"]')).toHaveValue('');await expect(page.locator('input[name="period.to"]')).toHaveValue('');await expect(trigger).toBeFocused();
+  await expect(trigger).toBeFocused();await expect(preview.locator('input[name="period.from"]')).toHaveValue('2026-10-13');await expect(preview.locator('input[name="period.to"]')).toHaveValue('2026-10-16');
+  await preview.getByRole('button',{name:'Clear reporting period'}).click();await expect(preview.locator('input[name="period.from"]')).toHaveValue('');await expect(preview.locator('input[name="period.to"]')).toHaveValue('');await expect(trigger).toBeFocused();
 });
 test('file selection validates type, size, duplicates, count and removal',async ({page})=>{
   await page.goto('/components/file-upload');const input=page.getByLabel('Project attachments',{exact:true});const file={name:'notes.txt',mimeType:'text/plain',buffer:Buffer.from('A note')};

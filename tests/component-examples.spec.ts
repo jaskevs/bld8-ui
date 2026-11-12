@@ -18,7 +18,7 @@ test('human and agent examples expose the same typechecked source modules',()=>{
 });
 test('editable registry CSS contains the control fragments without unresolved fragment imports',()=>{
   const styles=JSON.parse(read('apps/docs/public/r/bld8-styles.json')),css=styles.files.find((file:{path:string})=>file.path.endsWith('/styles.css')).content as string;
-  expect(css).toContain('.bui-range-slider');expect(css).toContain('.bui-tag-input');expect(css).not.toMatch(/@import.*(?:choice-controls|field-controls|menu-controls|data-grid-controls)/);
+  for(const selector of ['.bui-autocomplete','.bui-toolbar','.bui-alert-dialog','.bui-navigation-menu','.bui-preview-popup'])expect(css).toContain(selector);expect(css).toContain('.bui-range-slider');expect(css).toContain('.bui-tag-input');expect(css).not.toMatch(/@import.*(?:choice-controls|field-controls|menu-controls|data-grid-controls|autocomplete-controls|toolbar-alert-controls|navigation-preview-controls)/);
   for(const id of ['toggle-group','tag-input','range-slider','otp-input'])expect(JSON.parse(read('apps/docs/public/r/'+id+'.json')).registryDependencies).toContain('https://ui.bld8.dev/r/bld8-'+id+'.json');
 });
 test('named examples run inside their documented surface',async({page})=>{

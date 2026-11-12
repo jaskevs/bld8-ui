@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {validateCascaderPage,validateCascaderResolvedPath,type CascaderOptionsLoader,type CascaderPathResolver} from '@bld8/ui/cascader-state';
 
 export function createProjectAreaSource({endpoint='/api/examples/locations',failNext}:{endpoint?:string;failNext?:()=>boolean}={}) {

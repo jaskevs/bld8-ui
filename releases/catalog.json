@@ -1,6 +1,15 @@
 {
   "schemaVersion": 1,
   "versions": [
-    {"version": "0.2.0", "tag": "v0.2.0", "title": "Source adoption and complete workflows"}
+    {
+      "version": "0.2.0",
+      "tag": "v0.2.0",
+      "title": "Source adoption and complete workflows"
+    },
+    {
+      "version": "0.3.0",
+      "tag": "v0.3.0",
+      "title": "Core controls, complete forms and editable data workflows"
+    }
   ]
 }

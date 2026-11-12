@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /* Optional column layout and touch-friendly sort controls. */
 .bui-data-grid[data-layout] th { position:relative; box-sizing:border-box; }
 .bui-data-grid[data-layout] td { overflow:visible; }
@@ -36,3 +40,22 @@
 @media(pointer:coarse) { .bui-data-grid[data-density="compact"] td { height:52px; padding-block:6px; } .bui-data-grid[data-density="compact"] .bui-data-grid-sort { min-height:44px; } .bui-data-grid-resize { width:18px; inset-inline-end:-8px; } .bui-data-grid-resize::after { inset-inline-start:8px; } }
 @media(prefers-reduced-motion:reduce) { .bui-data-grid-resize::after { transition:none; } }
 @media(forced-colors:active) { .bui-data-grid-resize:focus-visible,.bui-data-grid-resize:hover::after { outline-color:Highlight; background:Canvas; } .bui-data-grid-resize:focus-visible::after { background:Highlight; } }
+
+/* Typed cell controls share one perimeter; complex choices use a buffered panel. */
+.bui-data-grid-tags{display:flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0;max-width:100%}
+.bui-data-grid-tag{display:inline-flex;max-width:100%;padding:2px 7px;border:1px solid var(--bui-border);border-radius:5px;background:var(--bui-bg);font-size:12px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bui-data-grid-boolean{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0;border-radius:4px;background:var(--bui-bg);box-shadow:inset 0 1px 2px rgb(0 0 0/.12),inset 0 0 0 1px var(--bui-border);transition:background-color var(--bui-duration-fast) var(--bui-ease),box-shadow var(--bui-duration-fast) var(--bui-ease)}
+.bui-data-grid-boolean[data-checked]{color:var(--bui-accent-ink);background:var(--bui-accent);box-shadow:inset 0 1px 3px rgb(110 87 0/.28),inset 0 -1px 1px rgb(255 255 255/.25)}
+.bui-data-grid .bui-data-grid-checkbox-editor{margin:0;min-height:32px;gap:10px;font-size:14px}
+.bui-data-grid-custom-editor{min-width:0;max-width:100%;width:100%}
+.bui-data-grid-custom-editor>.bui-input{padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;outline:none;height:100%;min-height:30px}
+.bui-data-grid-rich-popup{box-sizing:border-box;display:grid;gap:16px;width:min(360px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:20px}
+.bui-data-grid-rich-title{font-size:15px;line-height:1.5;font-weight:600;margin:0}
+.bui-data-grid-rich-popup>.bui-hint{margin:0}
+.bui-data-grid-rich-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding-block-start:4px}
+.bui-data-grid-rich-popup .bui-field{min-width:0}
+@media(pointer:coarse){.bui-data-grid .bui-data-grid-checkbox-editor{min-height:44px}.bui-data-grid-rich-actions .bui-button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.bui-data-grid-boolean{transition:none}}
+@media(forced-colors:active){.bui-data-grid-tag,.bui-data-grid-boolean{border:1px solid CanvasText;box-shadow:none}.bui-data-grid-boolean[data-checked]{background:Highlight;color:HighlightText}}
+
+.bui-data-grid-rich-fields{display:block;min-width:0}.bui-data-grid-rich-field-content{display:grid;align-content:start;gap:8px;min-width:0}.bui-data-grid-rich-field-content>.bui-error{margin:0}

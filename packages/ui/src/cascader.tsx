@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useCallback,useEffect,useId,useMemo,useRef,useState,type FocusEventHandler,type KeyboardEvent,type ReactNode,type Ref} from 'react';
 import {Popover} from '@base-ui/react/popover';

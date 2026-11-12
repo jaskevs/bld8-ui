@@ -56,12 +56,29 @@ test('manual queue sends the selected bytes and encoded name through the real re
 });
 
 test('bounded concurrency keeps sent files processing until acknowledgement and starts the next authorised file',async({page})=>{
-  const requests:Route[]=[],waits:ReturnType<typeof release>[]=[];
-  await page.route('**/api/examples/uploads',async route=>{const held=release();requests.push(route);waits.push(held);await held.promise;await accept(route).catch(()=>{});});
-  await page.goto(example);await input(page).setInputFiles([file('first.txt'),file('second.txt'),file('third.txt')]);await queue(page).getByRole('button',{name:'Start queued',exact:true}).click();
-  await expect.poll(()=>requests.length).toBe(2);await expect(row(page,'third.txt')).toHaveAttribute('data-upload-status','queued');await expect(row(page,'first.txt')).not.toHaveAttribute('data-upload-status','complete');
-  const outside=page.getByRole('checkbox',{name:'Fail next upload',exact:true});await outside.focus();waits[0].finish();await expect.poll(()=>requests.length).toBe(3);await expect(row(page,'first.txt')).toHaveAttribute('data-upload-status','complete');await expect(outside).toBeFocused();
-  waits[1].finish();waits[2].finish();await expect(queue(page).locator('[data-upload-status=complete]')).toHaveCount(3);
+  const heldByName=new Map<string,{route:Route;held:ReturnType<typeof release>}>(),secondSeen=release(),arrival:string[]=[];
+  await page.route('**/api/examples/uploads',async route=>{
+    const name=decodeURIComponent(route.request().headers()['x-bld8-file-name']??'');
+    // Force the network observation order opposite to the selected file order.
+    // A slot is released by file identity, never by callback arrival position.
+    if(name==='first.txt')await secondSeen.promise;
+    const held=release();heldByName.set(name,{route,held});arrival.push(name);
+    if(name==='second.txt')secondSeen.finish();
+    await held.promise;await accept(route).catch(()=>{});
+  });
+  try{
+    await page.goto(example);await input(page).setInputFiles([file('first.txt'),file('second.txt'),file('third.txt')]);await queue(page).getByRole('button',{name:'Start queued',exact:true}).click();
+    await expect.poll(()=>heldByName.size).toBe(2);expect(arrival).toEqual(['second.txt','first.txt']);
+    await expect(row(page,'third.txt')).toHaveAttribute('data-upload-status','queued');
+    await expect(row(page,'first.txt')).not.toHaveAttribute('data-upload-status','complete');
+    await expect(row(page,'second.txt')).not.toHaveAttribute('data-upload-status','complete');
+    const outside=page.getByRole('checkbox',{name:'Fail next upload',exact:true});await outside.focus();
+    heldByName.get('first.txt')!.held.finish();await expect.poll(()=>heldByName.size).toBe(3);
+    await expect(row(page,'first.txt')).toHaveAttribute('data-upload-status','complete');
+    await expect(row(page,'second.txt')).not.toHaveAttribute('data-upload-status','complete');await expect(outside).toBeFocused();
+    heldByName.get('second.txt')!.held.finish();heldByName.get('third.txt')!.held.finish();
+    await expect(queue(page).locator('[data-upload-status=complete]')).toHaveCount(3);
+  }finally{secondSeen.finish();for(const {held} of heldByName.values())held.finish();}
 });
 
 test('cancel and retry preserve request identity while removed attempts cannot return late receipts',async({page})=>{

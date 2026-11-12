@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useEffect, useRef, useState, type ComponentProps, type FormEvent } from 'react';
 import { Alert } from './core.js';
@@ -40,9 +44,28 @@ export function useForm<T extends object>({initialValues,validate,onSubmit,onSuc
 export function useUnsavedChanges(dirty:boolean) {
   useEffect(()=>{if(!dirty)return;const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue='';};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty]);
 }
-export function FormErrorSummary({error,errors}:{error?:string;errors?:Record<string,string|undefined>}) {
-  const messages=Object.values(errors ?? {}).filter(Boolean);
-  return error || messages.length ? <Alert title={error || 'Check the highlighted fields.'} tone="danger" live>{messages.length>0 && <ul>{messages.map((message,index)=><li key={index}>{message}</li>)}</ul>}</Alert> : null;
+export interface FormErrorSummaryProps {
+  error?:string;errors?:Record<string,string|undefined>;
+  /** Map error keys to stable visible-control IDs. Named native controls also resolve automatically. */
+  fieldIds?:Record<string,string>;fieldLabels?:Record<string,string>;
+  /** Scope named-control lookup to this native form, including externally associated inputs. */
+  formId?:string;
+  /** Optional application-owned focus (for example React Hook Form setFocus). */
+  onFocusField?:(name:string)=>void;
+}
+export function FormErrorSummary({error,errors,fieldIds,fieldLabels,formId,onFocusField}:FormErrorSummaryProps) {
+  const messages=Object.entries(errors??{}).filter((entry):entry is [string,string]=>!!entry[1]);
+  return error||messages.length?<div className="bui-form-error-summary"><Alert title={error||'Check the highlighted fields.'} tone="danger" live>{messages.length>0&&<ul>{messages.map(([name,message])=><li key={name}><a href={'#'+encodeURIComponent(fieldIds?.[name]??name)} onClick={event=>{
+    event.preventDefault();if(onFocusField){onFocusField(name);return;}
+    const document=event.currentTarget.ownerDocument,owner=formId?document.getElementById(formId):event.currentTarget.closest('form');
+    const explicit=fieldIds?.[name]?document.getElementById(fieldIds[name]):null;
+    const named=Array.from(document.querySelectorAll<HTMLElement>('[name], [data-field-name]')).find(node=>{
+      if(node.getAttribute('name')!==name&&node.getAttribute('data-field-name')!==name)return false;
+      if(node.matches('[type="hidden"], :disabled, [aria-disabled="true"]'))return false;
+      return !owner||('form' in node?(node as HTMLInputElement).form===owner:owner.contains(node));
+    });
+    const target=explicit??named;if(target instanceof HTMLElement&&!target.matches(':disabled,[type="hidden"]')){target.focus({preventScroll:true});target.scrollIntoView({block:'nearest',inline:'nearest'});}
+  }}>{fieldLabels?.[name]?fieldLabels[name]+': ':''}{message}</a></li>)}</ul>}</Alert></div>:null;
 }
 export function Form<T extends object>({form,children,...props}:Omit<ComponentProps<'form'>,'onSubmit'|'ref'> & {form:ReturnType<typeof useForm<T>>}) {
   return <form {...props} ref={form.formRef} noValidate aria-busy={form.pending || undefined} onSubmit={form.submit}>{children}</form>;

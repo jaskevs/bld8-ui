@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import { createOutlineRepository, OutlineConflictError,OutlineValidationError, validateOutline, type OutlineProject, type OutlineValues } from '@bld8/blocks/outline-repository';
 
 // This sample store is bounded and process-local. A production service supplies

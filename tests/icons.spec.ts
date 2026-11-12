@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import {hasFullNotice,mitNotice} from '../scripts/license-policy.mjs';
 
 test('icon directory searches, filters, paginates and resets empty results',async ({page}) => {
   await page.goto('/icons');await expect(page.locator('.icon-tile')).toHaveCount(72);
@@ -21,7 +22,7 @@ test('icon inspector provides usable React code and licensed SVG downloads',asyn
   await page.getByRole('group',{name:'Stroke width'}).getByRole('button',{name:'1.5',exact:true}).click();
   await expect(page.locator('.icon-inspector .code-block code')).toContainText('size={20} strokeWidth={1.5}');
   await page.getByRole('button',{name:'Copy code',exact:true}).click();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('import { Camera }');
+  const copied=await page.evaluate(() => navigator.clipboard.readText());expect(copied).toContain('import { Camera }');expect(hasFullNotice(copied,mitNotice())).toBe(true);
   const source=await request.get('/icon-assets/camera-1.5.svg');expect(source.ok()).toBe(true);
   const svg=await source.text();expect(svg).toContain('ISC License');expect(svg).toContain('Cole Bemis');expect(svg).toContain('stroke-width="1.5"');expect(svg).not.toContain('<script');
   await page.getByRole('button',{name:'Copy SVG',exact:true}).click();

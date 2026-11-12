@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {readPlayground,writePlayground} from '../apps/docs/src/lib/playground-state';
 import {playgroundCode} from '../apps/docs/src/lib/playground-code';
 import {chooseOption} from './helpers/controls';
+import {hasFullNotice,mitNotice} from '../scripts/license-policy.mjs';
 
 const preview=(page:Page)=>page.getByRole('region',{name:'Component preview',exact:true});
 const controls=(page:Page)=>page.getByRole('region',{name:'Playground controls',exact:true});
@@ -48,4 +49,19 @@ for(const component of ['Kanban','Tree','Chart'])for(const state of ['Error','Em
 });
 for(const component of ['Kanban','Tree','Chart'])test(component+' fits a phone and passes automated accessibility in both themes',async({page})=>{
   await page.setViewportSize({width:390,height:844});for(const dark of [false,true]){await page.goto('/playground?component='+component+'&dark='+dark);await expect(preview(page)).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(await preview(page).evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);expect((await new AxeBuilder({page}).include('#playground-preview').analyze()).violations).toEqual([]);}
+});
+
+
+test('Checkbox copies and downloads the same complete licensed module',async({page,context})=>{
+  await context.grantPermissions(['clipboard-read','clipboard-write']);
+  await page.goto('/playground?component=Checkbox&mixed=true');
+  const source=page.locator('.playground-code .code-block').filter({hasText:'export default function Example()'});
+  await source.getByRole('button',{name:'Copy code',exact:true}).click();
+  const copied=await page.evaluate(()=>navigator.clipboard.readText());
+  expect(hasFullNotice(copied,mitNotice())).toBe(true);
+  expect(copied).toContain('indeterminate = mixed');
+  expect(copied.trim()).toBe(playgroundCode(readPlayground(new URL(page.url()).search)).trim());
+  const waiting=page.waitForEvent('download');await page.getByRole('button',{name:'Download example',exact:true}).click();
+  const download=await waiting;expect(download.suggestedFilename()).toBe('checkbox-example.tsx');
+  expect((await readFile((await download.path())!,'utf8')).trim()).toBe(copied.trim());
 });

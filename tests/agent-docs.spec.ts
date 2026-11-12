@@ -2,7 +2,10 @@ import {expect, test} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {buildAgentCatalog, entryMarkdown, readExportLiteral, type AgentCatalog} from '../scripts/prepare-agent-docs.mjs';
+import {buildAgentCatalog, entryMarkdown, exampleMarkdown, readExportLiteral, type AgentCatalog} from '../scripts/prepare-agent-docs.mjs';
+import {readComponentExamples} from '../scripts/prepare-component-examples.mjs';
+import {hasFullNotice,mitNotice} from '../scripts/license-policy.mjs';
+import ts from 'typescript';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 let catalog:AgentCatalog;
@@ -27,6 +30,26 @@ test('agent catalogue keeps source identities and APIs tied to the existing auth
   const issue = catalog.entries.find(entry => entry.kind === 'block' && entry.id === 'issue-table')!;
   expect(issue.api[0].name).toBe('IssueTable');
   expect(issue.api[0].properties.some(property => property.name === 'repository')).toBe(true);
+});
+
+test('exact example documents and registry compositions share the complete canonical source',()=>{
+  const authorities=readComponentExamples(root),examples=catalog.entries.flatMap(entry=>entry.examples);
+  expect(examples).toHaveLength(authorities.length);expect(new Set(examples.map(example=>example.id)).size).toBe(examples.length);
+  for(const example of examples){
+    const authority=authorities.find(item=>item.id===example.id)!;
+    expect(example.componentId).toBe(authority.componentId);expect(example.documentationUrl).toBe(catalog.homepage+authority.documentationPath);expect(example.markdownUrl).toBe(catalog.homepage+'/agent/example/'+example.id+'.md');expect(example.registry).toEqual({name:authority.registryName,url:catalog.homepage+'/r/'+authority.registryName+'.json'});expect(example.code).toBe(authority.source);expect(example.registryCode).toBe(authority.registrySource);
+    const registry=JSON.parse(readFileSync(join(root,'apps/docs/public/r/'+example.registry.name+'.json'),'utf8'));expect(registry.name).toBe(example.registry.name);
+    // Installed example files live under bld8/examples and use relative UI imports;
+    // the copyable source uses the default configured UI alias.
+    const installed=registry.files.find((file:{path:string})=>file.path.endsWith('/'+example.id+'.tsx'))?.content as string;
+    expect(installed).toBeTruthy();expect(hasFullNotice(installed,mitNotice())).toBe(true);
+    const parsed=ts.createSourceFile(example.id+'.tsx',installed,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+    const declaration=parsed.statements.find(node=>ts.isFunctionDeclaration(node)&&node.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword)&&(authority.exportName==='default'?node.modifiers.some(modifier=>modifier.kind===ts.SyntaxKind.DefaultKeyword):node.name?.text===authority.exportName));
+    expect(declaration,'Installed export must match the canonical example '+authority.exportName).toBeDefined();
+    const importedUi=authority.modules.filter(module=>!module.startsWith('block:'));
+    for(const module of importedUi)expect(installed).toContain("'../"+module+"'");
+    const markdown=exampleMarkdown(example,catalog);expect(markdown).toContain('npx shadcn@latest add '+example.registry.url);expect(markdown).toContain(example.documentationUrl);expect(markdown).toContain(example.code);expect(markdown).toContain(example.registryCode);expect(markdown).toContain(catalog.release.snapshot);expect(hasFullNotice(markdown,mitNotice())).toBe(true);expect(readFileSync(join(root,'apps/docs/public/agent/example/'+example.id+'.md'),'utf8')).toBe(markdown);
+  }
 });
 
 test('literal catalogue reads refuse executable expressions and computed properties', () => {

@@ -1,3 +1,8 @@
+/*!
+ * SPDX-FileCopyrightText: 2023 shadcn
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 // Adapted from shadcn/ui's provider / desktop-collapse / mobile-overlay pattern.
 // No cookies or global keyboard shortcut. See SHADCN_LICENSE and docs/upstream.json.

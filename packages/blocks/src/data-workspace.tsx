@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useCallback,useEffect,useId,useMemo,useRef,useState,type FormEvent} from 'react';
 import {Check,Columns3,RefreshCw,RotateCcw,Save,Undo2,Redo2} from 'lucide-react';
@@ -152,7 +156,7 @@ export function DataWorkspace({dataSource,onUploadFile,className}:DataWorkspaceP
     <Reveal open={!!loadError}><Alert tone="danger" title="Records could not be loaded" live><p>{loadError}</p><Button size="sm" variant="secondary" onClick={()=>setReload(value=>value+1)}>Retry loading records</Button></Alert></Reveal>
     <div className="bblocks-data-workspace-grid" aria-busy={loading||saving}>
       <p className="bblocks-data-workspace-loading" role="status">{loading&&<><Spinner/>Loading records…</>}</p>
-      <DataGrid label="Issue data grid" rows={displayRows} columns={issueDataColumns} onEdit={edit} cellErrors={errors} dirtyCells={dirtyCells} disabled={!sourceReady||editLocked||loading||!!loadError} onOpenRow={inspect} sorts={query.sorts} onSortsChange={sorts=>setQuery(previous=>({...previous,sorts,page:1}))} onUndo={undo} onRedo={redo} canUndo={!editLocked&&!!history.past.length} canRedo={!editLocked&&!!history.future.length} onClipboardError={setNotice}/>
+      <DataGrid bulkEditing onBulkEditError={setNotice} label="Issue data grid" rows={displayRows} columns={issueDataColumns} onEdit={edit} cellErrors={errors} dirtyCells={dirtyCells} disabled={!sourceReady||editLocked||loading||!!loadError} onOpenRow={inspect} sorts={query.sorts} onSortsChange={sorts=>setQuery(previous=>({...previous,sorts,page:1}))} onUndo={undo} onRedo={redo} canUndo={!editLocked&&!!history.past.length} canRedo={!editLocked&&!!history.future.length} onClipboardError={setNotice}/>
       {!loading&&!loadError&&!rows.length&&<EmptyState title="No matching issues." action={<Button variant="secondary" onClick={()=>{setQuery(initialQuery());setFilterDraft(emptyFilterQuery());}}>Reset view</Button>}>Try another search or fewer filter conditions. Pending drafts are kept.</EmptyState>}
     </div>
     <footer className="bblocks-data-workspace-footer"><p>{total} matching {total===1?'record':'records'}</p><fieldset disabled={editLocked}><legend className="bui-sr-only">Record pages</legend><Pagination page={query.page} totalPages={Math.max(1,Math.ceil(total/query.pageSize))} label="Workspace pages" onPageChange={page=>{if(!editLocked)setQuery(previous=>({...previous,page}));}}/></fieldset></footer>

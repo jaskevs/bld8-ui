@@ -10,6 +10,12 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
 import {validateManifest,byteHash,createReceipt,planReceiptUpdate,manifestHash,sourceHash} from './source-release.mjs';
 import {localReader} from './check-source-updates.mjs';
+import {hasFullNotice,mitNotice} from './license-policy.mjs';
+import {readComponentExamples} from './prepare-component-examples.mjs';
+import {checkEditingExamples} from './check-control-editing.mjs';
+import {installedCompositionExampleIds,checkInstalledCompositionExamples} from './check-new-controls.mjs';
+import {installedAdoptionExampleIds,checkInstalledAdoptionExamples} from './check-adoption-controls.mjs';
+import {createGridEditorRaceFixture,checkGridEditorRaceFixture} from './grid-editor-race-fixture.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(join(root, 'package.json'));
@@ -85,8 +91,24 @@ const coreControlNames=['toggle-group','tag-input','range-slider','otp-input'];
 const availableCoreControls=coreControlNames.filter(name=>originals.has(name+'.json'));
 const richCoreControlsAvailable=coreControlNames.every(name=>originals.has(name+'.json'))&&originals.has('select.json')&&originals.has('dropdown.json');
 const coreControlInstallItems=[...availableCoreControls,...(richCoreControlsAvailable?['select','dropdown']:[])];
+const editingExampleIds=new Set(['date-entry-lifecycle','date-range-presets','date-controlled-entry','tree-select-native','tree-select-lazy','grid-editor-mixed','grid-editor-custom']);
+const installedEditingExamples=originals.has('tree-select.json')?readComponentExamples(root).filter(item=>editingExampleIds.has(item.id)):[];
+if(originals.has('tree-select.json'))assert.equal(installedEditingExamples.length,editingExampleIds.size,'The current editing controls need all complete installation examples.');
+const editingInstallItems=installedEditingExamples.length?['tree-select','date-picker','date-range','data-grid']:[];
+const editingModules=[...new Set(installedEditingExamples.flatMap(item=>item.modules))].map(name=>'bld8-'+name);
+// New examples are installed through their real public registry entries. Retained
+// releases without this family retain their original consumer fixture and graph.
+const compositionControls=['autocomplete','toolbar','alert-dialog','navigation-menu','preview-card'];
+const compositionExamplesAvailable=compositionControls.every(name=>originals.has(name+'.json'));
+const adoptionAvailable=originals.has('faceted-filter.json')&&originals.has('checkbox-group.json');
+const compositionExampleIds=[...installedCompositionExampleIds,...(adoptionAvailable?installedAdoptionExampleIds:[])];
+const installedCompositionExamples=compositionExamplesAvailable?readComponentExamples(root).filter(item=>compositionExampleIds.includes(item.id)):[];
+if(compositionExamplesAvailable)assert.equal(installedCompositionExamples.length,compositionExampleIds.length,'All representative new controls and workflow examples must be available.');
+const compositionInstallItems=installedCompositionExamples.map(item=>item.registryName);
+for(const name of compositionInstallItems){assert.match(name,/^example-[a-z0-9-]+$/);visit(name+'.json');}
+
 const extendedControls=['async-combobox','async-multi-select','cascader','event-calendar','calendar-workspace','upload-queue','upload-http','data-grid','data-workspace-state','data-workspace'].filter(name=>originals.has(name+'.json'));
-for(const name of [...extendedControls,...coreControlInstallItems])visit(name+'.json');
+for(const name of [...extendedControls,...coreControlInstallItems,...editingInstallItems,...editingModules])visit(name+'.json');
 assert.ok(graph.size > 11, 'The representative workflow must install its transitive graph.');
 
 const temporaryParent = await realpath(tmpdir());
@@ -276,6 +298,9 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
         await expect(dialog).not.toBeVisible();
         await expect(trigger).toBeFocused();
         await checkCoreConsumerControls(page);
+        if(installedEditingExamples.length){await checkEditingExamples(page,id=>page.locator('[data-installed-editing="'+id+'"]'));await checkGridEditorRaceFixture(page);}
+        if(installedCompositionExamples.length)await checkInstalledCompositionExamples(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
+        if(adoptionAvailable)await checkInstalledAdoptionExamples(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
         const files = page.getByRole('region', {name:'Installed file browser',exact:true});
         const tree = files.getByRole('tree',{name:'Workspace folders',exact:true});
         await expect(tree).toBeVisible();
@@ -488,6 +513,19 @@ async function prepare(framework, lean=false) {
     exclude: ['node_modules'],
   });
   const {imports:coreImports,source:coreSource}=coreConsumerFixture(alias);
+  const compositionImports=!lean?installedCompositionExamples.map((item,index)=>'import {'+item.exportName+' as InstalledComposition'+index+'} from '+JSON.stringify(alias+'/examples/'+item.id)+';').join('\n'):'';
+  const compositionSource=!lean?installedCompositionExamples.map((item,index)=>'<section data-installed-composition="'+item.id+'" style={{marginBottom:32,maxWidth:680}}><h2>'+item.title+'</h2><InstalledComposition'+index+'/></section>').join(''):'';
+
+  const editingRace=!lean&&installedEditingExamples.length?createGridEditorRaceFixture(alias):{imports:'',source:'',element:''};
+  let editingImports='',editingSource='';
+  if(!lean&&installedEditingExamples.length){
+    for(const [index,item] of installedEditingExamples.entries()){
+      const imported='./installed-editing/'+item.id;
+      editingImports+='import {'+item.exportName+' as InstalledEditing'+index+'} from '+JSON.stringify(imported)+';\n';
+      editingSource+='<section data-installed-editing="'+item.id+'"><InstalledEditing'+index+'/></section>';
+      await write(target,(next?'app':'src')+'/installed-editing/'+item.id+'.tsx',item.registrySource.replaceAll('@/components/ui/bld8/',alias+'/'));
+    }
+  }
   const component = lean ? `import {SignInForm} from '${alias}/blocks/sign-in';\nexport default function Setup(){return <SignInForm/>}\n` : `import {useState} from 'react';
 import {AnalyticsDashboard} from '${alias}/blocks/analytics-dashboard';
 import {FileBrowser} from '${alias}/blocks/file-browser';
@@ -500,13 +538,17 @@ import {OperationsTemplate} from '${alias}/blocks/operations-template';
 import {Button} from '${alias}/core';
 import {Dialog,UIProvider} from '${alias}/overlays';
 ${coreImports}
+${editingImports}
+${compositionImports}
+${editingRace.imports}
 ${coreSource}
+${editingRace.source}
 const queue=Array.from({length:240},(_,index)=>({id:'C-'+String(index).padStart(3,'0'),title:'Queue record '+index,status:index%2?'Later':'Current'}));
 const queueKey=(row:typeof queue[number])=>row.id;
 const queueGrouping={key:(row:typeof queue[number])=>row.status,label:(key:string)=>key};
 const queueColumns=[{key:'id',header:'ID',width:120,cell:(row:typeof queue[number])=>row.id},{key:'title',header:'Record',width:240,flex:1,cell:(row:typeof queue[number])=>row.title}];
 const loadConsumerIssues=async({signal}:{signal:AbortSignal})=>{if(signal.aborted)throw new DOMException('Cancelled','AbortError');return createSampleLargeIssues(80);};
-export default function Setup(){const[selected,setSelected]=useState<string[]>([]);return <UIProvider><section data-consumer-content>${availableCoreControls.length?'<InstalledCoreControls/>':''}<div className="theme-controls"><Button variant="accent">Theme accent</Button><Button>Theme primary</Button><Dialog title="Installed theme portal" description="Exported CSS inherited through a body-mounted portal." trigger={<Button variant="secondary">Open theme dialog</Button>}><Button variant="accent">Portal accent</Button><Button>Portal primary</Button></Dialog></div><div className="bblocks-root"><SessionSetup/></div><section aria-label="Installed file browser" className="bblocks-root"><FileBrowser/></section><section aria-label="Installed analytics" className="bblocks-root"><AnalyticsDashboard/></section><section aria-label="Installed windowed table"><h2>Installed queue</h2><WindowedTable caption="Installed queue" rows={queue} columns={queueColumns} rowKey={queueKey} grouping={queueGrouping} height={320} rowHeight={52} overscan={3} selectable selectedKeys={selected} onSelectedKeysChange={setSelected}/><p role="status" aria-label="Installed selection">{selected.length} selected</p></section><section aria-label="Installed large issue block" className="bblocks-root"><LargeIssueTable loadRows={loadConsumerIssues}/></section><section aria-label="Installed schedule" className="bblocks-root"><SchedulePlanner/></section>${dataWorkspaceAvailable?`<section aria-label="Installed data workspace" className="bblocks-root"><DataWorkspace/></section>`:''}<section aria-label="Installed Outline" className="bblocks-root"><OperationsTemplate/></section></section></UIProvider>}
+export default function Setup(){const[selected,setSelected]=useState<string[]>([]);return <UIProvider><section data-consumer-content>${availableCoreControls.length?'<InstalledCoreControls/>':''}${editingSource}${editingRace.element}${compositionSource}<div className="theme-controls"><Button variant="accent">Theme accent</Button><Button>Theme primary</Button><Dialog title="Installed theme portal" description="Exported CSS inherited through a body-mounted portal." trigger={<Button variant="secondary">Open theme dialog</Button>}><Button variant="accent">Portal accent</Button><Button>Portal primary</Button></Dialog></div><div className="bblocks-root"><SessionSetup/></div><section aria-label="Installed file browser" className="bblocks-root"><FileBrowser/></section><section aria-label="Installed analytics" className="bblocks-root"><AnalyticsDashboard/></section><section aria-label="Installed windowed table"><h2>Installed queue</h2><WindowedTable caption="Installed queue" rows={queue} columns={queueColumns} rowKey={queueKey} grouping={queueGrouping} height={320} rowHeight={52} overscan={3} selectable selectedKeys={selected} onSelectedKeysChange={setSelected}/><p role="status" aria-label="Installed selection">{selected.length} selected</p></section><section aria-label="Installed large issue block" className="bblocks-root"><LargeIssueTable loadRows={loadConsumerIssues}/></section><section aria-label="Installed schedule" className="bblocks-root"><SchedulePlanner/></section>${dataWorkspaceAvailable?`<section aria-label="Installed data workspace" className="bblocks-root"><DataWorkspace/></section>`:''}<section aria-label="Installed Outline" className="bblocks-root"><OperationsTemplate/></section></section></UIProvider>}
 `;
   await write(target, next ? 'app/globals.css' : 'src/style.css', '*{box-sizing:border-box}body{position:relative;margin:0;padding:32px;font-family:var(--bui-font);background:var(--bui-canvas);color:var(--bui-ink)}main{max-width:1200px;margin:auto}.theme-controls{display:flex;gap:16px;margin-bottom:24px}\n');
   if (next) {
@@ -548,13 +590,26 @@ try {
     requests.clear();
     const target = await prepare(framework);
     await run(['install', '--no-audit', '--no-fund'], target);
-    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${installOrigin()}/r/session-setup.json`, `${installOrigin()}/r/theme-config.json`, `${installOrigin()}/r/file-browser.json`, `${installOrigin()}/r/chart.json`, `${installOrigin()}/r/analytics-dashboard.json`, `${installOrigin()}/r/windowed-table.json`, `${installOrigin()}/r/table-grouping.json`, `${installOrigin()}/r/large-issue-table.json`, `${installOrigin()}/r/day-agenda.json`, `${installOrigin()}/r/schedule-state.json`, `${installOrigin()}/r/schedule-planner.json`, `${installOrigin()}/r/outline.json`, ...(tableViewsAvailable?[`${installOrigin()}/r/table-view-state.json`,`${installOrigin()}/r/issue-table.json`]:[]), ...[...extendedControls,...coreControlInstallItems].map(name=>`${installOrigin()}/r/${name}.json`), '--yes', '--overwrite'], target);
+    await run(['exec', '--yes', `--package=shadcn@${tools.shadcn}`, '--', 'shadcn', 'add', `${installOrigin()}/r/session-setup.json`, `${installOrigin()}/r/theme-config.json`, `${installOrigin()}/r/file-browser.json`, `${installOrigin()}/r/chart.json`, `${installOrigin()}/r/analytics-dashboard.json`, `${installOrigin()}/r/windowed-table.json`, `${installOrigin()}/r/table-grouping.json`, `${installOrigin()}/r/large-issue-table.json`, `${installOrigin()}/r/day-agenda.json`, `${installOrigin()}/r/schedule-state.json`, `${installOrigin()}/r/schedule-planner.json`, `${installOrigin()}/r/outline.json`, ...(tableViewsAvailable?[`${installOrigin()}/r/table-view-state.json`,`${installOrigin()}/r/issue-table.json`]:[]), ...[...extendedControls,...coreControlInstallItems,...editingInstallItems,...editingModules,...compositionInstallItems].map(name=>`${installOrigin()}/r/${name}.json`), '--yes', '--overwrite'], target);
     if(!publishedVersion)for (const item of graph) assert.ok(requests.has(item), `shadcn did not request ${item}`);
     const uiDirectory = join(target, framework === 'next' ? 'components/ui/bld8' : 'src/ui/bld8');
     for (const file of ['blocks/outline-project-editor.tsx', 'blocks/outline-drafts.ts', 'drawer.tsx', 'day-agenda.tsx', 'schedule-state.ts', 'blocks/schedule-planner.tsx', 'windowed-table.tsx', 'table-grouping.ts', 'blocks/large-issue-table.tsx', 'blocks/issue-repository.ts', 'chart.tsx', 'chart-state.ts', 'blocks/analytics-dashboard.tsx', 'blocks/analytics-state.ts', 'blocks/file-browser.tsx', 'tree.tsx', 'blocks/session-setup.tsx', 'blocks/session-preferences.ts', 'time-options.ts', 'theme-config.ts', 'styles.css', 'tokens.css', 'tailwind.css', 'licenses/LICENSE', 'licenses/THIRD_PARTY_NOTICES.md']) {
       assert.ok((await readFile(join(uiDirectory, file))).length, `Missing installed source/style/notice: ${file}`);
     }
     for(const name of availableCoreControls)assert.ok((await readFile(join(uiDirectory,name+'.tsx'))).length,'Missing installed core source: '+name);
+    for(const item of installedCompositionExamples){
+      const installedSource=await readFile(join(uiDirectory,'examples',item.id+'.tsx'),'utf8');
+      const parsed=typescript.createSourceFile(item.id+'.tsx',installedSource,typescript.ScriptTarget.Latest,true,typescript.ScriptKind.TSX);
+      assert.ok(parsed.statements.some(node=>typescript.isExpressionStatement(node)&&typescript.isStringLiteral(node.expression)&&node.expression.text==='use client'),'Installed example keeps its client boundary: '+item.id);
+      assert.ok(hasFullNotice(installedSource,mitNotice()),'Installed example preserves its full MIT copyright and permission notice: '+item.id);
+      const registryExample=JSON.parse(originals.get(item.registryName+'.json'));
+      const originalExampleFile=registryExample.files.find(file=>file.target==='@ui/bld8/examples/'+item.id+'.tsx');
+      assert.equal(originalExampleFile?.type,'registry:file','Complete examples bypass CLI code transforms that discard leading notices: '+item.id);
+      assert.equal(installedSource,originalExampleFile.content,'Complete example installation preserves the exact licensed module: '+item.id);
+
+      for(const node of parsed.statements)if(typescript.isImportDeclaration(node)&&typescript.isStringLiteral(node.moduleSpecifier))assert.ok(!node.moduleSpecifier.text.startsWith('@bld8/'),'Example resolves editable installed source, not a workspace package: '+item.id);
+    }
+
     const installed = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'));
     assert.equal(installed.workspaces, undefined, 'A clean consumer must not use local workspace packages.');
     assert.ok(!Object.keys(installed.dependencies).some(name => name.startsWith('@bld8/')), 'Registry installation must use editable source.');

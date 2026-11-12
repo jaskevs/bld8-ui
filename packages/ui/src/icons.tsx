@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { Check, X, ChevronDown, Plus, Search, Copy, Sun, Moon, type LucideIcon, type LucideProps } from 'lucide-react';
 

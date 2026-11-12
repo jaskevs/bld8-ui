@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import type { TableQuery } from './table-query.js';
 
 /** A column's stable identity and the constraints needed to restore its layout. */

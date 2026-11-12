@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useState, type FormEvent } from 'react';
 import { Badge, Button, Dialog, Field, Input, Select } from '@bld8/ui';

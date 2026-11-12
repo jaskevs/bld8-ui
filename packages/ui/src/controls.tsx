@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useId, useMemo, useRef, type ReactNode, type Ref, type FocusEventHandler } from 'react';
 import { Select as PrimitiveSelect } from '@base-ui/react/select';

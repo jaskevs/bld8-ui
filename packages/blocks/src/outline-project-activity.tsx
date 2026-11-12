@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {Check,History,MessageSquare,RefreshCw,Send,Undo2} from 'lucide-react';

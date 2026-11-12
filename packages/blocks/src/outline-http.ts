@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import { OutlineValidationError,isOutlineActivity,isOutlineStatusChange,type OutlinePage, type OutlineProject, type OutlineRepository, type OutlineValues } from './outline-repository.js';
 
 export interface OutlineHttpOptions {

@@ -1,8 +1,8 @@
 # BLD8 UI
 
-React components, reusable blocks and complete interface examples. Built with Base UI, selected shadcn/ui compositions, Tailwind and original BLD8 styles. Both collections are free under MIT.
+React components, reusable blocks and complete interface examples. Built with Base UI, selected shadcn/ui compositions, Tailwind and original BLD8 styles. Original BLD8 source is free under MIT, with applicable third-party notices included.
 
-[React, Vite & Next.js guide](https://ui.bld8.dev/frameworks) · [Community](https://ui.bld8.dev/community) · [Showcase](https://ui.bld8.dev) · [Registry](https://ui.bld8.dev/registry) · [Playground](https://ui.bld8.dev/playground) · [Outline](https://ui.bld8.dev/templates/outline)
+[Documentation](https://ui.bld8.dev/docs) · [React, Vite & Next.js guide](https://ui.bld8.dev/frameworks) · [Community](https://ui.bld8.dev/community) · [Showcase](https://ui.bld8.dev) · [Registry](https://ui.bld8.dev/registry) · [Playground](https://ui.bld8.dev/playground) · [Outline](https://ui.bld8.dev/templates/outline)
 
 [Core component guide](docs/core-components.md) · [Developer and coding-agent guide](docs/agents.md) · [Documentation index](https://ui.bld8.dev/llms.txt) · [Structured catalogue](https://ui.bld8.dev/agent/catalog.json)
 
@@ -15,7 +15,7 @@ npx shadcn@latest add https://ui.bld8.dev/r/button.json
 npx shadcn@latest add https://ui.bld8.dev/r/outline.json
 ```
 
-For a retained version, replace `/r/` with `/releases/0.2.0/r/`. Save its source manifest and capture a clean-install receipt before customising. [Source versions and receipts](https://ui.bld8.dev/releases) explain updates.
+For a retained version, replace `/r/` with `/releases/0.3.0/r/`. Save its source manifest and capture a clean-install receipt before customising. [Source versions and receipts](https://ui.bld8.dev/releases) explain updates.
 
 The registry installs editable source under your configured UI directory in `bld8/`, resolves runtime dependencies and includes compiled styles and licences. It respects custom aliases and keeps existing components separate. For default aliases:
 
@@ -45,6 +45,8 @@ Open http://127.0.0.1:3120. UI source, blocks and styles rebuild on save.
 ```sh
 npm run build
 npm run typecheck
+npm run test:licenses
+npm run check:licenses
 npm run check:starter:vite
 npm run check:starter:uploads
 npm run check:registry:consumers
@@ -56,9 +58,13 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 63 component families, eighteen blocks and three templates. Families and named examples are counted separately.
+- 72 component families, 117 complete named examples, eighteen blocks and three templates. Families and examples are counted separately.
+- A searchable example catalogue with exact URLs, real previews and individual source registry installs. Example modules follow the same lean dependency graph in Next.js and Vite.
+- FacetedFilter, Fieldset and CheckboxGroup with native form contracts; linked error summaries, async read-only/reset parity and atomic DataGrid bulk edits.
+- Autocomplete, Toolbar, AlertDialog, NavigationMenu and PreviewCard compositions on the installed Base UI primitives, with explicit keyboard, focus and recovery contracts.
 - Complete, build-typechecked client examples share their actual preview source with human and agent documentation.
-- Rich grouped choices, composable menus, TagInput, ToggleGroup, RangeSlider and one-native-input code entry.
+- Rich grouped choices, checked hierarchical TreeSelect, composable menus, TagInput, ToggleGroup, RangeSlider and one-native-input code entry.
+- Editable date fields with native forms, range presets and confirmation; typed date/checkbox/multi-value grid editors and public custom cell/editor hooks.
 - Shareable category/capability filters, related controls and portable optional DataGrid layouts, pinning, resizing and touch/keyboard multi-sort.
 - 1,877 canonical Lucide icons with a stable gallery, semantic search, keyboard browsing, saved icons and shareable selected previews. Try common button examples and export sized, licensed SVGs or complete React usage.
 - A 21-control playground with native choices, disclosures, overlays, dates, boards, trees, charts and table/filter workflows. Share validated configurations, try keyboard interactions and copy or download matching client-component code. See [playground guidance](docs/playground.md).
@@ -98,7 +104,7 @@ Outline is the complete local reference application. It saves projects, resource
 
 White panels on warm light-grey backgrounds, near-black primary actions and golden yellow accents. Champagne selection surfaces and related evergreen and mint chart shades complement the accent. Forest-green success and warm-brick error pairs keep status clear while geometry and motion stay consistent. See [selection styling](docs/selection-style.md). Tailwind utilities use the `bui:` prefix without Preflight; packages and registry items include compiled CSS. Existing components can be used without a Tailwind build. Add ordinary CSS or your own Tailwind setup for new utility classes.
 
-All original source uses MIT. Keep the included notices for Base UI, shadcn/ui, Lucide, React DayPicker, Motion and dnd-kit. [Upstream records](docs/upstream.json) identify adapted source. Package names remain private/unpublished on npm; source installation is available through the registry and starters.
+All original source uses MIT. [Licensing and attribution](docs/licensing.md) explains source labels, portable provenance, distribution checks and dependency review. [Brand usage](BRAND.md) distinguishes official releases without adding restrictions to MIT. No visible credit is required in your application. Keep the included notices for Base UI, shadcn/ui, Lucide, React DayPicker, Motion and dnd-kit. [Upstream records](docs/upstream.json) identify adapted source. Package names remain private/unpublished on npm; source installation is available through the registry and starters.
 
 Source: [jaskevs/bld8-ui](https://github.com/jaskevs/bld8-ui). [Deployment](docs/deployment.md) and [verification](docs/verification.md) record the current release setup.
 

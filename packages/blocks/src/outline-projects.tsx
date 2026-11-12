@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Archive, Check, Download, Ellipsis, Plus,Undo2 } from 'lucide-react';

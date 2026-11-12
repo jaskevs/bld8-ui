@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import { useEffect, useRef, type ReactElement } from 'react';
 import { Combobox } from '@base-ui/react/combobox';
@@ -42,7 +46,7 @@ export function CommandPalette({ items, trigger, title = 'Quick actions', placeh
   }, [shortcut, isOpen, setOpen]);
   return <Combobox.Root<CommandItem> inline open={isOpen} onOpenChange={setOpen} items={items} value={null} autoHighlight
     itemToStringLabel={item => item.label} isItemEqualToValue={(a, b) => a.id === b.id}
-    filter={(item, query) => [item.label, item.description, item.category, ...(item.keywords ?? [])].join(' ').toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())}
+    filter={(item, query) => { const terms=query.trim().toLocaleLowerCase().split(/\s+/u).filter(Boolean);const text=[item.id,item.label,item.description,item.category,...(item.keywords??[])].join(' ').toLocaleLowerCase();return terms.every(term=>text.includes(term)); }}
     onValueChange={item => { if (item && !item.disabled) { setOpen(false); item.onSelect(); } }}>
     <Dialog initialFocus={input} trigger={trigger} title={title} description="Use arrow keys to navigate, Enter to choose and Escape to close." open={isOpen} onOpenChange={setOpen}>
       <div className="bui-command">

@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useMemo,type Ref,type FocusEventHandler} from 'react';
 import {Select} from './controls.js';

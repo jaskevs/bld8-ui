@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {isAsyncOptionValue,validateAsyncOption,validateAsyncPage,validateAsyncValues,type AsyncOption,type AsyncOptionsPage,type AsyncOptionsRequest} from './async-options.js';
 
 /** Globally stable IDs identify nodes; parent metadata makes a restored path verifiable. */

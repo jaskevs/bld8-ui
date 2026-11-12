@@ -10,7 +10,11 @@ test('ordered moves are immutable, validate anchors and preserve all task conten
   expect(validateKanban([...items,items[0]],columns)).toContain('unique');expect(validateKanban(items,[...columns,{id:'planned',title:'Duplicate'}])).toContain('unique');expect(kanbanOrderKey(moved)).not.toBe(kanbanOrderKey(items));
 });
 async function move(page:Page,title:string,column:string,position?:string){await page.getByRole('button',{name:'Move '+title,exact:true}).click();const dialog=page.getByRole('dialog',{name:'Move item',exact:true});await dialog.getByRole('combobox',{name:'Destination column',exact:true}).click();await page.getByRole('option',{name:column,exact:true}).click();if(position){await dialog.getByRole('combobox',{name:'Position',exact:true}).click();await page.getByRole('option',{name:position,exact:true}).click();}await dialog.getByRole('button',{name:'Move item',exact:true}).click();}
-const lane=(page:Page,id:string)=>page.locator('.bui-kanban-column[data-column-id="'+id+'"]');
+// Complete examples can contain independent boards; target the surface under test.
+const board=(page:Page)=>new URL(page.url()).pathname==='/components/kanban'
+  ?page.getByRole('region',{name:'Release board',exact:true})
+  :page.getByRole('region',{name:'Task workspace',exact:true}).getByRole('region',{name:/^Task (board|backlog)$/});
+const lane=(page:Page,id:string)=>board(page).locator('.bui-kanban-column[data-column-id="'+id+'"]');
 const order=async(page:Page,id:string)=>lane(page,id).locator('[data-item-id]').evaluateAll(nodes=>nodes.map(node=>(node as HTMLElement).dataset.itemId));
 test('keyboard moves target exact positions, return focus and keep backlog order',async({page})=>{
   await page.goto('/blocks/task-workspace');const title='Review keyboard navigation';await move(page,title,'Done','Before Set the spacing scale');await expect.poll(()=>order(page,'done')).toEqual(['task-1','task-6']);await expect(page.getByRole('button',{name:'Move '+title,exact:true})).toBeFocused();

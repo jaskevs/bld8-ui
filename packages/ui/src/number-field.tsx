@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useId,type Ref,type FocusEventHandler} from 'react';
 import {NumberField as Primitive} from '@base-ui/react/number-field';

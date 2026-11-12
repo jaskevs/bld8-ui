@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {validateAsyncPage,validateAsyncValues,validateResolvedOptions,type AsyncOption,type AsyncOptionsLoader,type AsyncOptionsResolver} from './async-options.js';

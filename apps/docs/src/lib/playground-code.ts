@@ -2,9 +2,11 @@ import {localDate,playgroundModules,type PlaygroundSettings} from './playground-
 import {playgroundDisclosures} from './playground-data';
 import {playgroundTableCode} from './playground-table-code';
 import {playgroundWorkflowCode} from './playground-workflow-code';
+import {withSourceNotice} from './source-notice';
 const quote=JSON.stringify;
 function date(value:string){const parsed=localDate(value);return parsed?`new Date(${parsed.getFullYear()}, ${parsed.getMonth()}, ${parsed.getDate()})`:'null';}
-export function playgroundCode(s:PlaygroundSettings){
+export function playgroundCode(s:PlaygroundSettings){return withSourceNotice(configuredCode(s));}
+function configuredCode(s:PlaygroundSettings){
   if(['Kanban','Tree','Chart'].includes(s.component))return playgroundWorkflowCode(s);
   if(['DataTable','FilterBuilder'].includes(s.component))return playgroundTableCode(s);
   const disabled=s.state==='Disabled'?' disabled':'',error=s.state==='Error';

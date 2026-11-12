@@ -19,6 +19,10 @@ and registry items during a documentation build.
 - Each entry links to plain Markdown, for example
   [Data table](https://ui.bld8.dev/agent/component/table.md) and
   [Issue workspace](https://ui.bld8.dev/agent/block/issue-table.md).
+- Complete named examples have their own interactive page, exact Markdown at
+  `/agent/example/<id>.md` and installable `/r/example-<id>.json` composition.
+  Nested structured examples carry these links alongside complete source,
+  keyboard paths, states and notices.
 
 The API tables come from the source rather than a second handwritten prop list.
 Usage snippets still need imports, state, data and callbacks; they are not complete
@@ -81,8 +85,14 @@ supports MCP, replacing the placeholder with the absolute path to your checkout:
 }
 ```
 
-The tools list and search entries, read an entry's overview, API or example, and
-read a public guide. Native React props are omitted by default to keep responses
+The tools list and search entries, read an entry's overview/API and read a public
+guide. Use `search_examples` with task text or a `componentId` to discover small
+summaries, then `get_example` with its exact ID to obtain the complete client
+module, actual composition registry URL and full portable notices. Its optional
+`source` chooses `workspace`, `registry` or `both`. The catalogue also exposes
+exact resources at `bld8://example/<id>`. Component, block and template kinds
+remain unchanged; examples are named compositions within their parent entries.
+Native React props are omitted by default to keep responses
 focused; request them when needed. No environment variables or API key are required.
 Restart the MCP connection after rebuilding to load the new catalogue. No hosted
 MCP service or published npm command is required for this local integration.
@@ -104,3 +114,21 @@ Read [MCP setup and boundaries](mcp.md) for client examples and response limits.
 The documentation catalogue and MCP responses are reference material. They do not
 grant permission to install dependencies, overwrite customised source, publish a
 release or access another repository.
+
+## Preserve source attribution
+
+Read [licensing and attribution](licensing.md) when copying or redistributing
+source. Complete code exports carry the applicable copyright and permission
+notices. SPDX labels supplement those full notices. Preserve upstream credits;
+source installation does not transfer copyright ownership.
+
+Individual catalogue entries, examples and MCP responses identify MIT, their
+canonical source paths, full notices and upstream provenance. The portable
+ledger maps original package paths to starter, compiled npm and registry files.
+List/search summaries keep shared notices once at the response level; request
+the exact entry or example before copying code. No visible BLD8 badge or footer
+credit is required in a consuming application.
+
+For repository changes, read AGENTS.md. Build, run npm run test:licenses and
+npm run check:licenses, and review any inventory update instead of regenerating
+an acceptance baseline automatically. Keep retained releases unchanged.

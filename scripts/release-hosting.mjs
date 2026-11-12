@@ -4,10 +4,10 @@ import {validateManifest,byteHash} from './source-release.mjs';
 
 export const releaseRepository='jaskevs/bld8-ui';
 export const versionPattern=/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-const roots=new Set(['manifest.json','CHANGELOG.md','UPDATING.md','LICENSE','check-source-updates.mjs','source-release.mjs','capture-installation.mjs']);
+const roots=new Set(['manifest.json','CHANGELOG.md','UPDATING.md','LICENSE','check-source-updates.mjs','source-release.mjs','capture-installation.mjs',"BRAND.md","packages/blocks/LICENSE","packages/ui/LICENSE","packages/ui/LUCIDE_LICENSE","packages/ui/DAY_PICKER_LICENSE","packages/ui/SHADCN_LICENSE","packages/ui/MOTION_LICENSE","packages/ui/DND_KIT_LICENSE","packages/ui/THIRD_PARTY_NOTICES.md","packages/ui/UPSTREAM.json","licenses/inventory.json","scripts/license-policy.mjs"]);
 export function releaseAssetName(path){
   if(typeof path!=='string'||!(roots.has(path)||/^(r|sources)\/[a-z0-9]+(?:-[a-z0-9]+)*\.json$/.test(path)||/^downloads\/[a-z0-9]+(?:-[a-z0-9]+)*\.zip$/.test(path)))throw Error('Unsupported release asset path.');
-  return path.replace('/','--');
+  return path.replaceAll('/','--');
 }
 export function validateVersionCatalog(value){
   if(!value||value.schemaVersion!==1||!Array.isArray(value.versions)||value.versions.length>200)throw Error('Invalid source version catalogue.');

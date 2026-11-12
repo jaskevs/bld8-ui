@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {parseTimeValue} from '@bld8/ui/time-options';
 export interface SessionPreferences { workspace:string; seats:number|null; duration:number|null; startTime:string|null; timeZone:string; locale:string }
 export interface CompleteSessionPreferences extends SessionPreferences { seats:number; duration:number; startTime:string }

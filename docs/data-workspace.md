@@ -147,3 +147,18 @@ explicit conflict rebase. Verify keyboard focus, mobile containment, both themes
 and live reduced motion. Do not infer physical iPhone keyboard behaviour from
 desktop WebKit. For discovery, use the generated component/block Markdown, the
 structured catalogue or the optional local read-only MCP server.
+
+## Bounded bulk edits
+
+Set DataGrid bulkEditing to expose Fill down and Apply active value. The ordinary
+grid toolbar is unchanged unless opted in; DataWorkspace enables these actions.
+Fill down repeats the top selected row within each editable column. Apply active
+value uses the active canonical value for every editable destination. Each target
+column validates before one onEdit array is reported. A failing target rejects
+the complete operation; read-only columns, id and revision remain unchanged.
+
+Control/Command+D fills down; Control/Command+Enter applies the active value.
+The same operations are available as buttons. Operations cover loaded rows only,
+up to 2,000 cells, and never silently truncate a range. The host owns one history
+entry and persistence; the complete example shows one Undo and explicit local
+Save draft. No automatic HTTP save is triggered by a bulk edit.

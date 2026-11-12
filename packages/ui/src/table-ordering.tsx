@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useId,useLayoutEffect,useRef,type CSSProperties} from 'react';
 import {DndContext,MouseSensor,TouchSensor,closestCenter,useSensor,useSensors} from '@dnd-kit/core';

@@ -42,7 +42,7 @@ sample does not host files, reserve disk paths or implement resumable transfers.
 For React + Vite, use the same UploadQueue and createUploadHttpAdapter with your
 own HTTP endpoint; the included receiver uses Next.js Node routes.
 
-Both collections are free under MIT. Keep the included licences and notices.
+BLD8 components, blocks and templates are free under MIT. Keep the included copyright and licence notices.
 `;
   return files;
 }

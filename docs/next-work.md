@@ -1,77 +1,255 @@
+# Core workflows and release follow-up — 12 November 2026
+
+The authorised five-item batch is implemented and locally verified. Source
+requests regular protected publication as 0.3.0. See the latest acceptance at
+the top of handoff.md/verification.md; check the exact Actions run and immutable
+manifest for remote publication status. Local remote evidence, when available,
+is .local/release-0.3.0-acceptance.json.
+
+## Delivered in this pass
+
+1. Reusable grouped FacetedFilter with complete table/resource/people examples.
+2. Fieldset/CheckboxGroup and linked form errors, plus conditional/repeatable
+   React Hook Form rows and retained failed-save drafts.
+3. Async external form/readOnly/reset parity and a nonmodal accessible popup.
+4. Bounded, fully validated grid bulk operations with one host batch/undo.
+5. A regular 0.3.0 release intent, actual clean installations in both frameworks,
+   independently themed downloads and a concrete installation-feedback intake.
+
+Catalogue navigation is consolidated, queries restore before live previews mount,
+and offscreen examples activate as reached. This addresses the observed Firefox
+readiness delay without increasing its five-second assertion timeout.
+
+Current authorities: 72 families, 117 complete examples, 18 blocks, 3 templates,
+344 registry items, 93 component/block/template agent entries and 18 guides.
+No new dependency was added. Keep counts separate; examples are not new families.
+
+## After this release
+
+- Verify the exact immutable 0.3.0 manifest/tag and production routes. Keep the
+  GitHub aggregate deployment gate; never force promotion around a failure.
+- Triage real installation reports by reproducible friction, keyboard/focus,
+  reset/service contracts and mobile behavior. No external feedback is assumed
+  merely because the issue form is available.
+- Add physical-phone and assistive-technology review when available; keep
+  emulation evidence distinct. Preserve copied-source notices and versioned APIs.
+- Select the next core feature from actual adoption evidence. Playground
+  expansion remains lower priority; preserve unrelated repositories/private work.
+
+The owner authorised this release. Continue using personal identity and isolated
+account settings, the normal 08:00–17:00 Melbourne restriction and actual commit
+times; do not backdate. The earlier implementation history below is retained.
+
+---
+
+# Core component follow-up plan — 12 November 2026
+
+The approved five-control and example-discovery batch is implemented and locally
+verified. Current authorities contain 69 families, 107 complete examples,
+18 blocks, 3 templates, 328 registry items, 90 component/block/template agent
+entries and 18 guides. Example discovery is separate from family counting.
+Read the latest acceptance at the top of handoff.md and verification.md.
+
+## Catalogue filter polish — current local pass
+
+The example browser now uses an aligned white filter panel with searchable
+multi-selection for families and categories. Whole family groups select all
+members, partial groups are mixed, and repeated URL keys preserve legacy links,
+reload and history. Selections within a filter are alternatives; categories and
+families narrow one another. No public component API or dependency changed.
+
+## Completed in the previous feature pass
+
+Autocomplete, Toolbar, AlertDialog, NavigationMenu and PreviewCard; exact
+searchable/installable examples; dependent choices, upload acknowledgement and
+Kanban recovery; complete human/agent APIs; exact example Markdown and MCP
+discovery; copyright-preserving example delivery; clean Next.js/Vite adoption.
+The current design remains white/light grey, near-black and #FFD900 with shared
+motion, native focus behavior and live reduced-motion support.
+
+## Next core priorities
+
+1. **Reusable grouped/faceted selection.** Build on the proven catalogue picker
+   so applications can use grouped multi-selection in table toolbars, resource
+   lists and people pickers. Include mixed parents, clear group-selection scope,
+   compact selected summaries, keyboard behavior and shareable state. Extend
+   an existing family or ship a complete composition; do not inflate family
+   counts for cosmetic variations.
+2. **Finish the shared form contract.** Extend the existing Field; add Fieldset
+   and CheckboxGroup, plus error-summary links that focus the relevant control.
+   Demonstrate conditional fields and repeatable rows with the existing React
+   Hook Form integration. Acceptance includes native submission/reset, prevented
+   reset, grouped validation and server errors retaining entered values.
+3. **Bring remote choices to form parity.** AsyncCombobox and AsyncMultiSelect
+   currently do not expose the local choices' external form and readOnly props.
+   Unify and test external-form ownership, controlled/uncontrolled reset,
+   prevented reset, retained labels and stale-request cancellation. Treat reset
+   behavior as a test target, not a proven defect from a type-signature review.
+4. **Bounded DataGrid bulk editing.** Add Fill down/apply-to-selection through
+   the existing typed edit pipeline: one validated host batch and one undo step,
+   read-only cells preserved, no writes outside loaded rows and no automatic
+   persistence. Copy/paste, rich editors and range selection already exist.
+5. **A reviewed release and first-install path.** Source versions, receipts and
+   clean Next.js/Vite adoption checks already exist. Use them to prepare 0.3.0
+   only when authorised, verify deployed routes and collect developer feedback
+   on actual integration friction. Keep retained 0.2.0 immutable.
+
+Meter and optional ScrollArea remain useful smaller additions when a concrete
+capacity/dashboard or contained-panel example needs them. Playground expansion
+remains lower priority. Keep exact example IDs, independent installs and one
+canonical source; split large agent/source payloads when measured growth calls
+for it.
+
+No commit, push, deployment or retained release is authorised by this feature
+request. Use the existing personal account isolation, and keep the daily
+08:00–17:00 no-commit/push window. Do not backdate changes. The earlier
+copy/navigation roadmap below remains useful where it is still outstanding.
+
+---
+
+# Licensing and site improvement plan — 12 November 2026
+
+This pass implements MIT-compatible distribution checks and the first marketing,
+copy and navigation improvements. Development remains 0.3.0/unreleased. The fixed
+private Workbench dates, exam allocation and 135-hour baseline are unchanged.
+No commit, push, deployment or retained release is authorised by this request.
+
+## Completed locally and verified
+
+- Accurate SPDX attribution on library modules and canonical examples, preserving
+  upstream authorship. Portable provenance and complete notices follow source
+  installs, downloads, copied complete modules and individual agent responses.
+- Content-based licence validation after generation and before publication.
+  Dependency/notice changes require an explicit inventory review; copying a
+  filename or keeping a digest is not evidence that a notice is complete.
+- Public badges read MIT · Free. Focused/Complete describe composition scope;
+  existing Free/Premium machine identifiers and retained URLs remain compatible.
+- Short, concrete homepage and introduction copy. Components lead the homepage.
+  Interactive examples demonstrate controls, state changes and keyboard paths.
+- Main navigation: Components, Blocks, Templates, Icons, Themes, Docs. Search and
+  colour mode stay separate. The Docs hub groups installation, design, workflows
+  and reference; framework setup, Playground and agent guidance remain accessible.
+- White marketing surfaces, near-black type, #FFD900 accents, light-grey product
+  stages and restrained motion. Component styling remains its own authority.
+
+## Next copy and information-architecture pass
+
+1. **Component detail pages.** Use one short outcome sentence, then Preview,
+   Examples, Install, API and Keyboard/states anchors. Put prerequisites and
+   service responsibilities next to the relevant example. Show actual family
+   and example counts separately; never count icons or variants as controls.
+   Acceptance: a new visitor can find installation and a complete example from
+   one detail page without opening the playground or guessing a dependency.
+2. **Catalogue and block browsing.** Group by the task (forms, data, navigation,
+   overlays, feedback); add an explicit distinction between a component, workflow
+   block and template. Prefer capability descriptions over abstract adjectives.
+   Keep filters shareable and show useful empty results with a clear reset.
+   Acceptance: consistent names, categories and descriptions across search,
+   cards, detail headings, generated Markdown and MCP discovery.
+3. **Workflow introductions.** Describe the actual inputs, actions, error states
+   and host-owned services in each block/template. Remove repeated promotional
+   lines. Label sample data, temporary storage and unfinished service work.
+   Acceptance: no backend, authentication, accessibility-certification, adoption
+   or performance claim without evidence specific to that claim.
+4. **Documentation reading layout.** Add a grouped guide sidebar and section
+   links where long guides warrant them, with current-page context and a stable
+   mobile disclosure. Preserve existing URLs and keyboard/focus behaviour.
+   Acceptance: no obscured heading under the floating nav, no horizontal page
+   overflow at 320px and readable long labels at increased text size.
+5. **Visual consistency and motion.** Extend the new spacing/type hierarchy to
+   marketing introductions, guide cards and the footer after reviewing the home.
+   Use the shared easing and a small motion vocabulary: hover feedback, state
+   transitions and once-only section reveals. Avoid unrelated autoplay, endless
+   floating objects, forced smooth scrolling or motion that moves a control
+   away from the pointer. All content remains available without animation.
+   Acceptance: interrupted transitions settle cleanly; reduced motion updates
+   live; no hidden essential content on first render or when JavaScript fails.
+
+## Copy rules for people and agents
+
+- Lead with the task and the behaviour: editable grids, keyboard entry, retained
+  drafts, source installation or explicit save/retry. Replace considered,
+  seamless, ultimate and premium-as-a-quality-claim with specific evidence.
+- Keep one main action per section and stable verbs: Browse components,
+  Install source, View example, Download starter. Do not imply copyright is
+  transferred by saying source you own or the source is yours.
+- Original code is MIT licensed. Preserve full notices in source distributions;
+  SPDX labels do not replace them. Do not demand a visible footer credit or add
+  anti-fork restrictions through branding language. See licensing.md.
+- Keep competitors, inspiration domains, invented testimonials and unsupported
+  superiority claims out of product copy. The value is demonstrated by working
+  controls, complete examples, clear APIs and free source access.
+- Edit the catalogue and example authorities, regenerate shared human/agent
+  documentation, then verify the rendered result. Do not patch generated files.
+
+## Latest acceptance
+
+Production builds/types, 38 licence tests and the full licence guard, the
+132-case affected sweep, 51 final cross-browser marketing checks and clean
+Next.js/Vite source consumers pass. A separately traced date input race was
+repaired and passed three core plus twelve browser/theme/viewport checks. See
+verification.md for exact scopes, initial failures and later-change coverage.
+No full matrix rerun or hosted publication is claimed.
+
+## Release and verification boundary
+
+Record actual build, licence, browser, source-install and screenshot evidence in
+verification.md. Preserve immutable 0.2.0 bytes. Local checks are not hosted CI or
+production acceptance. Physical iPhone and assistive-technology checks remain
+separate. Retained releases, hosted MCP and npm publication are not implied.
+
+---
+
 # Next work
 
-Updated 11 November 2026. The owner authorised the complete core-component plan
-in one pass. Implementation and combined acceptance are complete locally.
-Development remains 0.3.0/unreleased. See handoff.md and verification.md for the
-exact checked revision and publication state.
+Updated 12 November 2026. The owner authorised all three next core priorities in
+one coordinated pass: typed grid editors, editable dates and TreeSelect. Source
+implementation, final regression/browser checks and source adoption acceptance
+are complete locally. Development is 0.3.0/unreleased.
+The base is fcc1de91ffc5a0d593a73ff572f90d253cb3ca72. No new commit, push or
+retained release is authorised by this feature request.
 
-## Core pass
+## Current pass
 
-The catalogue now has 63 component families, eighteen blocks and three templates.
-Four new families extend the original 59. Named examples, icon assets and registry
-dependency items are separate counting units.
+- Typed date, boolean and multi-value DataGrid editors; canonical value parsing,
+  JSON-array TSV round trips, public display/editor contexts and stable focus.
+- Editable DatePicker keyboard entry and native form/reset ownership; strict
+  local date parsing, bounded range presets and explicit Apply/Cancel drafts.
+- Checked hierarchical TreeSelect with loaded-only parent selection, mixed
+  states, ancestor-aware search, abortable lazy children and retry.
+- A custom TreeSelect grid editor joins the new controls through the public
+  composition API. Query, data, revisions, permissions and saves remain host-owned.
+- Complete examples, TypeScript APIs, human/agent discovery, registry source and
+  shared real-browser checks carry each change into usable source installs.
 
-Implemented in this pass:
+Verified output has 64 families, 83 complete examples, eighteen blocks,
+three templates and 211 registry items. Count families independently of variants,
+examples, helpers and icons. Final evidence belongs in verification.md.
 
-- A stable icon gallery with scoped size/stroke previews, common buttons,
-  semantic/alias search, keyboard browsing, saved icons and licensed exports.
-- Select, Combobox and MultiSelect rich stable-ID options, grouping, descriptions,
-  icons and grouped rows. Combobox/MultiSelect match search terms; Select typeahead
-  uses labels. Existing string conveniences and typed values remain available.
-- Dropdown action composition with groups, separators, nested, checked and radio
-  items. The existing MenuItem interface and simple action callers remain valid.
-- Explicit native field states, mixed checkboxes, hint/error/ref/blur conventions,
-  and new ToggleGroup, TagInput, RangeSlider and OTPInput controls.
-- Complete literal source examples that compile as real client modules. Website
-  previews run that same source; human docs, agent docs and read-only MCP expose
-  matching source, keyboard guidance, supported states and TypeScript-derived APIs.
-- URL-backed category/capability/text filters and related-control navigation.
-  Existing catalogue previews remain available; no performance claim is inferred.
-- Optional DataGrid column order, visibility, width, logical pinning and density,
-  reusing the existing table view-state model. Touch/keyboard multi-sort and stable
-  row/column selection, draft and focus identity accompany the layout controls.
-- Human block/template API tables, alongside the existing integration sources,
-  complete starters and explicit host service contracts.
-- Registry aliases, compiled CSS, source graphs and lean starter packaging for
-  the new APIs. Retained 0.2.0 assets are unchanged.
+## Completed acceptance
 
-The private Workbench project and its fixed dates, exam window and 135-hour
-baseline are separate. This pass makes no effort-hour or adoption claim.
+All 764 core cases passed. The browser matrix passed 511/518, then all 36
+affected cases passed after the seven browser-check repairs, with twenty
+approved images unchanged. Report identities cover all 518 unique cases; a
+subsequent full green matrix is not claimed. Production UI/docs/MCP builds,
+workspace/quality types,
+83 complete example modules, clean Next.js/Vite source consumers and themed ZIP
+acceptance passed. Initial failures and repairs are recorded in verification.md.
+The seven actual examples and a separate stale-editor/permission fixture run in
+source consumers; the 122-item graph and lean sign-in boundaries are verified.
+Human and agent docs and generated source carry the same contracts. Source stays
+uncommitted/unpublished until the owner requests a release action.
 
-## Verified acceptance
+## After verified acceptance
 
-- Existing consumers compile with their existing APIs and native form values.
-- Complete examples typecheck and remain self-contained outside the docs app.
-- New controls pass meaningful keyboard, form, reset, validation, ref and focus
-  checks; rich choices keep IDs independent of display labels.
-- Grid layout changes preserve canonical cell identity and do not steal focus
-  from an outside control or silently expand an invalid range.
-- Narrow layouts and both themes stay contained. Shared easing follows live
-  reduced-motion preferences; approved visual baselines are compared unchanged.
-- Clean Next.js and Vite registry consumers compile and exercise the new controls;
-  lean sign-in stays free of unrelated dependencies. Themed starter ZIPs build
-  independently. Human/agent API and example identities agree.
+1. Prepare an owner-requested source push/deployment and, separately, a retained
+   0.3.0 release if requested. Preserve all immutable 0.2.0 assets and release gates.
+2. Review physical iPhone keyboard/zoom/autofill, assistive technologies, larger
+   text and long translated labels. Emulated browsers are not device certification.
+3. Use actual developer feedback to choose further core gaps. Keep the playground
+   below control quality, portable installation and useful examples in priority.
 
-Exact results and the distinction between the full core run and corrected-query
-reruns are recorded in verification.md. Browser-quality acceptance passed all 398
-cases without changing approved screenshots.
-
-## After the verified core pass
-
-1. Prepare a separately requested 0.3.0 retained release from the verified source.
-   Preserve every immutable 0.2.0 byte, generate manifests/receipts, run release
-   acceptance and explain the included APIs without implying an old install has
-   acquired new behaviour. Commit, push and publication require owner instruction.
-2. Review real touch hardware, particularly iPhone native keyboard/autofill/zoom,
-   larger text, screen readers and long translated labels. Desktop WebKit is
-   useful coverage, not a physical-device certification.
-3. Use actual developer feedback to choose additional component examples and
-   missing contracts. Do not inflate the family count with visual variants.
-   External outreach occurs only when the owner chooses to invite people.
-4. Profile catalogue mounting under representative hardware before changing its
-   loading behaviour or making performance claims. Keep normal table, editable
-   grid, scrolling supplied-data view and service ownership boundaries distinct.
-
-Calendar writes/resource views/recurrence and storage/resumable upload services
-remain possible later workflow work, outside this core pass. No paid tier,
-hosted MCP endpoint, npm publication or automatic commit is included.
+The private Workbench milestones, exam window and 135-hour baseline remain
+separate. Calendar service writes/recurrence, storage transport services, a paid
+tier, hosted MCP and npm publication are outside this pass. Do not infer adoption,
+external review, effort hours or completed deployment from local implementation.

@@ -21,7 +21,7 @@ test('every catalogue entry exposes both framework archives without changing the
 });
 
 test('framework guide explains both starters and the server migration boundary',async({page})=>{
-  await page.goto('/');await page.getByRole('link',{name:'React, Vite & Next.js guide',exact:true}).click();await expect(page).toHaveURL(/\/frameworks$/);
+  await page.goto('/');await page.getByRole('link',{name:'React, Next.js & Vite guide',exact:true}).click();await expect(page).toHaveURL(/\/frameworks$/);
   await page.getByRole('link',{name:'Vite setup',exact:true}).click();await expect(page).toHaveURL(/#vite$/);
   await expect(page.getByRole('link',{name:'Download Vite workspace'})).toHaveAttribute('href','/downloads/outline-vite.zip');
   await expect(page.getByRole('region',{name:'Framework migration guide'})).toContainText('Server Components, actions and API routes');

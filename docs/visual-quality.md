@@ -40,22 +40,30 @@ The four flows in `quality-tests/core-controls.spec.ts` add:
   validation, selection/deletion, form ownership and reset.
 
 Those four flows run in all twelve browser/theme/viewport combinations, adding
-48 cases to the existing 312 portable workflow cases. The phone viewport is
-390 × 844 CSS pixels; containment is checked in both themes.
+48 cases to the existing 312 portable workflow cases. Six further flows cover
+editable date forms/range drafts, checked/lazy TreeSelect and default/custom
+DataGrid editors in `date-fields.spec.ts`, `tree-select.spec.ts` and
+`grid-editors.spec.ts`. Their shared helpers also run the actual complete example
+source in clean Next.js and Vite registry consumers. Short-height tree popups
+are checked at 390/320 × 420 CSS pixels; the usual phone viewport remains
+390 × 844. Containment is checked in both themes.
 
 Separate touch projects enable a coarse pointer in Chromium, Firefox and WebKit
-at 390 × 844 in both themes. Their three scenarios check editable text size,
+at 390 × 844 in both themes. Their eleven scenarios check editable text size,
 native focus/blur and unrestricted zoom metadata; vector artwork/template marks;
-and grid touch scrolling with native editor text selection. These are eighteen
-touch cases, not a reproduction of the physical iPhone keyboard or UIKit zoom.
+grid touch scrolling with native editor text selection; and editable dates,
+range inputs, TreeSelect search and buffered grid date entry. Native text checks
+each start on a fresh page, avoiding a long navigation chain
+and prefetch cancellation from replacing unrelated documents. These are 66 touch
+cases, not a reproduction of the physical iPhone keyboard or UIKit zoom.
 
-The suite contains **398 cases**: twenty approved image comparisons, eighteen
-touch checks and 360 smoke checks (30 workflows × twelve configurations). The
-local pinned-Linux run on 11 November 2026 passed all 398 with snapshot updates
-disabled and all approved image files unchanged. Final evidence is recorded in
-[verification](verification.md). Run only touch cases with
-`--project="touch-*"`, or only the new core flows with
-`npm run test:quality -- core-controls.spec.ts`.
+The suite contains **518 cases**: twenty approved image comparisons, 66 touch
+checks and 432 smoke checks (36 workflows × twelve configurations). Snapshot
+updates remain disabled. Run results, initial failures and repaired acceptance
+are recorded separately in [verification](verification.md). Run only touch cases with
+`--project="touch-*"`. Run the choice/menu/core flows with
+`npm run test:quality -- core-controls.spec.ts`, or editing/hierarchy flows with
+`npm run test:quality -- date-fields.spec.ts tree-select.spec.ts grid-editors.spec.ts`.
 
 ## Run comparisons
 
@@ -72,8 +80,8 @@ node quality-tests/run-linux.mjs
 ```
 
 The runner copies an explicit top-level source allowlist into a disposable BLD8-only container,
-excluding credentials, environment files, host node_modules and generated output.
-It verifies and uses Node 22.22.0, installs from the lockfile, checks quality types, builds, and compares
+including the reviewed licenses/ inventory and BRAND.md, and excluding credentials, environment files, host node_modules and generated output.
+It verifies and uses Node 22.22.0, installs from the lockfile, checks quality types, builds, runs the licence fixtures and generated-artifact integrity gate, and compares
 without modifying baselines. It leaves reports in the printed
 `.local/quality-linux/<run-id>/` directory and removes its container on exit.
 It does not change the Docker daemon or other containers.
@@ -81,6 +89,8 @@ It does not change the Docker daemon or other containers.
 Within the pinned CI/container environment after `npm ci` and `npm run build`:
 
 ```sh
+npm run test:licenses
+npm run check:licenses
 npm run test:quality
 ```
 

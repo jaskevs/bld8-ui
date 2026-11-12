@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /* Stateful menu entries, toggles and tags share the control tokens and motion language. */
 .bui-menu-rich { min-width:220px; max-width:calc(100vw - 24px); }
 .bui-menu-entry { justify-content:flex-start; gap:10px; transition:background-color var(--bui-duration-fast) var(--bui-ease),color var(--bui-duration-fast) var(--bui-ease),box-shadow var(--bui-duration-fast) var(--bui-ease); }

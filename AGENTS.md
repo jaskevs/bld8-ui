@@ -40,6 +40,26 @@ crisp vector icons, consistent alignment, subtle shadows and shared easing.
 Respect live reduced-motion preferences. Preserve third-party licence notices;
 do not add design-inspiration names or promotional claims to product copy.
 
+## Licensing and portable attribution
+
+Keep original code under the existing MIT terms; do not add visible-credit,
+anti-fork or access-key requirements. Preserve upstream authorship and complete
+permission notices. Read docs/licensing.md and BRAND.md before changing source
+attribution or distribution metadata.
+
+Substantial UI, block and canonical example modules carry SPDX identifiers.
+Copyable complete modules also carry the full applicable notice through the
+shared licence helpers. Do not attach code banners to commands, configuration
+values or import-only fragments. Human/agent exports must share the same source.
+
+licenses/inventory.json records reviewed dependency/workspace metadata, canonical
+notice contents and upstream provenance. Review changes before updating it;
+never automatically accept the current output merely to make a check pass.
+Keep canonical source paths distinct from starter, npm and registry mappings.
+After generation run npm run test:licenses and npm run check:licenses. The
+release generator checks notices before hashing, and CI checks distributions
+before publication. Existing retained releases keep their original bytes.
+
 ## Build and verify
 
 Use Node 22. After `npm ci`, run `npm run build` and `npm run typecheck`. The build

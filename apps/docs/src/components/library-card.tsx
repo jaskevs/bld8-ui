@@ -22,5 +22,5 @@ export function LibraryArtwork({ id }: { id: string }) {
   </div>;
 }
 export function LibraryCard({ item, kind = 'blocks' }: { item: LibraryItem; kind?: 'blocks' | 'templates' }) {
-  return <article className="library-card"><LibraryArtwork id={item.id} /><div className="library-card-body"><div className="library-card-meta"><span>{item.category}</span><span className={'collection-label' + (item.tier === 'Premium' ? ' collection-label--premium' : '')}>{item.tier === 'Premium' ? 'Premium · Free' : 'Free'}</span></div><h2><Link href={'/' + kind + '/' + item.id}>{item.name}<Icon /></Link></h2><p>{item.description}</p></div></article>;
+  return <article className="library-card"><LibraryArtwork id={item.id} /><div className="library-card-body"><div className="library-card-meta"><span>{item.category}</span><span className={'collection-label' + (item.tier === 'Premium' ? ' collection-label--premium' : '')}>{'MIT · Free'}</span></div><h2><Link href={'/' + kind + '/' + item.id}>{item.name}<Icon /></Link></h2><p>{item.description}</p></div></article>;
 }

@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useRef,useState,type KeyboardEvent,type PointerEvent,type TouchEvent} from 'react';
 import {Select} from '@base-ui/react/select';
@@ -7,7 +11,7 @@ import {Icon} from './core.js';
 
 export interface GridChoiceResult {value:string;intent:'choose'|'dismiss'|'tab';restoreFocus:boolean;reverse?:boolean}
 interface GridChoiceProps {
-  label:string;columnKey:string;owner:string;options:readonly {value:string;label:string}[];
+  label:string;columnKey:string;owner:string;options:readonly {value:string;label:string;disabled?:boolean}[];
   value:string;active:boolean;searchable:boolean;disabled:boolean;errorId?:string;
   onFinish:(result:GridChoiceResult)=>boolean|void;onClosed:()=>void;
 }
@@ -31,7 +35,7 @@ export function GridChoiceEditor({label,columnKey,owner,options,value,active,sea
     onTouchStart:(event:TouchEvent<HTMLDivElement>)=>{const point=event.touches[0];if(event.touches.length===1&&point)touch.current={id:point.identifier,value,x:point.clientX,y:point.clientY};else touch.current=null;},
     onTouchMove:(event:TouchEvent<HTMLDivElement>)=>{const start=touch.current,point=event.touches[0];if(start&&(!point||event.touches.length!==1||Math.hypot(point.clientX-start.x,point.clientY-start.y)>8))touch.current=null;},
     onTouchCancel:()=>{touch.current=null;},
-    onTouchEnd:(event:TouchEvent<HTMLDivElement>)=>{const start=touch.current,point=event.changedTouches[0];touch.current=null;if(disabled||!start||!point||start.value!==value||Math.hypot(point.clientX-start.x,point.clientY-start.y)>8||!event.currentTarget.contains(document.elementFromPoint(point.clientX,point.clientY)))return;event.preventDefault();finish({value,intent:'choose',restoreFocus:true});},
+    onTouchEnd:(event:TouchEvent<HTMLDivElement>)=>{const start=touch.current,point=event.changedTouches[0];touch.current=null;if(disabled||options.find(option=>option.value===value)?.disabled||!start||!point||start.value!==value||Math.hypot(point.clientX-start.x,point.clientY-start.y)>8||!event.currentTarget.contains(document.elementFromPoint(point.clientX,point.clientY)))return;event.preventDefault();finish({value,intent:'choose',restoreFocus:true});},
   };}
   const trigger={className:'bui-data-grid-choice-trigger','aria-label':label,'aria-invalid':!!errorId||undefined,'aria-describedby':errorId,'data-grid-choice-owner':owner,'data-closing':!active||undefined,tabIndex:-1,onKeyDownCapture:tab};
   const content=<><span className="bui-data-grid-value bui-data-grid-choice-value" data-value={value}>{labelFor(value)||'Choose an option'}</span><Icon icon={ChevronDown} size={14}/></>;
@@ -46,7 +50,7 @@ export function GridChoiceEditor({label,columnKey,owner,options,value,active,sea
       <Combobox.Popup {...popup} initialFocus={search}>
         <div className="bui-data-grid-choice-search"><Icon icon={Search} size={14}/><Combobox.Input ref={search} aria-label={'Search '+label+' options'} placeholder="Find an option…" autoComplete="off"/></div>
         <Combobox.Empty className="bui-data-grid-choice-empty">No matching options. Try another search.</Combobox.Empty>
-        <Combobox.List className="bui-data-grid-choice-list">{(item:string)=><Combobox.Item key={item} value={item} {...touchChoice(item)} className="bui-data-grid-choice-option"><span>{labelFor(item)}</span><Combobox.ItemIndicator className="bui-data-grid-choice-check"><Icon icon={Check} size={14}/></Combobox.ItemIndicator></Combobox.Item>}</Combobox.List>
+        <Combobox.List className="bui-data-grid-choice-list">{(item:string)=><Combobox.Item key={item} value={item} disabled={options.find(option=>option.value===item)?.disabled} {...touchChoice(item)} className="bui-data-grid-choice-option"><span>{labelFor(item)}</span><Combobox.ItemIndicator className="bui-data-grid-choice-check"><Icon icon={Check} size={14}/></Combobox.ItemIndicator></Combobox.Item>}</Combobox.List>
       </Combobox.Popup>
     </Combobox.Positioner></Combobox.Portal>
   </Combobox.Root>;
@@ -55,7 +59,7 @@ export function GridChoiceEditor({label,columnKey,owner,options,value,active,sea
     onOpenChange={(next,details)=>close(next,details.reason)} onOpenChangeComplete={completed}>
     <Select.Trigger {...trigger}>{content}</Select.Trigger>
     <Select.Portal><Select.Positioner className="bui-positioner bui-data-grid-choice-positioner" align="start" sideOffset={5} collisionPadding={12} alignItemWithTrigger={false} disableAnchorTracking={!active||!open}>
-      <Select.Popup {...popup}><Select.List className="bui-data-grid-choice-list">{options.map(option=><Select.Item key={option.value} value={option.value} {...touchChoice(option.value)} className="bui-data-grid-choice-option"><Select.ItemText>{option.label}</Select.ItemText><Select.ItemIndicator className="bui-data-grid-choice-check"><Icon icon={Check} size={14}/></Select.ItemIndicator></Select.Item>)}</Select.List></Select.Popup>
+      <Select.Popup {...popup}><Select.List className="bui-data-grid-choice-list">{options.map(option=><Select.Item key={option.value} value={option.value} disabled={option.disabled} {...touchChoice(option.value)} className="bui-data-grid-choice-option"><Select.ItemText>{option.label}</Select.ItemText><Select.ItemIndicator className="bui-data-grid-choice-check"><Icon icon={Check} size={14}/></Select.ItemIndicator></Select.Item>)}</Select.List></Select.Popup>
     </Select.Positioner></Select.Portal>
   </Select.Root>;
 }

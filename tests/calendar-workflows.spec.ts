@@ -102,3 +102,33 @@ for(const [width,theme] of [[320,'light'],[390,'dark']] as const)test(`calendar 
   await sample.getByRole('button',{name:'Week',exact:true}).click();await expect(sample.locator('[data-calendar-date]')).toHaveCount(7);await expect(sample.getByRole('button',{name:'View Interface review',exact:true})).toBeVisible();
   const scan=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(scan.violations.map(item=>({id:item.id,targets:item.nodes.map(node=>node.target)}))).toEqual([]);
 });
+
+
+for(const theme of ['light','dark'] as const)test('compact calendar selections keep equal insets and stable date baselines in '+theme,async({page})=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  for(const layout of [{width:1440,path:'/components?category=data'},{width:390,path:componentRoute},{width:320,path:componentRoute}]){
+    await page.setViewportSize({width:layout.width,height:1100});await page.goto(layout.path);
+    const sample=calendar(page);await expect(sample.locator('[data-calendar-date="2026-11-02"]')).toBeVisible();
+    if((await page.locator('html').getAttribute('data-ui-theme')??'light')!==theme)await page.getByRole('button',{name:'Switch to '+theme+' theme',exact:true}).click();
+    await expect.poll(async()=>await page.locator('html').getAttribute('data-ui-theme')??'light').toBe(theme);await page.evaluate(()=>document.fonts.ready);
+    expect((await sample.boundingBox())!.width).toBeLessThanOrEqual(640);
+    for(const view of ['Month','Week']){
+      await sample.getByRole('button',{name:view,exact:true}).click();
+      for(const value of view==='Month'?['2026-11-02','2026-11-06','2026-11-20']:['2026-11-02','2026-11-06']){
+        const target=sample.locator('[data-calendar-date="'+value+'"]');await target.click();await expect(target).toHaveAttribute('aria-pressed','true');
+        const geometry=await target.evaluate(button=>{
+          const tile=button.getBoundingClientRect(),cell=button.parentElement!.getBoundingClientRect(),number=button.firstElementChild!.getBoundingClientRect(),count=button.querySelector('.bui-event-calendar-count')?.getBoundingClientRect();
+          return {insets:[tile.top-cell.top,cell.right-tile.right,cell.bottom-tile.bottom,tile.left-cell.left],height:tile.height,numberOffset:number.top+number.height/2-(cell.top+cell.height/2),countGap:count?count.top-number.bottom:null,countBottom:count?tile.bottom-count.bottom:null};
+        });
+        for(const inset of geometry.insets)expect(Math.abs(inset-2),'Every selection edge keeps its 2px gutter').toBeLessThanOrEqual(.25);
+        expect(geometry.height).toBeGreaterThanOrEqual(48);expect(Math.abs(geometry.numberOffset),'Dates with and without counts share the cell centre').toBeLessThanOrEqual(.25);
+        if(geometry.countGap!==null){expect(geometry.countGap).toBeGreaterThanOrEqual(0);expect(geometry.countBottom).toBeGreaterThanOrEqual(0);}
+        await page.mouse.move(1,1);const resting=await target.evaluate(button=>getComputedStyle(button).backgroundColor);
+        expect(resting).not.toBe(await target.evaluate(button=>getComputedStyle(button.parentElement!).backgroundColor));
+        await target.hover();await expect(target).toHaveCSS('background-color',resting);
+      }
+    }
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }
+  expect(errors).toEqual([]);
+});

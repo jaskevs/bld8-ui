@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 export type AnalyticsPeriod = 'week' | 'month' | 'quarter';
 
 export interface AnalyticsRecord {

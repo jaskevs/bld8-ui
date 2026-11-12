@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /** The host owns record order and persistence. Keys describe the current unsorted page. */
 export interface TableRowMove {rowKey: string; targetKey: string; position: 'before' | 'after'}
 

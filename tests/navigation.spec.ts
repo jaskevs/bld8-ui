@@ -8,8 +8,8 @@ for (const width of [1440, 390]) test('floating navigation stays visible at ' + 
   await expect(header).toHaveAttribute('data-scrolled', 'true');
   await expect.poll(async () => (await header.boundingBox())?.y).toBe(width < 761 ? 8 : 12);
   if (width < 761) await page.getByRole('button', { name: 'Menu', exact: true }).click();
-  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Playground', exact: true }).click();
-  await expect(page).toHaveURL(/\/playground(?:\?|$)/);
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Docs', exact: true }).click();
+  await expect(page).toHaveURL(/\/docs(?:\?|$)/);
   if (width < 761) {
     await expect(page.getByRole('button', { name: 'Menu', exact: true })).toHaveAttribute('aria-expanded', 'false');
     await expect(page.getByRole('navigation', { name: 'Main navigation' })).not.toBeVisible();

@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {AnimatePresence,motion} from 'motion/react';
 import {Check} from 'lucide-react';

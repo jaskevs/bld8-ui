@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 'use client';
 import {useCallback,useEffect,useId,useLayoutEffect,useRef,useState,type ComponentProps,type CSSProperties,type Ref} from 'react';
 import {cx} from './core.js';

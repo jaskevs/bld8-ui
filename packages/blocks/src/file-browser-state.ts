@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 /** File metadata only. A host service owns contents, access control and persistence. */
 export interface FileBrowserEntry {
   id: string;

@@ -1,3 +1,7 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
 import {validateUploadReceipt,type UploadFileHandler,type UploadReceipt} from './upload-state.js';
 
 export interface UploadHttpOptions {

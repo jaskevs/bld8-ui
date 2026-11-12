@@ -44,6 +44,8 @@ formats differ; the JSON above shows the common `mcpServers` structure.
 | `list_components` | List component, block or template entries; filter by kind/category. |
 | `search_components` | Search names, descriptions and behavior notes with plain text. |
 | `get_component` | Read an exact entry's overview, API properties, example or all sections. |
+| `search_examples` | Discover complete named examples by task text, component ID or category without loading source code. |
+| `get_example` | Read one exact complete client module, its real registry composition, keyboard/states and portable notices. |
 | `get_guide` | Read an allowlisted integration guide by its catalog ID. |
 
 List/search results default to 20 entries and allow at most 50 per call. Use
@@ -52,15 +54,32 @@ List/search results default to 20 entries and allow at most 50 per call. Use
 are excluded by default to keep the first response useful. API properties name
 their declaring definition, so overlapping names remain distinguishable.
 
+`search_examples` accepts an optional `query`, `componentId`, `category`, `offset`
+and `limit`. Every plain-text query term must match the example's name,
+description, component, keyboard or state notes. Results are lightweight
+summaries with exact example IDs, interactive/Markdown links and a registry
+composition URL. They omit code and share notices once at response level.
+`get_example` accepts the exact `id`, an optional `componentId` guard and
+`source: "workspace" | "registry" | "both"` (default `"both"`). It returns the
+requested complete source, full licence notices/provenance and source identity.
+Registry source uses the default local UI alias; adapt it to your application.
+
 Read `bld8://catalog` for all entry and guide IDs and the source identity. Each
 entry has a resource such as `bld8://component/button`, `bld8://block/issue-table`
-or `bld8://template/outline`. Guides use `bld8://guide/<id>`. Component resources
+or `bld8://template/outline`. Complete examples use `bld8://example/<example-id>`
+and are listed separately in the catalogue; they do not add an entry kind.
+Guides use `bld8://guide/<id>`. Component resources
 include full APIs; tools provide a smaller paginated alternative.
 
 A useful sequence is: search for a task, read the matching entry's notes and API,
-then inspect its example and registry requirements. Examples are fragments and
-are explicitly marked `complete: false`; they may need imports, state, data or
-host callbacks. The server does not claim they are standalone applications.
+then search its complete examples and request one exact module. The entry's
+quick-reference `example` remains a fragment with `complete: false`. Nested
+`examples` and exact example returns have `complete: true`: they include client
+imports, state and local/sample callbacks without required props. The actual
+`example-<id>.json` registry item installs that composition and its dependencies.
+The example's interactive link has a matching `/agent/example/<id>.md` document.
+Complete UI examples still leave authentication and production persistence to
+the host; read each example's notes before connecting a service.
 
 ## Source and access boundaries
 

@@ -1,6 +1,7 @@
 import {readFileSync,readdirSync} from 'node:fs';
 import {basename,join} from 'node:path';
 import {createSourceGraph} from './source-graph.mjs';
+import {licenseCode} from './license-policy.mjs';
 
 /** Package only the selected modules and their source/build dependencies. */
 export function createStarterPackages(root) {
@@ -31,13 +32,13 @@ export function createStarterPackages(root) {
         files[folder+'/dist/'+key+'.d.ts']=read(folder+'/dist/'+key+'.d.ts');
       }
       const entry=[...modules.keys()].map(key=>`export * from './${key}.js';`).join('\n')+'\n';
-      const client=/^['"]use client['"]/.test(read(folder+'/src/index.ts').toString())?"'use client';\n":'';
-      files[folder+'/src/index.ts']=client+entry;files[folder+'/dist/index.js']=client+entry;files[folder+'/dist/index.d.ts']=entry;
+      const client=/^\s*(?:\/\*[\s\S]*?\*\/\s*)*['"]use client['"]/.test(read(folder+'/src/index.ts').toString())?"'use client';\n":'';
+      files[folder+'/src/index.ts']=licenseCode(client+entry,{standalone:true,sourcePath:folder+'/src/index.ts',root});files[folder+'/dist/index.js']=licenseCode(client+entry,{standalone:true,sourcePath:folder+'/src/index.ts',root});files[folder+'/dist/index.d.ts']=licenseCode(entry,{standalone:true,sourcePath:folder+'/src/index.ts',root});
       for(const file of kind==='ui'?readdirSync(join(root,folder,'src')).filter(name=>name.endsWith('.css')):['styles.css']){
         files[folder+'/src/'+file]=read(folder+'/src/'+file);files[folder+'/dist/'+file]=read(folder+'/dist/'+file);
       }
     }
-    for(const name of ['THIRD_PARTY_NOTICES.md','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE'])files['packages/ui/'+name]=read('packages/ui/'+name);
+    for(const name of ['THIRD_PARTY_NOTICES.md','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','UPSTREAM.json'])files['packages/ui/'+name]=read('packages/ui/'+name);
     return files;
   };
 }
