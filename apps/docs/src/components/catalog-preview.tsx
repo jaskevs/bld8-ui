@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import {useEffect,useRef,useState} from 'react';
 import {ExamplePreview} from './component-examples';
 const Demo=dynamic(()=>import('./demos').then(module=>module.ComponentDemo),{loading:()=> <PreviewPlaceholder/>});
-const examples:Record<string,string>={autocomplete:'autocomplete-search',toolbar:'toolbar-editor-actions','alert-dialog':'alert-dialog-delete','navigation-menu':'navigation-product','preview-card':'preview-person'};
+const examples:Record<string,string>={"scroll-area":"scroll-area-native-region","resizable-panels":"resizable-workspace-panes","stacked-bar-chart":"chart-stacked-periods","sparkline":"chart-sparkline-missing","donut-chart":"chart-donut-allocation","layout-transition":"motion-shared-selection","auto-height":"motion-intrinsic-height","animated-number":"motion-number-metric","animated-list":"motion-list-updates",autocomplete:'autocomplete-search',toolbar:'toolbar-editor-actions','alert-dialog':'alert-dialog-delete','navigation-menu':'navigation-product','preview-card':'preview-person'};
 function PreviewPlaceholder(){return <div className="catalog-preview-placeholder" aria-hidden="true"><span/><span/><span/></div>;}
 /** Metadata stays server-rendered. Live examples mount once, after URL restore and viewport entry. */
 export function CatalogPreview({id,enabled}:{id:string;enabled:boolean}){

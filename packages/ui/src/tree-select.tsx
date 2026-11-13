@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal,useUIConfig} from './ui-config.js';
 import {useEffect,useId,useLayoutEffect,useMemo,useRef,useState,type CSSProperties,type FocusEventHandler,type KeyboardEvent,type ReactNode,type Ref} from 'react';
 import {Popover} from '@base-ui/react/popover';
 import {Check,ChevronDown,ChevronRight,Folder,FolderOpen,Minus,X} from 'lucide-react';
@@ -45,7 +46,7 @@ function snapshotChildren(nodes:readonly TreeSelectNode[]):readonly TreeSelectNo
 
 /** Checked hierarchy with leaf values, bounded lazy data and native repeated form entries. */
 export function TreeSelect({label,nodes,formatValue,value,defaultValue=[],onValueChange,loadChildren,sourceKey='',expandedIds,defaultExpandedIds=[],onExpandedChange,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,name,form,disabled=false,readOnly=false,required=false,placeholder='Choose items…',hint,error,clearable=true,searchable=true,emptyMessage='No matching choices.',inputRef,onBlur,density='comfortable',labelVisibility='visible',className,popupDataAttributes}:TreeSelectProps){
-  const id=useId(),owner=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement|null>(null),search=useRef<HTMLInputElement>(null),popup=useRef<HTMLDivElement>(null),tree=useRef<HTMLUListElement>(null),elements=useRef(new Map<string,HTMLLIElement>());
+  const {direction,message}=useUIConfig(),id=useId(),owner=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement|null>(null),search=useRef<HTMLInputElement>(null),popup=useRef<HTMLDivElement>(null),tree=useRef<HTMLUListElement>(null),elements=useRef(new Map<string,HTMLLIElement>());
   const initial=useRef(defaultValue),[internal,setInternal]=useState<readonly string[]>(defaultValue),[expanded,setExpanded]=useControllableValue<readonly string[]>(expandedIds,defaultExpandedIds,ids=>onExpandedChange?.([...ids]));
   const [opened,setOpened]=useControllableValue(open,defaultOpen,onOpenChange),[query,setQuery]=useState(''),[focused,setFocused]=useState<string|null>(null),[announcement,setAnnouncement]=useState('');
   const scope=useMemo(()=>({}),[nodes,loadChildren,sourceKey]),currentScope=useRef(scope);currentScope.current=scope;
@@ -142,8 +143,8 @@ export function TreeSelect({label,nodes,formatValue,value,defaultValue=[],onValu
       else if(key==='End')focusItem(enabled.at(-1)?.node.id??null);
       else if(key===' '||key==='Enter'&&!item.branch)choose(item);
       else if(key==='Enter')toggleExpansion(item);
-      else if(key==='ArrowRight'&&item.branch){if(!expandedSet.has(item.node.id)&&!filtered)toggleExpansion(item);else if(item.node.children===undefined)requestChildren(item);else focusItem(visible.find(entry=>entry.parentId===item.node.id&&!entry.disabled)?.node.id??null);}
-      else if(key==='ArrowLeft'){if(item.branch&&expandedSet.has(item.node.id)&&!filtered)toggleExpansion(item);else focusItem(item.parentId);}
+      else if(key===(direction==='rtl'?'ArrowLeft':'ArrowRight')&&item.branch){if(!expandedSet.has(item.node.id)&&!filtered)toggleExpansion(item);else if(item.node.children===undefined)requestChildren(item);else focusItem(visible.find(entry=>entry.parentId===item.node.id&&!entry.disabled)?.node.id??null);}
+      else if(key===(direction==='rtl'?'ArrowRight':'ArrowLeft')){if(item.branch&&expandedSet.has(item.node.id)&&!filtered)toggleExpansion(item);else focusItem(item.parentId);}
       return;
     }
     if(key.length===1&&key.trim()){
@@ -181,16 +182,16 @@ export function TreeSelect({label,nodes,formatValue,value,defaultValue=[],onValu
         <Popover.Trigger render={<Button id={id} form={form} ref={element=>{trigger.current=element;if(typeof inputRef==='function')inputRef(element);else if(inputRef)inputRef.current=element;}} variant="secondary" className="bui-tree-select-trigger" disabled={disabled||!!index.error} aria-labelledby={id+'-label'} aria-describedby={described} aria-invalid={!!problem||undefined} onBlur={onBlur}><span id={id+'-value'} title={labels.join(', ')} data-placeholder={!values.length||undefined}>{summary}</span><Icon icon={ChevronDown} size={16}/></Button>}/>
         {clearable&&values.length>0&&!readOnly&&<IconButton icon={X} label={'Clear '+label.toLowerCase()} className="bui-tree-select-clear" variant="ghost" disabled={disabled} onClick={()=>{change([],'Cleared all choices.');trigger.current?.focus({preventScroll:true});}}/>}
       </div>
-      <Popover.Portal><Popover.Positioner sideOffset={6} align="start" collisionPadding={12} sticky collisionAvoidance={{side:'shift',align:'shift'}} className="bui-positioner"><Popover.Popup {...safePopupData(popupDataAttributes)} ref={popup} className="bui-popup bui-tree-select-popup" initialFocus={interaction=>interaction==='touch'?popup.current:search.current??tree.current}>
+      <UIPortal render={Popover.Portal}><Popover.Positioner sideOffset={6} align="start" collisionPadding={12} sticky collisionAvoidance={{side:'shift',align:'shift'}} className="bui-positioner"><Popover.Popup {...safePopupData(popupDataAttributes)} ref={popup} className="bui-popup bui-tree-select-popup" initialFocus={interaction=>interaction==='touch'?popup.current:search.current??tree.current}>
         <Popover.Title className="bui-sr-only">{label} choices</Popover.Title>
-        {searchable&&<Input ref={search} type="search" aria-label={'Search '+label.toLowerCase()+' choices'} placeholder="Search choices…" value={query} maxLength={1000} onChange={event=>{focusWithin.current=false;setQuery(event.target.value);}} onKeyDown={event=>{if(event.nativeEvent.isComposing||event.keyCode===229)return;if(event.key==='ArrowDown'||event.key==='ArrowUp'||event.key==='Enter'){const target=event.key==='ArrowUp'?enabled.at(-1):enabled[0];if(target){event.preventDefault();focusItem(target.node.id);}}}}/>}
+        {searchable&&<Input ref={search} type="search" aria-label={message('searchChoices','Search {label} choices',{label:label.toLowerCase()})} placeholder="Search choices…" value={query} maxLength={1000} onChange={event=>{focusWithin.current=false;setQuery(event.target.value);}} onKeyDown={event=>{if(event.nativeEvent.isComposing||event.keyCode===229)return;if(event.key==='ArrowDown'||event.key==='ArrowUp'||event.key==='Enter'){const target=event.key==='ArrowUp'?enabled.at(-1):enabled[0];if(target){event.preventDefault();focusItem(target.node.id);}}}}/>}
         <p id={id+'-keys'} className="bui-sr-only">Arrow keys move and expand branches. Space selects loaded choices. Enter opens a branch or selects a leaf. Escape closes.{query?' Search keeps matching branches open; clear search to collapse them.':''}</p>
         <ul ref={tree} role="tree" aria-label={label+' choices'} aria-multiselectable="true" aria-describedby={id+'-keys'} tabIndex={!activeId?0:-1} className="bui-tree-select-tree" onFocusCapture={()=>{focusWithin.current=true;}}>{renderNodes(Array.isArray(merged)?merged:[])}</ul>
         {!visible.length&&<p role="status" className="bui-tree-select-empty bui-hint">{query?emptyMessage:'No choices available.'}</p>}
-        <div className="bui-tree-select-footer"><span className="bui-hint">{values.length} selected{unknown.length?' · '+unknown.length+' unavailable kept':''}</span><Popover.Close render={<Button variant="ghost" size="sm">Done</Button>}/></div>
+        <div className="bui-tree-select-footer"><span className="bui-hint">{message('selectedCount','{count} selected',{count:values.length})}{unknown.length?' · '+unknown.length+' unavailable kept':''}</span><Popover.Close render={<Button variant="ghost" size="sm">{message('done','Done')}</Button>}/></div>
         {(loadChildren||index.items.some(item=>item.branch&&item.node.children===undefined))&&<p className="bui-tree-select-contract bui-hint">Parents select loaded choices only. New children stay unselected.</p>}
         <span className="bui-sr-only" role="status" aria-live="polite">{announcement}</span>
-      </Popover.Popup></Popover.Positioner></Popover.Portal>
+      </Popover.Popup></Popover.Positioner></UIPortal>
     </Popover.Root>
     {name&&values.map(key=><input type="hidden" key={key} name={name} form={form} value={key} disabled={disabled}/>)}
     {hint&&<p id={id+'-hint'} className="bui-hint">{hint}</p>}{required&&<p id={id+'-required'} className="bui-sr-only">Choose at least one item. The application checks this requirement on submission.</p>}{readOnly&&<p id={id+'-readonly'} className="bui-sr-only">Read only. Selections cannot be changed.</p>}{problem&&<p id={id+'-error'} className="bui-error" role="alert">{problem}</p>}

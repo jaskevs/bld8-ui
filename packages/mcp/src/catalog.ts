@@ -40,7 +40,7 @@ const entry = z.object({
 });
 const guide = z.object({ ...licenseMetadata,id, title: text, url: text, markdownUrl: text, content: text });
 const schema = z.object({
-  schemaVersion: z.literal(1), release: z.object({ version: text, status: text, snapshot: text }),
+  schemaVersion: z.literal(1), release: z.object({ version: text, status: text, snapshot: text, snapshotKind:z.enum(['manifest','source-graph']).optional(),sourceRevision:z.string().regex(/^[a-f0-9]{40}$/).optional() }),
   homepage: text, ...licenseMetadata,
   installation: z.object({ requirements: z.array(text).max(30), notes: z.array(text).max(30), registryBase: text }),
   entries: z.array(entry).max(2000), guides: z.array(guide).max(100),
@@ -73,7 +73,7 @@ export async function loadCatalog(): Promise<Catalog> {
   if (relative.startsWith('..') || path.isAbsolute(relative) || details.isSymbolicLink() || !details.isFile()) {
     throw new Error('The generated catalog must be a regular file inside the public documentation directory.');
   }
-  if (details.size > 25_000_000) throw new Error('The generated documentation catalog exceeds its size limit.');
+  if (details.size > 32*1024*1024) throw new Error('The generated documentation catalog exceeds its size limit.');
   return validateCatalog(JSON.parse(await readFile(catalogPath, 'utf8')));
 }
 

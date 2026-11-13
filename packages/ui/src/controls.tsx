@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal,useUIConfig} from './ui-config.js';
 import { useId, useMemo, useRef, type ReactNode, type Ref, type FocusEventHandler } from 'react';
 import { Select as PrimitiveSelect } from '@base-ui/react/select';
 import { Combobox as PrimitiveCombobox } from '@base-ui/react/combobox';
@@ -18,7 +19,7 @@ export interface SelectProps {
   /** Stable, unique values; labels and optional rich content are display only. */
   options:readonly Option[];
   value?:string|null; defaultValue?:string|null; onValueChange?:(value:string|null)=>void;
-  placeholder?:string; name?:string; form?:string; disabled?:boolean; required?:boolean; clearable?:boolean;
+  placeholder?:string; name?:string; form?:string; disabled?:boolean; readOnly?:boolean; required?:boolean; clearable?:boolean;
   labelVisibility?:'visible'|'hidden'; density?:'comfortable'|'compact';
   inputRef?:Ref<HTMLButtonElement>; onBlur?:FocusEventHandler<HTMLButtonElement>; hint?:string; error?:string;
   /** Optional controlled popup state, independent of the selected value. */
@@ -27,10 +28,10 @@ export interface SelectProps {
   renderOption?:(option:Option)=>ReactNode;
   emptyMessage?:string;
 }
-export function Select({label,options,placeholder='Select an option',value,defaultValue=null,onValueChange,clearable=false,labelVisibility='visible',density='comfortable',inputRef,onBlur,hint,error,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,renderOption,emptyMessage='No options available.',...props}:SelectProps) {
-  const id=useId(),trigger=useRef<HTMLButtonElement>(null),root=useRef<HTMLDivElement>(null);
+export function Select({label,options,placeholder,value,defaultValue=null,onValueChange,clearable=false,labelVisibility='visible',density='comfortable',inputRef,onBlur,hint,error,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,renderOption,emptyMessage,...props}:SelectProps) {
+  const {message}=useUIConfig(),id=useId(),trigger=useRef<HTMLButtonElement>(null),root=useRef<HTMLDivElement>(null);
   const [selected,setSelected]=useChoiceValue<string|null>(value,defaultValue,onValueChange,root,props.form);
-  const [expanded,setExpanded]=useControllableValue(open,defaultOpen,onOpenChange),popupOpen=expanded&&!props.disabled;
+  const [expanded,setExpanded]=useControllableValue(open,defaultOpen,onOpenChange),popupOpen=expanded&&!props.disabled&&!props.readOnly;
   const descriptions=[hint&&id+'-hint',error&&id+'-error'].filter(Boolean).join(' ')||undefined;
   const groups=groupChoiceOptions(options);
   function renderItem(option:Option){
@@ -43,13 +44,13 @@ export function Select({label,options,placeholder='Select an option',value,defau
   return <div ref={root} className="bui-field bui-local-choice"><label className={labelVisibility==='hidden'?'bui-sr-only':'bui-label'} htmlFor={id}>{label}{props.required&&<span aria-hidden="true"> *</span>}</label><div className="bui-date-field">
     <PrimitiveSelect.Root<string> items={options} value={selected} onValueChange={setSelected} open={popupOpen} onOpenChange={setExpanded} onOpenChangeComplete={onOpenChangeComplete} {...props}>
       <PrimitiveSelect.Trigger ref={node=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} onBlur={onBlur} data-field-name={props.name} data-density={density} aria-invalid={!!error||undefined} aria-describedby={descriptions} id={id} className="bui-input bui-select-trigger">
-        <PrimitiveSelect.Value placeholder={placeholder}>{selected!==null?options.find(option=>option.value===selected)?.label??selected:undefined}</PrimitiveSelect.Value><PrimitiveSelect.Icon><Icon name="chevron"/></PrimitiveSelect.Icon>
+        <PrimitiveSelect.Value placeholder={placeholder??message('selectOption','Select an option')}>{selected!==null?options.find(option=>option.value===selected)?.label??selected:undefined}</PrimitiveSelect.Value><PrimitiveSelect.Icon><Icon name="chevron"/></PrimitiveSelect.Icon>
       </PrimitiveSelect.Trigger>
-      <PrimitiveSelect.Portal><PrimitiveSelect.Positioner sideOffset={6} alignItemWithTrigger={false} disableAnchorTracking={!popupOpen} className="bui-positioner"><PrimitiveSelect.Popup className="bui-popup bui-select-popup bui-choice-options">
-        <PrimitiveSelect.List aria-label={label+' options'}>{groups.length?groups.map(group=>group.label?<PrimitiveSelect.Group key={group.label} className="bui-choice-group"><PrimitiveSelect.GroupLabel className="bui-choice-group-label">{group.label}</PrimitiveSelect.GroupLabel>{group.options.map(renderItem)}</PrimitiveSelect.Group>:group.options.map(renderItem)):<PrimitiveSelect.Item value={null} disabled className="bui-option bui-choice-empty">{emptyMessage}</PrimitiveSelect.Item>}</PrimitiveSelect.List>
-      </PrimitiveSelect.Popup></PrimitiveSelect.Positioner></PrimitiveSelect.Portal>
+      <UIPortal render={PrimitiveSelect.Portal}><PrimitiveSelect.Positioner sideOffset={6} alignItemWithTrigger={false} disableAnchorTracking={!popupOpen} className="bui-positioner"><PrimitiveSelect.Popup className="bui-popup bui-select-popup bui-choice-options">
+        <PrimitiveSelect.List aria-label={label+' options'}>{groups.length?groups.map(group=>group.label?<PrimitiveSelect.Group key={group.label} className="bui-choice-group"><PrimitiveSelect.GroupLabel className="bui-choice-group-label">{group.label}</PrimitiveSelect.GroupLabel>{group.options.map(renderItem)}</PrimitiveSelect.Group>:group.options.map(renderItem)):<PrimitiveSelect.Item value={null} disabled className="bui-option bui-choice-empty">{emptyMessage??message('noOptions','No options available.')}</PrimitiveSelect.Item>}</PrimitiveSelect.List>
+      </PrimitiveSelect.Popup></PrimitiveSelect.Positioner></UIPortal>
     </PrimitiveSelect.Root>
-    {clearable&&selected!==null&&<button type="button" className="bui-select-clear" disabled={props.disabled} aria-label={'Clear '+label.toLowerCase()} onClick={()=>{setSelected(null);setExpanded(false);trigger.current?.focus({preventScroll:true});}}><Icon name="close"/></button>}
+    {clearable&&!props.readOnly&&selected!==null&&<button type="button" className="bui-select-clear" disabled={props.disabled} aria-label={message('clearField','Clear {label}',{label:label.toLowerCase()})} onClick={()=>{setSelected(null);setExpanded(false);trigger.current?.focus({preventScroll:true});}}><Icon name="close"/></button>}
   </div>{hint&&<p id={id+'-hint'} className="bui-hint">{hint}</p>}{error&&<p id={id+'-error'} className="bui-error" role="alert">{error}</p>}</div>;
 }
 export interface ComboboxProps {
@@ -66,8 +67,8 @@ export interface ComboboxProps {
   renderOption?:(option:Option)=>ReactNode;
   emptyMessage?:string;
 }
-export function Combobox({label,items=noStringItems,options,value,defaultValue=null,onValueChange,placeholder='Search options…',clearable=false,hint,error,labelVisibility='visible',density='comfortable',inputRef,onBlur,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,renderOption,emptyMessage='No matching options.',...props}:ComboboxProps) {
-  const id=useId(),actions=useRef<PrimitiveCombobox.Root.Actions|null>(null),root=useRef<HTMLDivElement>(null);
+export function Combobox({label,items=noStringItems,options,value,defaultValue=null,onValueChange,placeholder,clearable=false,hint,error,labelVisibility='visible',density='comfortable',inputRef,onBlur,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,renderOption,emptyMessage,...props}:ComboboxProps) {
+  const {message}=useUIConfig(),id=useId(),actions=useRef<PrimitiveCombobox.Root.Actions|null>(null),root=useRef<HTMLDivElement>(null);
   const choices=useMemo(()=>options??items.map(item=>({value:item,label:item})),[options,items]);
   const grouped=useMemo(()=>groupChoiceOptions(choices).map(group=>({label:group.label||'',items:group.options.map(option=>option.value)})),[choices]);
   const lookup=useMemo(()=>new Map(choices.map(option=>[option.value,option])),[choices]);
@@ -77,11 +78,11 @@ export function Combobox({label,items=noStringItems,options,value,defaultValue=n
   const descriptions=[hint&&id+'-hint',error&&id+'-error'].filter(Boolean).join(' ')||undefined;
   return <div ref={root} className="bui-field bui-local-choice"><label className={labelVisibility==='hidden'?'bui-sr-only':'bui-label'} htmlFor={id}>{label}{props.required&&<span aria-hidden="true"> *</span>}</label>
     <PrimitiveCombobox.Root<string> actionsRef={actions} items={grouped} value={selected} onValueChange={(next,details)=>{if(details.reason==='escape-key'){details.cancel();return;}setSelected(next);}} itemToStringLabel={value=>lookup.get(value)?.label??value} itemToStringValue={value=>value} filter={(item,query)=>query.trim().split(/\s+/).filter(Boolean).every(term=>contains(choiceSearchText(lookup.get(item)),term))} open={popupOpen} onOpenChange={setExpanded} onOpenChangeComplete={onOpenChangeComplete} {...props}>
-      <PrimitiveCombobox.InputGroup className="bui-combobox-input"><PrimitiveCombobox.Input ref={inputRef} onBlur={event=>{onBlur?.(event);if(event.relatedTarget&&!event.currentTarget.closest('.bui-local-choice')?.contains(event.relatedTarget as Node))setExpanded(false);}} onKeyDown={event=>{if(event.key==='Tab')setExpanded(false);if(event.key==='Escape'&&!popupOpen)event.preventBaseUIHandler();}} id={id} data-density={density} aria-describedby={descriptions} aria-invalid={!!error||undefined} placeholder={placeholder} className="bui-input"/>
-        {clearable&&<PrimitiveCombobox.Clear aria-label={'Clear '+label.toLowerCase()} className="bui-combobox-clear"><Icon name="close"/></PrimitiveCombobox.Clear>}
-        <PrimitiveCombobox.Trigger aria-label={'Show '+label.toLowerCase()+' options'} className="bui-combobox-trigger"><Icon name="chevron"/></PrimitiveCombobox.Trigger>
+      <PrimitiveCombobox.InputGroup className="bui-combobox-input"><PrimitiveCombobox.Input ref={inputRef} onBlur={event=>{onBlur?.(event);if(event.relatedTarget&&!event.currentTarget.closest('.bui-local-choice')?.contains(event.relatedTarget as Node))setExpanded(false);}} onKeyDown={event=>{if(event.key==='Tab')setExpanded(false);if(event.key==='Escape'&&!popupOpen)event.preventBaseUIHandler();}} id={id} data-density={density} aria-describedby={descriptions} aria-invalid={!!error||undefined} placeholder={placeholder??message('searchOptions','Search options…')} className="bui-input"/>
+        {clearable&&<PrimitiveCombobox.Clear aria-label={message('clearField','Clear {label}',{label:label.toLowerCase()})} className="bui-combobox-clear"><Icon name="close"/></PrimitiveCombobox.Clear>}
+        <PrimitiveCombobox.Trigger aria-label={message('showChoices','Show {label} options',{label:label.toLowerCase()})} className="bui-combobox-trigger"><Icon name="chevron"/></PrimitiveCombobox.Trigger>
       </PrimitiveCombobox.InputGroup>
-      <ChoiceComboboxPopup open={popupOpen} actions={actions} onOpenChangeComplete={onOpenChangeComplete}><PrimitiveCombobox.Empty className="bui-combo-empty">{emptyMessage}</PrimitiveCombobox.Empty><ChoiceComboboxList options={choices} label={label} id={id} renderOption={renderOption}/></ChoiceComboboxPopup>
+      <ChoiceComboboxPopup open={popupOpen} actions={actions} onOpenChangeComplete={onOpenChangeComplete}><PrimitiveCombobox.Empty className="bui-combo-empty">{emptyMessage??message('noMatchingOptions','No matching options.')}</PrimitiveCombobox.Empty><ChoiceComboboxList options={choices} label={label} id={id} renderOption={renderOption}/></ChoiceComboboxPopup>
     </PrimitiveCombobox.Root>
     {hint&&<p id={id+'-hint'} className="bui-hint">{hint}</p>}{error&&<p id={id+'-error'} className="bui-error" role="alert">{error}</p>}
   </div>;

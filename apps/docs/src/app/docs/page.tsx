@@ -21,6 +21,7 @@ const groups = [
     ['/icons', 'Icons', 'Search Lucide icons and copy licensed SVG or React usage.'],
   ] },
   { id: 'workflows', title: 'Connect a workflow', description: 'Working examples with explicit service contracts.', links: [
+    ['/docs/application-foundations', 'Application foundations', 'Generic workspaces, scoped configuration, dates, large grids, charts and motion.'],
     ['/examples/data-workspace', 'Editable data workspace', 'Review drafts, save batches and recover from conflicts.'],
     ['/integrations/react-hook-form', 'React Hook Form', 'Connect existing form state, errors and focus handling.'],
     ['/integrations/uploads', 'Upload workflows', 'Byte progress, cancellation and server acknowledgements.'],

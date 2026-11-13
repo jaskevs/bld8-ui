@@ -3,18 +3,27 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal,useUIConfig} from './ui-config.js';
 import {useEffect,useId,useLayoutEffect,useRef,useState,type Ref,type FocusEventHandler,type KeyboardEventHandler,type RefObject} from 'react';
 import {DayPicker,type DateRange,type DayPickerLocale} from 'react-day-picker';
 import {Popover} from '@base-ui/react/popover';
-import {CalendarDays,X} from 'lucide-react';
+import {CalendarDays,X,ChevronLeft,ChevronRight} from 'lucide-react';
+import {arSA,enAU} from 'react-day-picker/locale';
+import {Select} from './controls.js';
+import {useControllableValue} from './state.js';
 import {Button,Icon,IconButton,Input} from './core.js';
 import {useChoiceValue} from './choice-option.js';
-import {parseDateValue,formatDateValue,dateEntryMessage,rangeEntryMessage} from './date-fields-state.js';
+import {parseDateValue,formatDateValue,dateEntryMessage,rangeEntryMessage,isUnavailableDate,type DateAvailability} from './date-fields-state.js';
 export type {DateRange,DayPickerLocale} from 'react-day-picker';
-export {parseDateValue,formatDateValue} from './date-fields-state.js';
+export {parseDateValue,formatDateValue,isUnavailableDate} from './date-fields-state.js';
+export type {DateAvailability} from './date-fields-state.js';
 
-export interface CalendarBaseProps {
+export interface CalendarBaseProps extends DateAvailability {
   label?:string;defaultMonth?:Date;minDate?:Date;maxDate?:Date;disabled?:boolean;
+  /** Optional controlled visible month, independent of selection. */
+  month?:Date;onMonthChange?:(month:Date)=>void;
+  /** Additional navigation bounds. Day-level minDate/maxDate remain authoritative. */
+  startMonth?:Date;endMonth?:Date;numberOfMonths?:1|2|3;navigation?:'buttons'|'dropdowns';
   locale?:DayPickerLocale;weekStartsOn?:0|1|2|3|4|5|6;autoFocus?:boolean;
 }
 export type CalendarProps=CalendarBaseProps&(
@@ -28,14 +37,39 @@ const calendarClasses={
   today:'bui-calendar-today',selected:'bui-calendar-selected',outside:'bui-calendar-outside',disabled:'bui-calendar-disabled',
   range_start:'bui-calendar-range-start',range_end:'bui-calendar-range-end',range_middle:'bui-calendar-range-middle',hidden:'bui-calendar-hidden',
 };
-export function Calendar({label='Choose a date',defaultMonth,minDate,maxDate,disabled,locale,weekStartsOn=1,autoFocus,...selection}:CalendarProps){
-  const lower=dateOrNull(minDate),upper=dateOrNull(maxDate),single=selection.mode==='range'?null:dateOrNull(selection.value),range=selection.mode==='range'?safeRange(selection.value):null;
-  const common={classNames:calendarClasses,'aria-label':label,defaultMonth:dateOrNull(defaultMonth)??(selection.mode==='range'?range?.from:single)??undefined,
-    startMonth:lower??undefined,endMonth:upper??undefined,locale,weekStartsOn,autoFocus,showOutsideDays:true,fixedWeeks:true,
-    disabled:disabled?true:[...(lower?[{before:lower}]:[]),...(upper?[{after:upper}]:[])]};
-  return selection.mode==='range'
-    ? <DayPicker {...common} mode="range" selected={range??undefined} onSelect={selection.onValueChange} excludeDisabled/>
-    : <DayPicker {...common} mode="single" selected={single??undefined} onSelect={selection.onValueChange}/>;
+function monthDate(year:number,month:number){const date=new Date(0);date.setHours(12,0,0,0);date.setFullYear(year,month,1);return date;}
+function monthIndex(date:Date){return date.getFullYear()*12+date.getMonth();}
+export function Calendar({label,defaultMonth,month,onMonthChange,startMonth,endMonth,numberOfMonths=1,navigation='buttons',minDate,maxDate,disabled,locale,weekStartsOn=1,autoFocus,unavailableDates,isDateUnavailable,...selection}:CalendarProps){
+  const ui=useUIConfig(),lower=dateOrNull(minDate),upper=dateOrNull(maxDate),single=selection.mode==='range'?null:dateOrNull(selection.value),range=selection.mode==='range'?safeRange(selection.value):null;
+  const seed=dateOrNull(defaultMonth)??(selection.mode==='range'?range?.from:single)??new Date(),initial=useRef(monthDate(seed.getFullYear(),seed.getMonth()));
+  const [visible,setVisible]=useControllableValue(month,initial.current,onMonthChange),shown=dateOrNull(visible)??initial.current;
+  const lowerMonth=dateOrNull(startMonth)??lower,upperMonth=dateOrNull(endMonth)??upper,count=[1,2,3].includes(numberOfMonths)?numberOfMonths:1;
+  const firstYear=lowerMonth?.getFullYear()??shown.getFullYear()-100,lastYear=upperMonth?.getFullYear()??shown.getFullYear()+20;
+  // Unconfigured consumers retain DayPicker's original locale and accessible date labels.
+  const effectiveLocale=locale??(ui.scoped?(ui.locale.toLowerCase().startsWith('ar')?arSA:enAU):undefined),formatLocale=locale?.code??ui.locale;
+  const previous=monthDate(shown.getFullYear(),shown.getMonth()-1),next=monthDate(shown.getFullYear(),shown.getMonth()+1);
+  const previousDisabled=disabled||!!lowerMonth&&monthIndex(previous)<monthIndex(lowerMonth),nextDisabled=disabled||!!upperMonth&&monthIndex(shown)+count>monthIndex(upperMonth);
+  function navigate(date:Date){if(disabled)return;const lower=lowerMonth&&monthDate(lowerMonth.getFullYear(),lowerMonth.getMonth()),upper=upperMonth&&monthDate(upperMonth.getFullYear(),upperMonth.getMonth()-count+1);setVisible(lower&&date<lower?lower:upper&&date>upper?upper:date);}
+  const common={classNames:calendarClasses,'aria-label':label??ui.message('chooseDate','Choose a date'),month:shown,onMonthChange:setVisible,
+    startMonth:lowerMonth??undefined,endMonth:upperMonth??undefined,locale:effectiveLocale,dir:ui.direction,weekStartsOn,autoFocus,showOutsideDays:true,fixedWeeks:true,numberOfMonths:count,
+    hideNavigation:navigation==='dropdowns',labels:ui.scoped?{labelPrevious:()=>ui.message('calendarPreviousMonth','Previous month'),labelNext:()=>ui.message('calendarNextMonth','Next month')}:undefined,
+    disabled:disabled?true:[...(lower?[{before:lower}]:[]),...(upper?[{after:upper}]:[]),(date:Date)=>isUnavailableDate(date,{unavailableDates,isDateUnavailable})]};
+  return <div className="bui-calendar-composite" data-month-count={count} data-navigation={navigation}>
+    {navigation==='dropdowns'&&<div className="bui-calendar-jump">
+      <div className="bui-calendar-jump-fields" role="group" aria-label={ui.message('calendarPeriod','Displayed month and year')}>
+      <Select label={ui.message('month','Month')} labelVisibility="hidden" density="compact" disabled={disabled} value={String(shown.getMonth())} onValueChange={value=>{if(value!==null)navigate(monthDate(shown.getFullYear(),Number(value)));}}
+        options={Array.from({length:12},(_,value)=>({value:String(value),label:new Intl.DateTimeFormat(formatLocale,{month:'long'}).format(monthDate(shown.getFullYear(),value)),disabled:!!lowerMonth&&monthIndex(monthDate(shown.getFullYear(),value))<monthIndex(lowerMonth)||!!upperMonth&&monthIndex(monthDate(shown.getFullYear(),value))>monthIndex(upperMonth)}))}/>
+      <Select label={ui.message('year','Year')} labelVisibility="hidden" density="compact" disabled={disabled} value={String(shown.getFullYear())} onValueChange={value=>{if(value!==null)navigate(monthDate(Number(value),shown.getMonth()));}}
+        options={Array.from({length:Math.max(0,Math.min(9999,lastYear)-Math.max(1,firstYear)+1)},(_,index)=>{const year=Math.max(1,firstYear)+index;return {value:String(year),label:new Intl.NumberFormat(formatLocale,{useGrouping:false}).format(year)};})}/>
+      </div><div className="bui-calendar-jump-actions" role="group" aria-label={ui.message('calendarNavigation','Calendar navigation')}>
+      <IconButton label={ui.message('calendarPreviousMonth','Previous month')} icon={ui.direction==='rtl'?ChevronRight:ChevronLeft} size="sm" variant="ghost" disabled={previousDisabled} onClick={()=>navigate(previous)}/>
+      <IconButton label={ui.message('calendarNextMonth','Next month')} icon={ui.direction==='rtl'?ChevronLeft:ChevronRight} size="sm" variant="ghost" disabled={nextDisabled} onClick={()=>navigate(next)}/>
+      </div>
+    </div>}
+    {selection.mode==='range'
+      ? <DayPicker {...common} mode="range" selected={range??undefined} onSelect={selection.onValueChange} excludeDisabled/>
+      : <DayPicker {...common} mode="single" selected={single??undefined} onSelect={selection.onValueChange}/>}
+  </div>;
 }
 function assignRef<T>(ref:Ref<T>|undefined,node:T|null){if(typeof ref==='function')ref(node);else if(ref)ref.current=node;}
 function dateOrNull(value:Date|null|undefined){return formatDateValue(value)?value!:null;}
@@ -63,9 +97,9 @@ export interface DatePickerProps extends Omit<CalendarBaseProps,'label'|'autoFoc
   editable?:boolean;textInputRef?:Ref<HTMLInputElement>;onInputBlur?:FocusEventHandler<HTMLInputElement>;onInputKeyDown?:KeyboardEventHandler<HTMLInputElement>;
   readOnly?:boolean;clearable?:boolean;labelVisibility?:'visible'|'hidden';density?:'comfortable'|'compact';
 }
-export function DatePicker({label,value,defaultValue=null,onValueChange,name,form,required=false,placeholder,hint,error,formatLocale='en-AU',
+export function DatePicker({label,value,defaultValue=null,onValueChange,name,form,required=false,placeholder,hint,error,formatLocale,
   inputRef,onBlur,editable=false,textInputRef,onInputBlur,onInputKeyDown,readOnly=false,clearable=true,labelVisibility='visible',density='comfortable',...calendar}:DatePickerProps){
-  const id=useId(),root=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null),input=useRef<HTMLInputElement>(null),popup=useRef<HTMLDivElement>(null),closeReason=useRef<string|undefined>(undefined);
+  const ui=useUIConfig(),resolvedLocale=formatLocale??ui.locale,id=useId(),root=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null),input=useRef<HTMLInputElement>(null),popup=useRef<HTMLDivElement>(null),closeReason=useRef<string|undefined>(undefined);
   const initial=useRef(dateOrNull(defaultValue)),[selected,setSelected]=useChoiceValue(value,initial.current,onValueChange,root,form);
   const key=formatDateValue(selected),[text,setText]=useState(key),[touched,setTouched]=useState(false),[open,setOpen]=useState(false);
   const live=useRef({selected,text}),committedKey=useRef(key);live.current={selected,text};committedKey.current=key;
@@ -94,7 +128,7 @@ export function DatePicker({label,value,defaultValue=null,onValueChange,name,for
     if(!next&&editable){if(reason==='escape-key')restore();else commitText();}
     setOpen(next);
   }
-  const selectedDate=dateOrNull(selected),display=selectedDate?new Intl.DateTimeFormat(formatLocale,{day:'numeric',month:'short',year:'numeric'}).format(selectedDate):placeholder??'Choose a date';
+  const selectedDate=dateOrNull(selected),display=selectedDate?new Intl.DateTimeFormat(resolvedLocale,{day:'numeric',month:'short',year:'numeric'}).format(selectedDate):placeholder??'Choose a date';
   const opener=<Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;assignRef(inputRef,node);}} onBlur={onBlur} data-field-name={name} id={editable?id+'-calendar':id}
     title={editable?'Open '+label.toLowerCase()+' calendar':display} disabled={calendar.disabled||readOnly} aria-describedby={described}
     aria-invalid={!editable&&!!error||undefined} className={editable?'bui-button bui-button--ghost bui-button--sm bui-icon-button bui-date-open':'bui-input bui-date-trigger'} data-density={density}
@@ -120,11 +154,11 @@ export function DatePicker({label,value,defaultValue=null,onValueChange,name,for
         {clearable&&!readOnly&&(!!key||editable&&!!text)&&<IconButton icon={X} label={'Clear '+label.toLowerCase()} size="sm" variant="ghost" className={editable?'bui-date-clear':undefined}
           disabled={calendar.disabled} onClick={()=>{commit(null);setOpen(false);(editable?input.current:trigger.current)?.focus({preventScroll:true});}}/>}
       </div>
-      <Popover.Portal><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup"
+      <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" data-month-count={calendar.numberOfMonths??1}
         finalFocus={()=>closeReason.current==='outside-press'||closeReason.current==='focus-out'?false:editable?input.current:trigger.current}>
         <Popover.Title className="bui-sr-only">{label}</Popover.Title>
         <Calendar {...calendar} label={label} value={parseDateValue(text)??selectedDate??undefined} autoFocus onValueChange={date=>{commit(date??null);setOpen(false);}}/>
-      </Popover.Popup></Popover.Positioner></Popover.Portal>
+      </Popover.Popup></Popover.Positioner></UIPortal>
     </Popover.Root>
     {required&&!editable&&<span className="bui-sr-only" id={id+'-required'}>Required. Choose a date before submitting.</span>}
     {!editable&&name&&<input type="hidden" name={name} form={form} value={key} disabled={calendar.disabled}/>}
@@ -139,10 +173,10 @@ export interface DateRangePickerProps extends Omit<DatePickerProps,'value'|'defa
   textInputRefs?:readonly [Ref<HTMLInputElement>|undefined,Ref<HTMLInputElement>|undefined];
   onInputBlur?:FocusEventHandler<HTMLInputElement>;onInputKeyDown?:KeyboardEventHandler<HTMLInputElement>;
 }
-export function DateRangePicker({label,value,defaultValue=null,onValueChange,name,form,required=false,placeholder='Choose a date range',hint,error,formatLocale='en-AU',
+export function DateRangePicker({label,value,defaultValue=null,onValueChange,name,form,required=false,placeholder='Choose a date range',hint,error,formatLocale,
   inputRef,onBlur,editable=false,textInputRefs,onInputBlur,onInputKeyDown,readOnly=false,clearable=true,labelVisibility='visible',density='comfortable',
   commitMode='immediate',presets=[],...calendar}:DateRangePickerProps){
-  const id=useId(),root=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null),start=useRef<HTMLInputElement>(null),end=useRef<HTMLInputElement>(null),popup=useRef<HTMLDivElement>(null),closeReason=useRef<string|undefined>(undefined);
+  const ui=useUIConfig(),resolvedLocale=formatLocale??ui.locale,id=useId(),root=useRef<HTMLDivElement>(null),trigger=useRef<HTMLButtonElement>(null),start=useRef<HTMLInputElement>(null),end=useRef<HTMLInputElement>(null),popup=useRef<HTMLDivElement>(null),closeReason=useRef<string|undefined>(undefined);
   const initial=useRef(defaultValue),[selected,setSelected]=useChoiceValue(value,initial.current,onValueChange,root,form),key=rangeKey(selected),explicit=commitMode==='explicit';
   const [texts,setTexts]=useState<[string,string]>([formatDateValue(selected?.from),formatDateValue(selected?.to)]),[draft,setDraft]=useState<DateRange|null>(safeRange(selected)),
     [open,setOpen]=useState(false),[touched,setTouched]=useState(false),[calendarEpoch,setCalendarEpoch]=useState(0);
@@ -185,10 +219,10 @@ export function DateRangePicker({label,value,defaultValue=null,onValueChange,nam
     commit(draft);setOpen(false);(editable?start.current:trigger.current)?.focus({preventScroll:true});
   }
   function cancel(){restore();setOpen(false);(editable?start.current:trigger.current)?.focus({preventScroll:true});}
-  const format=(date:Date)=>new Intl.DateTimeFormat(formatLocale,{day:'numeric',month:'short',year:'numeric'}).format(date);
+  const format=(date:Date)=>new Intl.DateTimeFormat(resolvedLocale,{day:'numeric',month:'short',year:'numeric'}).format(date);
   const display=selected?.from&&formatDateValue(selected.from)?format(selected.from)+(selected.to&&formatDateValue(selected.to)?' – '+format(selected.to):' – Choose end date'):placeholder;
   const footer=<div className="bui-calendar-footer bui-date-range-footer"><span className="bui-hint" aria-live="polite">{applyMessage||'Range ready'}</span>
-    <div className="bui-date-range-actions">{explicit?<><Button size="sm" variant="ghost" onClick={cancel}>Cancel</Button><Button size="sm" disabled={!!applyMessage||!dirty} onClick={apply}>Apply range</Button></>:<Button size="sm" disabled={!draft?.from||!draft.to} onClick={()=>setOpened(false)}>Done</Button>}</div>
+    <div className="bui-date-range-actions">{explicit?<><Button size="sm" variant="ghost" onClick={cancel}>{ui.message('cancel','Cancel')}</Button><Button size="sm" disabled={!!applyMessage||!dirty} onClick={apply}>{ui.message('applyRange','Apply range')}</Button></>:<Button size="sm" disabled={!draft?.from||!draft.to} onClick={()=>setOpened(false)}>{ui.message('done','Done')}</Button>}</div>
   </div>;
   const opener=<Popover.Trigger ref={(node:HTMLButtonElement|null)=>{trigger.current=node;assignRef(inputRef,node);}} onBlur={onBlur} id={editable?id+'-calendar':id}
     disabled={calendar.disabled||readOnly} aria-describedby={described} aria-invalid={!editable&&!!error||undefined} data-field-name={name} data-density={density}
@@ -217,7 +251,7 @@ export function DateRangePicker({label,value,defaultValue=null,onValueChange,nam
         {clearable&&!readOnly&&(!!selected?.from||editable&&(!!texts[0]||!!texts[1]))&&<IconButton icon={X} label={'Clear '+label.toLowerCase()} size="sm" variant="ghost" className={editable?'bui-date-range-clear':undefined}
           disabled={calendar.disabled} onClick={()=>{if(explicit){setDraft(null);setTexts(['','']);setTouched(false);if(!editable)setOpen(true);}else{commit(null);setOpen(false);}(editable?start.current:trigger.current)?.focus({preventScroll:true});}}/>}
       </div>
-      <Popover.Portal><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" finalFocus={()=>closeReason.current==='outside-press'||closeReason.current==='focus-out'?false:editable?start.current:trigger.current}>
+      <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" data-month-count={calendar.numberOfMonths??1} finalFocus={()=>closeReason.current==='outside-press'||closeReason.current==='focus-out'?false:editable?start.current:trigger.current}>
         <Popover.Title className="bui-sr-only">{label}</Popover.Title>
         {presets.length>0&&<div className="bui-date-presets" role="group" aria-label={label+' presets'}>{presets.map(preset=>{
           const invalid=preset.value&&(!dateOrNull(preset.value.from)||!dateOrNull(preset.value.to))?'Choose both start and end dates.':rangeEntryMessage(formatDateValue(preset.value?.from),formatDateValue(preset.value?.to),{required,...calendar});
@@ -225,7 +259,7 @@ export function DateRangePicker({label,value,defaultValue=null,onValueChange,nam
         })}</div>}
         <Calendar {...calendar} key={calendarEpoch} defaultMonth={draft?.from??calendar.defaultMonth} label={label} mode="range" value={draft??undefined} autoFocus={calendarEpoch===0} onValueChange={range=>updateDraft(range??null)}/>
         {footer}
-      </Popover.Popup></Popover.Positioner></Popover.Portal>
+      </Popover.Popup></Popover.Positioner></UIPortal>
     </Popover.Root>
     {editable&&explicit&&!open&&dirty&&<div className="bui-date-inline-actions">{footer}</div>}
     {required&&!editable&&<span className="bui-sr-only" id={id+'-required'}>Required. Choose start and end dates before submitting.</span>}

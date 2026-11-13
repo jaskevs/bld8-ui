@@ -39,6 +39,26 @@
     "./issue-data-source": {
       "types": "./dist/issue-data-source.d.ts",
       "import": "./dist/issue-data-source.js"
+    },
+    "./resource-workspace": {
+      "types": "./dist/resource-workspace.d.ts",
+      "import": "./dist/resource-workspace.js"
+    },
+    "./resource-workspace-state": {
+      "types": "./dist/resource-workspace-state.d.ts",
+      "import": "./dist/resource-workspace-state.js"
+    },
+    "./resource-data-source": {
+      "types": "./dist/resource-data-source.d.ts",
+      "import": "./dist/resource-data-source.js"
+    },
+    "./resource-workspace-view": {
+      "types": "./dist/resource-workspace-view.d.ts",
+      "import": "./dist/resource-workspace-view.js"
+    },
+    "./use-resource-workspace": {
+      "types": "./dist/use-resource-workspace.d.ts",
+      "import": "./dist/use-resource-workspace.js"
     }
   },
   "sideEffects": [

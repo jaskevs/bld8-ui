@@ -48,6 +48,21 @@ source in clean Next.js and Vite registry consumers. Short-height tree popups
 are checked at 390/320 × 420 CSS pixels; the usual phone viewport remains
 390 × 844. Containment is checked in both themes.
 
+Eleven more flows cover the expanded component/example catalogue and grouped
+discovery, FacetedFilter, async external-form parity, atomic grid bulk editing
+and complete adoption workflows. These add 132 cases across the same twelve
+configurations. They retain real source examples, keyboard paths, native values
+and failed-action recovery rather than testing static preview markup.
+
+The five application-foundations flows and two resource-workspace flows add
+**84 cases**. They check keyed motion and draft/focus retention through live
+reduced-motion changes; scoped dark RTL portals and modal focus return; chart
+legend state, exact values and containment; typed time fields with native invalid
+events, external-form values and reset; retained native editors across virtual
+scrolling; logical panel resizing and narrow layouts; and inventory drafts kept
+out of shared view URLs. The native invalid assertion observes the browser event
+and validity state rather than requiring a particular localized validation string.
+
 Separate touch projects enable a coarse pointer in Chromium, Firefox and WebKit
 at 390 × 844 in both themes. Their eleven scenarios check editable text size,
 native focus/blur and unrestricted zoom metadata; vector artwork/template marks;
@@ -57,8 +72,8 @@ each start on a fresh page, avoiding a long navigation chain
 and prefetch cancellation from replacing unrelated documents. These are 66 touch
 cases, not a reproduction of the physical iPhone keyboard or UIKit zoom.
 
-The suite contains **518 cases**: twenty approved image comparisons, 66 touch
-checks and 432 smoke checks (36 workflows × twelve configurations). Snapshot
+The suite contains **734 cases**: twenty approved image comparisons, 66 touch
+checks and 648 smoke checks (54 workflows × twelve configurations). Snapshot
 updates remain disabled. Run results, initial failures and repaired acceptance
 are recorded separately in [verification](verification.md). Run only touch cases with
 `--project="touch-*"`. Run the choice/menu/core flows with

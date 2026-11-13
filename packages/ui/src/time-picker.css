@@ -1,0 +1,5 @@
+/*!
+ * SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT
+ */
+.bui-time-popup{width:min(280px,calc(100vw - 24px));padding:8px}.bui-time-title{font-size:var(--bui-text-meta);font-weight:550;padding:8px 10px;color:var(--bui-muted)}.bui-time-options{display:grid;gap:2px;max-height:min(280px,50dvh);overflow:auto;scroll-padding:6px;overscroll-behavior:contain}.bui-time-option{display:flex;align-items:center;justify-content:space-between;width:100%;gap:16px;font:inherit;text-align:start;border:0;background:transparent;color:var(--bui-ink);cursor:pointer}.bui-time-option[aria-selected=true]{background:var(--bui-selected-bg);color:var(--bui-selected-ink)}.bui-time-check{opacity:0;transition:opacity var(--bui-duration) var(--bui-ease)}.bui-time-option[aria-selected=true]>.bui-time-check{opacity:1}.bui-time-option:disabled{opacity:.4;cursor:not-allowed}.bui-time-actions{display:flex;justify-content:flex-end;gap:8px;padding:10px 2px 2px;border-top:1px solid var(--bui-line);margin-top:8px}.bui-time-entry>.bui-input{font-variant-numeric:tabular-nums;text-align:start}.bui-time-entry>.bui-input[readonly]{background:var(--bui-bg)}

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import {useRef,useState,type KeyboardEvent,type PointerEvent,type TouchEvent} from 'react';
 import {Select} from '@base-ui/react/select';
 import {Combobox} from '@base-ui/react/combobox';
@@ -46,20 +47,20 @@ export function GridChoiceEditor({label,columnKey,owner,options,value,active,sea
     onValueChange={(next,details)=>{if(details.reason==='item-press'&&next!==null)finish({value:next,intent:'choose',restoreFocus:true});}}
     onOpenChange={(next,details)=>close(next,details.reason)} onOpenChangeComplete={completed}>
     <Combobox.Trigger {...trigger}>{content}</Combobox.Trigger>
-    <Combobox.Portal><Combobox.Positioner className="bui-positioner bui-data-grid-choice-positioner" align="start" sideOffset={5} collisionPadding={12} disableAnchorTracking={!active||!open}>
+    <UIPortal render={Combobox.Portal}><Combobox.Positioner className="bui-positioner bui-data-grid-choice-positioner" align="start" sideOffset={5} collisionPadding={12} disableAnchorTracking={!active||!open}>
       <Combobox.Popup {...popup} initialFocus={search}>
         <div className="bui-data-grid-choice-search"><Icon icon={Search} size={14}/><Combobox.Input ref={search} aria-label={'Search '+label+' options'} placeholder="Find an option…" autoComplete="off"/></div>
         <Combobox.Empty className="bui-data-grid-choice-empty">No matching options. Try another search.</Combobox.Empty>
         <Combobox.List className="bui-data-grid-choice-list">{(item:string)=><Combobox.Item key={item} value={item} disabled={options.find(option=>option.value===item)?.disabled} {...touchChoice(item)} className="bui-data-grid-choice-option"><span>{labelFor(item)}</span><Combobox.ItemIndicator className="bui-data-grid-choice-check"><Icon icon={Check} size={14}/></Combobox.ItemIndicator></Combobox.Item>}</Combobox.List>
       </Combobox.Popup>
-    </Combobox.Positioner></Combobox.Portal>
+    </Combobox.Positioner></UIPortal>
   </Combobox.Root>;
   return <Select.Root items={options} value={value} open={active&&open} modal={false} disabled={disabled}
     onValueChange={(next,details)=>{if(details.reason==='item-press'&&next!==null)finish({value:next,intent:'choose',restoreFocus:true});}}
     onOpenChange={(next,details)=>close(next,details.reason)} onOpenChangeComplete={completed}>
     <Select.Trigger {...trigger}>{content}</Select.Trigger>
-    <Select.Portal><Select.Positioner className="bui-positioner bui-data-grid-choice-positioner" align="start" sideOffset={5} collisionPadding={12} alignItemWithTrigger={false} disableAnchorTracking={!active||!open}>
+    <UIPortal render={Select.Portal}><Select.Positioner className="bui-positioner bui-data-grid-choice-positioner" align="start" sideOffset={5} collisionPadding={12} alignItemWithTrigger={false} disableAnchorTracking={!active||!open}>
       <Select.Popup {...popup}><Select.List className="bui-data-grid-choice-list">{options.map(option=><Select.Item key={option.value} value={option.value} disabled={option.disabled} {...touchChoice(option.value)} className="bui-data-grid-choice-option"><Select.ItemText>{option.label}</Select.ItemText><Select.ItemIndicator className="bui-data-grid-choice-check"><Icon icon={Check} size={14}/></Select.ItemIndicator></Select.Item>)}</Select.List></Select.Popup>
-    </Select.Positioner></Select.Portal>
+    </Select.Positioner></UIPortal>
   </Select.Root>;
 }

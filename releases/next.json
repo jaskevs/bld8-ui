@@ -1,12 +1,12 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "status": "unreleased",
-  "title": "Core controls, complete forms and editable data workflows",
+  "title": "Reusable workspaces, scoped configuration and application motion",
   "changes": [
-    "Grouped faceted filters and consistent component/example navigation.",
-    "Fieldset and CheckboxGroup, linked error recovery and conditional/repeatable React Hook Form workflows.",
-    "Async choice external form ownership, read-only values, native reset and cancellation.",
-    "Validated DataGrid Fill down and apply-to-selection with one batch and one Undo.",
-    "Complete source-backed examples, exact registry installation and human/agent discovery."
+    "Generic resource workflows and adjustable workspace layouts.",
+    "Scoped themes, portal inheritance, locale and direction contracts.",
+    "Typed time/date entry and reusable motion primitives.",
+    "Optional virtualized editing, hierarchy and explicit summaries.",
+    "Additional chart primitives and version-matched human/agent discovery."
   ]
 }

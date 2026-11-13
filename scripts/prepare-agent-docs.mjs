@@ -1,3 +1,5 @@
+import {documentationFiles,licenseMarkdown} from './documentation-renderer.mjs';
+export {entryMarkdown,exampleMarkdown,documentationFiles} from './documentation-renderer.mjs';
 import ts from 'typescript';
 import {mkdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, posix, resolve} from 'node:path';
@@ -5,9 +7,14 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 import {blocks, templates} from './library-catalog.mjs';
 import {readComponentExamples} from './prepare-component-examples.mjs';
 import {licenseCode,licenseMetadata} from './license-policy.mjs';
+import {supportsDocumentationVersion} from './documentation-versions.mjs';
 
 const defaultRoot = fileURLToPath(new URL('../', import.meta.url));
 const guideFiles = [
+  ['advanced-data','Virtualised, hierarchical and summarised data workflows','docs/advanced-data.md'],
+  ['scoped-interface-contracts','Scoped themes, portals and interface preferences','docs/scoped-interface-contracts.md'],
+  ['resource-workspace','Reusable resources, attachments and recovery','docs/resource-workspace.md'],
+  ['motion-and-charts','Composed motion and chart workflows','docs/motion-and-charts.md'],
   ['licensing','MIT licensing, copyright and upstream notices','docs/licensing.md'],
   ['core-components','Core controls and complete examples','docs/core-components.md'],
   ['data-workspace', 'Typed batch editing and durable data workflows', 'docs/data-workspace.md'],
@@ -90,8 +97,8 @@ function publicGuide(content, file) {
   });
 }
 
-export function buildAgentCatalog({root=defaultRoot, origin}={}) {
-  const release = JSON.parse(read(root, 'apps/docs/public/releases/current.json'));
+export function buildAgentCatalog({root=defaultRoot, origin, releaseOverride, documentationVersion, registryBase}={}) {
+  const release = releaseOverride ?? JSON.parse(read(root, 'apps/docs/public/releases/current.json'));
   const homepage = originFor(origin ?? new URL(release.registryBase).origin);
   const components = readExportLiteral(read(root, 'apps/docs/src/lib/catalog.ts'), 'components');
   const api = readExportLiteral(read(root, 'apps/docs/src/lib/generated/api.ts'), 'api');
@@ -106,7 +113,7 @@ export function buildAgentCatalog({root=defaultRoot, origin}={}) {
     const registry = JSON.parse(read(root, `apps/docs/public/r/${item.id}.json`));
     const group = item.kind === 'component' ? 'components' : item.kind === 'block' ? 'blocks' : 'templates';
     if (registry.name !== item.id) throw Error(`Registry identity does not match ${item.id}.`);
-    const declarations = item.kind === 'component' ? api[item.id] : describeBlock(item.exportName);
+    const declarations = item.kind === 'component' ? api[item.id] : item.id==='data-workspace' ? [...describeBlock(item.exportName),...describeBlock('ResourceWorkspace'),...describeBlock('useResourceWorkspace')] : describeBlock(item.exportName);
     if (!Array.isArray(declarations) || !declarations.length) throw Error(`Missing generated API: ${item.id}`);
     const sourcePaths=registry.provenance?.sourcePaths?.length?registry.provenance.sourcePaths:[item.kind==='component'?'apps/docs/src/lib/catalog.ts':'packages/blocks/src/'+item.file];
     const attribution=licenseMetadata({sourcePaths,root});
@@ -130,7 +137,7 @@ export function buildAgentCatalog({root=defaultRoot, origin}={}) {
   if (new Set(identifiers).size !== identifiers.length) throw Error('Public catalogue identifiers must be unique.');
   const catalog = {
     schemaVersion:1,
-    release:{version:release.version, status:release.status, snapshot:release.snapshot},
+    release:{version:release.version, status:release.status, snapshot:release.snapshot,...(release.snapshotKind?{snapshotKind:release.snapshotKind}:{}),...(release.sourceRevision?{sourceRevision:release.sourceRevision}:{})},
     homepage, ...licenseMetadata({sourcePaths:['apps/docs/src/lib/catalog.ts','scripts/library-catalog.mjs'],root}),
     installation:{
       requirements:['React 19', 'Initialise shadcn before registry installation.', 'Node 22 for the supplied starters and local documentation server.'],
@@ -142,62 +149,31 @@ export function buildAgentCatalog({root=defaultRoot, origin}={}) {
   };
   const serialized = JSON.stringify(catalog);
   if (/(?<![a-z])[A-Za-z]:[\\/]|file:\/\/|\\\\Users\\/i.test(serialized)) throw Error('Public documentation must not contain local filesystem paths.');
-  return catalog;
+  return documentationVersion?pinDocumentationCatalog(catalog,{version:documentationVersion,registryBase:registryBase??release.registryBase}):catalog;
 }
 
-function licenseMarkdown(metadata) {
-  const fence=String.fromCharCode(96).repeat(3);
-  return '## Licence and provenance\n\nLicence: '+metadata.license+'. Keep the included copyright and permission notices when copying source.\n\n'+fence+'json\n'+JSON.stringify(metadata.provenance,null,2)+'\n'+fence+'\n\n'+metadata.notices.map(({path,content})=>'### '+path+'\n\n'+fence+'text\n'+content.trim()+'\n'+fence).join('\n\n');
-}
-
-const cell = value => String(value).replaceAll('|', '\\|').replaceAll('\n', ' ');
-function apiMarkdown(declarations) {
-  return declarations.map(declaration => {
-    const rows = declaration.properties.map(property => `| \`${cell(property.name)}\` | \`${cell(property.type)}\` | ${property.required ? 'Yes' : 'No'} | \`${cell(property.defaultValue)}\` | ${cell(property.description)}${property.native ? ' (Native React prop.)' : ''} |`);
-    return `### ${declaration.name}\n\n${declaration.kind}.\n\n${declaration.definition ? '\x60\x60\x60ts\ntype '+declaration.name+' = '+declaration.definition+';\n\x60\x60\x60\n\n' : ''}${rows.length ? '| '+(declaration.kind==='Function parameters'?'Parameter':'Prop')+' | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |\n' + rows.join('\n') : 'No props.'}`;
-  }).join('\n\n');
-}
-
-function examplesMarkdown(examples=[]) {
-  const fence=String.fromCharCode(96).repeat(3);
-  return examples.map(example=>['### '+example.title,example.description,'Example ID: '+example.id+'.',`[Interactive example](${example.documentationUrl}) · [Exact Markdown](${example.markdownUrl}) · [Install this composition](${example.registry.url})`,fence+'tsx\n'+example.code+'\n'+fence,'Registry source (adjust the default UI alias to your application):',fence+'tsx\n'+example.registryCode+'\n'+fence,'Keyboard: '+example.keyboard.join(' '),'States: '+example.states.join(' ')].join('\n\n')).join('\n\n')||'Complete integration source is available in the interactive documentation source panel and supplied starter.';
-}
-
-export function exampleMarkdown(example,catalog) {
-  const fence=String.fromCharCode(96).repeat(3);
-  return ['# '+example.title,example.description,`Example ID: ${example.id}. Component: ${example.componentId}. Complete client module.`,
-    `Source version: ${catalog.release.version} (${catalog.release.status}); snapshot ${catalog.release.snapshot}.`,
-    `[Interactive example](${example.documentationUrl}) · [Component reference](${catalog.homepage}/components/${example.componentId}) · [Registry composition](${example.registry.url})`,
-    '## Install this example', 'React 19 and an initialised shadcn application are required.',fence+'sh\nnpx shadcn@latest add '+example.registry.url+'\n'+fence,
-    'The registry composition installs the complete example and its actual source dependencies. Adjust the default UI alias when copying registry source into a different application. Host services and durable persistence remain the application’s responsibility.',
-    '## Workspace source',fence+'tsx\n'+example.code+'\n'+fence,'## Registry source',fence+'tsx\n'+example.registryCode+'\n'+fence,
-    '## Keyboard',example.keyboard.map(note=>'- '+note).join('\n'),'## States',example.states.map(note=>'- '+note).join('\n'),licenseMarkdown(example)].join('\n\n')+'\n';
-}
-
-export function entryMarkdown(entry, catalog) {
-  return `# ${entry.title}\n\n${entry.description}\n\nKind: ${entry.kind}. Category: ${entry.category}. Licence: ${catalog.license}.\nSource version: ${catalog.release.version} (${catalog.release.status}); snapshot ${catalog.release.snapshot}.\n\n[Interactive documentation](${entry.documentationUrl}) · [Registry item](${entry.registry.url})\n\n## Install\n\nReact 19 and an initialised shadcn application are required.\n\n\`\`\`sh\nnpx shadcn@latest add ${entry.registry.url}\n\`\`\`\n\n${catalog.installation.notes.join('\n\n')}\n\nDirect runtime dependencies: ${entry.registry.dependencies.join(', ') || 'Resolved by the registry dependency graph.'}\nRegistry dependencies: ${entry.registry.registryDependencies.join(', ') || 'None.'}\n\n## Usage snippet\n\nThis snippet needs its named data, callbacks, state and imports. It is not a standalone application.\n\n\`\`\`tsx\n${entry.example.code}\n\`\`\`\n\n## Complete named examples\n\n${examplesMarkdown(entry.examples)}\n\n## Behaviour and boundaries\n\n${entry.notes}\n\n## Public API\n\nGenerated from the current public TypeScript exports. Native React props are marked explicitly.\n\n${apiMarkdown(entry.api)}\n\n${licenseMarkdown(entry)}\n`;
+/** Rewrite reference metadata, never the complete example source bytes. */
+export function pinDocumentationCatalog(catalog,{version,registryBase}){
+  if(!supportsDocumentationVersion(version)||catalog.release.version!==version)throw Error('A supported matching documentation version is required.');
+  const pinned=structuredClone(catalog),base=`${catalog.homepage}/docs/versions/${version}`;
+  const registry=name=>`${registryBase}/${name}.json`;
+  const link=(key,value,markdown=false)=>`${base}${markdown?'/markdown':''}?${key}=${encodeURIComponent(value)}`;
+  for(const entry of pinned.entries){
+    entry.documentationUrl=link('entry',entry.kind+':'+entry.id);entry.markdownUrl=link('entry',entry.kind+':'+entry.id,true);
+    if(entry.registry){entry.registry.url=registry(entry.registry.name);entry.registry.registryDependencies=entry.registry.registryDependencies.map(value=>{const name=new URL(value).pathname.split('/').at(-1).replace(/\.json$/,'');return registry(name);});}
+    for(const example of entry.examples){example.documentationUrl=link('example',example.id);example.markdownUrl=link('example',example.id,true);example.registry.url=registry(example.registry.name);}
+  }
+  pinned.installation.registryBase=registryBase;
+  for(const guide of pinned.guides){guide.url=link('guide',guide.id);guide.markdownUrl=link('guide',guide.id,true);guide.content=guide.content.replaceAll(catalog.homepage+'/r/',registryBase+'/');if(catalog.release.sourceRevision)guide.content=guide.content.replaceAll('https://github.com/jaskevs/bld8-ui/blob/main/','https://github.com/jaskevs/bld8-ui/blob/'+catalog.release.sourceRevision+'/');guide.content='> This guide belongs to source '+version+'. Any links to unversioned interactive demos show the current website, not a retained runtime.\n\n'+guide.content;}
+  return pinned;
 }
 
 export function prepareAgentDocs(options={}) {
   const root = options.root ?? defaultRoot;
   const catalog = buildAgentCatalog({...options, root});
-  const write = (path, value) => {
-    const target = join(root, 'apps/docs/public', path);
-    mkdirSync(dirname(target), {recursive:true});
-    writeFileSync(target, value, 'utf8');
-  };
   const blockApis=Object.fromEntries(catalog.entries.filter(entry=>entry.kind!=='component').map(entry=>[entry.id,entry.api]));
   const blockApiPath=join(root,'apps/docs/src/lib/generated/block-api.ts');mkdirSync(dirname(blockApiPath),{recursive:true});writeFileSync(blockApiPath,'export const blockApi = '+JSON.stringify(blockApis)+';\n');
-  write('agent/catalog.json', JSON.stringify(catalog, null, 2) + '\n');
-  const documents = catalog.entries.map(entry => ({entry, markdown:entryMarkdown(entry, catalog)}));
-  for (const {entry, markdown} of documents) write(`agent/${entry.kind}/${entry.id}.md`, markdown);
-  const namedExamples=catalog.entries.flatMap(entry=>entry.examples);
-  for(const example of namedExamples)write(`agent/example/${example.id}.md`,exampleMarkdown(example,catalog));
-  for (const guide of catalog.guides) write(`agent/guides/${guide.id}.md`, guide.content);
-  const introduction = `# BLD8 UI\n\n> Editable React components, reusable blocks and interface templates. All original source is free under MIT.\n\nCurrent source: ${catalog.release.version} (${catalog.release.status}). These documents describe the moving development source. Retained versions have their own immutable manifests and APIs; do not assume this catalogue matches an older installation.\n\n[Human and agent setup](${catalog.homepage}/agents) · [Machine-readable catalogue](${catalog.homepage}/agent/catalog.json) · [Source versions](${catalog.homepage}/releases)\n\n${catalog.installation.requirements.join(' ')} ${catalog.installation.notes[0]}\n`;
-  const index = introduction + '\n## Guides\n\n' + catalog.guides.map(guide => `- [${guide.title}](${guide.markdownUrl})`).join('\n') + '\n\n' + ['component', 'block', 'template'].map(kind => `## ${kind[0].toUpperCase() + kind.slice(1)}s\n\n` + catalog.entries.filter(entry => entry.kind === kind).map(entry => `- [${entry.title}](${entry.markdownUrl}): ${entry.description}`).join('\n')).join('\n\n') + '\n\n## Complete named examples\n\n'+namedExamples.map(example=>`- [${example.title}](${example.markdownUrl}) (${example.id}, ${example.componentId}): ${example.description}`).join('\n')+'\n';
-  write('llms.txt', index);
-  write('llms-full.txt', introduction + '\n\n' + catalog.guides.map(guide => guide.content).join('\n\n---\n\n') + '\n\n---\n\n' + documents.map(document => document.markdown).join('\n\n---\n\n'));
+  for(const [path,value] of Object.entries(documentationFiles(catalog))){const target=join(root,'apps/docs/public',path.startsWith('llms')?path:'agent/'+path);mkdirSync(dirname(target),{recursive:true});writeFileSync(target,value,'utf8');}
   console.log(`Prepared agent documentation for ${catalog.entries.length} entries and ${catalog.guides.length} guides (${catalog.release.version}/${catalog.release.status}).`);
   return catalog;
 }

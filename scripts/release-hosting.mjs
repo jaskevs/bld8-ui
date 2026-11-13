@@ -9,6 +9,8 @@ export function releaseAssetName(path){
   if(typeof path!=='string'||!(roots.has(path)||/^(r|sources)\/[a-z0-9]+(?:-[a-z0-9]+)*\.json$/.test(path)||/^downloads\/[a-z0-9]+(?:-[a-z0-9]+)*\.zip$/.test(path)))throw Error('Unsupported release asset path.');
   return path.replaceAll('/','--');
 }
+roots.add('docs/catalog.json');
+roots.add('documentation.zip');
 export function validateVersionCatalog(value){
   if(!value||value.schemaVersion!==1||!Array.isArray(value.versions)||value.versions.length>200)throw Error('Invalid source version catalogue.');
   const seen=new Set();for(const entry of value.versions){if(!entry||typeof entry.version!=='string'||!versionPattern.test(entry.version)||entry.tag!=='v'+entry.version||typeof entry.title!=='string'||!entry.title.trim()||entry.title.length>150||seen.has(entry.version))throw Error('Invalid or repeated source version.');seen.add(entry.version);}
@@ -28,7 +30,7 @@ export function readPreparedRelease(directory){
   const manifest=validateManifest(JSON.parse(readFileSync(manifestPath,'utf8')));
   if(manifest.status!=='released'||!manifest.sourceRevision||!/^[a-f0-9]{40}$/.test(manifest.sourceRevision))throw Error('A frozen source revision is required.');
   const expected=new Set(['manifest.json',...manifest.artifacts.map(item=>item.path)]),seen=new Set(),assets=[];
-  const walk=folder=>{for(const name of readdirSync(folder)){const file=join(folder,name),info=lstatSync(file),path=relative(root,file).split(sep).join('/');if(info.isSymbolicLink())throw Error('Release links are not supported.');if(info.isDirectory()){if(![...expected].some(value=>value.startsWith(path+'/')))throw Error('Unexpected release directory.');walk(file);}else{if(!info.isFile()||!expected.has(path)||info.size>16*1024*1024)throw Error('Unexpected release artifact.');const bytes=readFileSync(file),sha256=byteHash(bytes),record=manifest.artifacts.find(item=>item.path===path);if(record&&(record.sha256!==sha256||record.bytes!==bytes.length))throw Error('Release artifact digest mismatch: '+path);seen.add(path);assets.push({path,name:releaseAssetName(path),bytes,sha256});}}};
+  const walk=folder=>{for(const name of readdirSync(folder)){const file=join(folder,name),info=lstatSync(file),path=relative(root,file).split(sep).join('/');if(info.isSymbolicLink())throw Error('Release links are not supported.');if(info.isDirectory()){if(![...expected].some(value=>value.startsWith(path+'/')))throw Error('Unexpected release directory.');walk(file);}else{if(!info.isFile()||!expected.has(path)||info.size>(path==='docs/catalog.json'?32:16)*1024*1024)throw Error('Unexpected release artifact.');const bytes=readFileSync(file),sha256=byteHash(bytes),record=manifest.artifacts.find(item=>item.path===path);if(record&&(record.sha256!==sha256||record.bytes!==bytes.length))throw Error('Release artifact digest mismatch: '+path);seen.add(path);assets.push({path,name:releaseAssetName(path),bytes,sha256});}}};
   walk(root);if(seen.size!==expected.size)throw Error('Incomplete release inventory.');
   if(new Set(assets.map(item=>item.name)).size!==assets.length)throw Error('Colliding release asset names.');
   assets.sort((a,b)=>(a.path==='manifest.json'?-1:b.path==='manifest.json'?1:a.path.localeCompare(b.path)));

@@ -155,3 +155,23 @@ The [upstream advisory](https://github.com/advisories/GHSA-2464-fhr4-w9xw)
 identifies affected versions through 16.4.0 and the patched release line. This
 is a dependency update in the consuming application, not a replacement of a
 retained BLD8 source artifact. Vite starters do not depend on Next.js.
+
+## Documentation matching a source version
+
+Future retained releases from 0.4.0 include `docs/catalog.json` and one
+`documentation.zip`. The source manifest covers both artifacts by byte digest.
+The catalogue records the exact version, status and source revision. Its
+`snapshotKind: "source-graph"` digest covers canonical manifest items rather than
+its own artifact, so the verification does not depend on a circular hash.
+
+The archive contains the same APIs, complete source examples, guides and notices
+as that selected catalogue. Registry URLs stay within the selected version.
+Human pages under `/docs/versions/<version>` verify the manifest/catalogue before
+showing them. The development preview is labelled unreleased; interactive demos
+on the main website follow its current build.
+
+The immutable 0.2.0 and 0.3.0 assets are unchanged and did not contain this
+documentation format. Their documentation selection reports unsupported instead
+of substituting a current API. MCP clients can sync a supporting published
+version into a verified local cache, then pass its explicit version to a
+read-only discovery tool. See [MCP setup](mcp.md).

@@ -13,9 +13,9 @@ test('every named example has a distinct installable composition and source-back
     const item=JSON.parse(readFileSync(join(root,'apps/docs/public/r/'+example.registryName+'.json'),'utf8'));
     expect(item.name).toBe('example-'+example.id);expect(item.type).toBe('registry:block');expect(item.license).toBe('MIT');
     expect(item.files).toHaveLength(1);expect(item.files[0].type).toBe('registry:file');expect(item.files[0].target).toBe('@ui/bld8/examples/'+example.id+'.tsx');
-    expect(item.files[0].content).not.toContain('@bld8/ui');expect(item.files[0].content).not.toContain('@/components/ui');expect(item.files[0].content).toContain("from '../");
+    expect(item.files[0].content).not.toContain('@bld8/ui');expect(item.files[0].content).not.toContain('@bld8/blocks');expect(item.files[0].content).not.toContain('@/components/ui');expect(item.files[0].content).toContain("from '../");
     expect(hasFullNotice(item.files[0].content,mitNotice())).toBe(true);
-    expect(item.registryDependencies.slice().sort()).toEqual(example.modules.map(module=>'https://ui.bld8.dev/r/bld8-'+module+'.json').sort());
+    expect(item.registryDependencies.slice().sort()).toEqual(example.modules.map(module=>'https://ui.bld8.dev/r/bld8-'+module+'.json').concat((example.blockModules??[]).map(module=>'https://ui.bld8.dev/r/bld8-block-'+module+'.json')).sort());
     expect(item.provenance.sourcePaths.length).toBeGreaterThan(0);
   }
 });

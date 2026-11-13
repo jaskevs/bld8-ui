@@ -1,3 +1,108 @@
+# Frozen 0.4.0 release preparation — 13 November 2026
+
+The owner has authorised publication of the frozen application-foundations
+0.4.0 source through the regular protected release pathway. Keep the later
+0.5.0 content/import/planning work separate. The development descriptor remains
+0.4.0/unreleased; adding the catalogue entry and publication intent requests a
+release and does not establish that publication or deployment has succeeded.
+
+Historical local acceptance recorded 943 core cases and 734 browser-quality
+cases for the frozen working tree. Those results remain accurate historical
+evidence. Release-metadata and narrow documentation-tracing changes still need
+the clean exact-commit verification guard and the normal protected CI checks.
+The tag, immutable assets, production promotion and public acceptance are pending.
+Preserve retained 0.2.0/0.3.0 bytes, personal identity and the permitted actual
+Melbourne commit/push hours. This section supersedes older publication-authority
+statements below; the earlier implementation record remains unchanged.
+
+---
+
+# Local development handoff — 13 November 2026
+
+The authorised application-foundations batch is implemented in **0.4.0/unreleased**.
+Final integrated local acceptance passes. The current section supersedes
+older feature/release plans below; historical evidence remains after the divider.
+No commit, push, deployment or retained 0.4.0 publication is authorised by this
+feature pass. Preserve the personal account isolation, identity hooks and daily
+08:00–17:00 Australia/Melbourne restriction. Retained 0.2.0 and 0.3.0 source assets
+must keep their original bytes.
+
+## Current implementation
+
+- **Reusable resource workflows.** ResourceWorkspace and its controller share
+  typed drafts, review, atomic batch saves, acknowledgement recovery, explicit
+  conflict rebase and guarded undo. The issue-specific DataWorkspace API remains
+  available. The controller bounds loaded pages and drafted records to 100,
+  columns to 30 and edit actions to 2,000 cells. Saved/shareable views contain
+  presentation and allowed queries, not drafts or records. Upload acknowledgements
+  remain separate from record saves. Authentication, storage, durable idempotency
+  and server-side atomic revision checks remain host responsibilities.
+- **Larger and hierarchical data.** DataGrid keeps its ordinary 100-record default;
+  optional fixed-height row virtualization handles up to 20,000 supplied records.
+  AdvancedDataGrid adds Scroll/Pages reading, retained editors/focus, separate
+  details, bounded lazy children, cancellation/retry and explicitly scoped
+  summaries. Trees allow eight levels and 1,000 direct children per response.
+  This is row virtualization over supplied data, not column virtualization or an
+  automatic remote paging/aggregation service. Clipboard/bulk writes retain
+  their smaller existing bounds.
+- **Scoped configuration.** UIProvider supports local themes/tokens, locale,
+  explicit direction, message overrides, reduced-motion policy and portal hosts.
+  Nested and externally portalled controls retain their owning configuration.
+  Existing unconfigured providers retain their presentation. English fallback and
+  common Arabic messages cover defined interface paths; application labels and
+  business errors remain host-owned. This is not a claim that all controls are
+  fully translated or every RTL/assistive-technology combination is certified.
+- **Date/time interaction.** Editable TimePicker keeps strict HH:mm drafts,
+  optional explicit confirmation, canonical native-form values, reset and
+  read-only contracts. Its slot-only default remains available. Calendar/date
+  controls add bounded dropdown navigation, up to three months and explicit
+  unavailable-day rules. Civil dates and date-free times do not perform instant
+  conversion, timezone resolution or service availability checks.
+- **Adjustable layouts and motion.** ResizablePanels supports two to six stable
+  panels, bounded controlled layouts, pointer/touch and keyboard resizing,
+  collapse/restore and a readable narrow-container fallback. ScrollArea preserves
+  native scrolling and zoom. AnimatedList, AnimatedNumber, AutoHeight and grouped
+  layout transitions preserve native state/focus where their contracts apply and
+  respect system/scoped reduced motion. AnimatedList is bounded to 200 rows;
+  these controls make no frame-rate guarantee.
+- **Additional charts.** DonutChart, Sparkline and StackedBarChart expose exact
+  values alongside colour, legends or compact trends. Bounds are 24 categories,
+  366 observations and 100 rows/six series respectively. Null/missing values stay
+  distinct; displayed percentages do not replace source values. Some built-in
+  chart table captions still use English.
+- **Version-matched reference.** Future retained releases from 0.4.0 include
+  manifest-covered docs/catalog.json and one documentation.zip. A source-graph
+  snapshot plus source revision avoids circular hashing. Human reference pages
+  verify a selected version; development is labelled unreleased. MCP discovery
+  accepts explicit versions from verified local caches. The separate sync command
+  performs bounded fixed-origin downloads; MCP handlers never fetch or write.
+  Old 0.2.0/0.3.0 references report unsupported rather than using current APIs.
+
+Current authorities contain **81 component families, 136 complete examples,
+18 blocks, 3 templates, 388 registry items, 102 agent entries and 22 guides**.
+Families, examples and distribution items are separate counts. No dependency was
+added. Canonical examples, registry source and human/agent APIs share the same
+source authorities and portable notices.
+
+Read advanced-data.md, scoped-interface-contracts.md, resource-workspace.md and
+motion-and-charts.md for the public contracts and limitations. Application
+foundations are also introduced at /docs/application-foundations.
+
+## Acceptance and continuation
+
+**Local acceptance passes:** 943 core checks, 734 browser-quality checks,
+production/types, clean Next.js/Vite source installations, eight independent Vite
+builds, themed downloads, HTTP references, licence integrity and the draft
+documentation/archive audit. Read verification.md for exact logs and boundaries.
+The local development overview is /docs/application-foundations. Source remains
+0.4.0/unreleased; local preparation does not publish a release.
+
+Follow next-work.md after acceptance. This is additional UI scope: the fixed
+Workbench milestones, exam window and 135-hour baseline are unchanged. No effort
+hours, external adoption or completed private milestones have been inferred.
+
+---
+
 ## Dependency-free release preflight — 12 November 2026
 
 Commit d2e30c4 passed all 877 core cases and 650 browser-quality cases in GitHub

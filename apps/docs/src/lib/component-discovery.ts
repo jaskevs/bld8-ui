@@ -10,6 +10,7 @@ export const componentCapabilityDefinitions = [
   {id:'ranges',label:'Ranges',description:'A pair of values, dates or a rectangular cell selection.'},
   {id:'ordering',label:'Ordering',description:'Pointer or keyboard ordering APIs.'},
   {id:'keyboard',label:'Keyboard patterns',description:'Documented composite keyboard interactions.'},
+  {id:'motion',label:'Application motion',description:'Reusable intrinsic-height, keyed-list, metric and shared-layout transitions.'},
   {id:'windowed',label:'Windowed rows',description:'A bounded window over supplied table records.'},
 ] as const;
 export type ComponentCapability=typeof componentCapabilityDefinitions[number]['id'];
@@ -20,15 +21,25 @@ const capabilitySets:Record<ComponentCapability,readonly string[]>={
   forms:['faceted-filter','checkbox-group','fieldset','autocomplete','input','input-group','textarea','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','number-field','time-picker','slider','range-slider','otp-input','toggle-group','tag-input','date-picker','date-range','file-upload','form','react-hook-form','tree-select'],
   validation:['checkbox-group','fieldset','autocomplete','input','input-group','textarea','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','number-field','time-picker','range-slider','otp-input','toggle-group','tag-input','form','react-hook-form','data-grid','editable-cell','filter-builder','upload-queue','tree-select','date-picker','date-range'],
   search:['faceted-filter','autocomplete','combobox','multi-select','async-combobox','async-multi-select','command','table','advanced-table','tree-select'],
-  async:['autocomplete','alert-dialog','async-combobox','async-multi-select','cascader','form','editable-cell','file-upload','upload-queue','tree-select'],
+  async:['data-grid','autocomplete','alert-dialog','async-combobox','async-multi-select','cascader','form','editable-cell','file-upload','upload-queue','tree-select'],
   multiple:['faceted-filter','checkbox-group','multi-select','async-multi-select','toggle-group','tag-input','tree-select'],
-  nested:['faceted-filter','navigation-menu','dropdown','context-menu','cascader','tree','filter-builder','tree-select'],
+  nested:['data-grid','faceted-filter','navigation-menu','dropdown','context-menu','cascader','tree','filter-builder','tree-select'],
   ranges:['range-slider','date-range','data-grid'],
   ordering:['kanban','table','advanced-table'],
-  keyboard:['faceted-filter','checkbox-group','autocomplete','toolbar','alert-dialog','navigation-menu','preview-card','button','icon-button','input-group','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','slider','range-slider','otp-input','toggle-group','tag-input','tabs','accordion','pagination','dialog','sheet','drawer','popover','tooltip','dropdown','context-menu','command','sidebar','tree','kanban','stepper','data-grid','windowed-table','calendar','date-picker','date-range','day-agenda','event-calendar','time-picker','number-field','filter-builder','chart','tree-select'],
-  windowed:['windowed-table'],
+  keyboard:['resizable-panels','scroll-area','animated-list','layout-transition','donut-chart','stacked-bar-chart','faceted-filter','checkbox-group','autocomplete','toolbar','alert-dialog','navigation-menu','preview-card','button','icon-button','input-group','checkbox','switch','radio','select','combobox','multi-select','async-combobox','async-multi-select','cascader','slider','range-slider','otp-input','toggle-group','tag-input','tabs','accordion','pagination','dialog','sheet','drawer','popover','tooltip','dropdown','context-menu','command','sidebar','tree','kanban','stepper','data-grid','windowed-table','calendar','date-picker','date-range','day-agenda','event-calendar','time-picker','number-field','filter-builder','chart','tree-select'],
+  windowed:['windowed-table','data-grid'],
+  motion:['animated-list','animated-number','auto-height','layout-transition'],
 };
 const searchAliases:Record<string,string>={
+  'animated-list':'motion animation keyed reorder focus retained drafts reduced motion',
+  'animated-number':'motion metric animation locale number formatting committed accessible value',
+  'auto-height':'motion intrinsic measured height resize text no scaling disclosure',
+  'layout-transition':'motion shared layout position transition groups selection',
+  'resizable-panels':'split pane resize keyboard pointer collapse restore workspace layout',
+  'scroll-area':'native scroll container overflow keyboard region touch',
+  'donut-chart':'pie part whole allocation exact values legend reporting',
+  sparkline:'chart compact trend missing observations signed exact values',
+  'stacked-bar-chart':'chart stacked absolute percent category totals exact values',
   autocomplete:'free text suggestions typeahead query grouped email search abort retry native form',
   toolbar:'mixed controls action bar roving focus orientation toggle link separator',
   'alert-dialog':'confirmation destructive delete pending retry cancel safe focus',
@@ -42,7 +53,7 @@ const searchAliases:Record<string,string>={
   'multi-select':'multiple choices chips tags searchable', 'async-combobox':'remote autocomplete paging retry retained labels',
   'async-multi-select':'remote multiple choices paging retry retained labels', 'cascader':'hierarchy path dependent choices lazy children',
   'dropdown':'action menu submenu checkbox radio groups separator', 'context-menu':'right click menu submenu checkbox radio groups',
-  'data-grid':'spreadsheet cells editing clipboard tsv ranges undo redo drafts date checkbox boolean multiple assignees custom editors', 'windowed-table':'virtual virtualized virtualised bounded rows scrolling window',
+  'data-grid':'virtual virtualized windowed hierarchy lazy children summaries aggregates inventory resource workspace spreadsheet cells editing clipboard tsv ranges undo redo drafts date checkbox boolean multiple assignees custom editors', 'windowed-table':'virtual virtualized virtualised bounded rows scrolling window',
   'table':'records columns visibility pinning resizing sorting pagination selection export', 'advanced-table':'records drag reorder saved layouts grouping facets',
   'date-picker':'dates keyboard editable iso native form bounds validation ref reset', 'date-range':'dates start end interval presets apply cancel draft keyboard native forms', 'calendar':'date month day picker', 'event-calendar':'week month appointments timezone events overlap',
   'upload-queue':'files progress cancel retry transport', 'file-upload':'files drag drop browse transfer', 'tree':'folders hierarchy expand collapse',
@@ -56,7 +67,7 @@ const families=[
   ['calendar','date-picker','date-range','event-calendar','day-agenda','time-picker'],
   ['tabs','accordion','breadcrumb','pagination','sidebar','stepper'], ['file-upload','upload-queue'],
   ['form','react-hook-form'], ['alert','toast','badge','progress','loading','empty'],
-  ['button','icon-button','icon','avatar','card'], ['tree','kanban','timeline','chart'],
+  ['button','icon-button','icon','avatar','card'], ['tree','kanban','timeline'], ['chart','donut-chart','sparkline','stacked-bar-chart'], ['animated-list','animated-number','auto-height','layout-transition'], ['resizable-panels','scroll-area'],
 ];
 const slug=(value:string)=>value.toLowerCase().replace(/\s+/g,'-');
 export function getComponentCapabilities(id:string):ComponentCapability[]{return componentCapabilityDefinitions.filter(capability=>capabilitySets[capability.id].includes(id)).map(capability=>capability.id);}

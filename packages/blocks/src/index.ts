@@ -38,3 +38,13 @@ export * from './calendar-workspace.js';
 
 export * from './issue-data-source.js';
 export * from './data-workspace.js';
+
+export * from './resource-workspace.js';
+
+export * from './resource-workspace-state.js';
+
+export * from './resource-data-source.js';
+
+export * from './resource-workspace-view.js';
+
+export * from './use-resource-workspace.js';

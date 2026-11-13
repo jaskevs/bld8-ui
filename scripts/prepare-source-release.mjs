@@ -5,6 +5,9 @@ import {createManifest,byteHash,validateManifest} from './source-release.mjs';
 import {blocks,templates} from './library-catalog.mjs';
 import {distributionNotices} from './license-policy.mjs';
 import {checkLicenses} from './check-licenses.mjs';
+import {buildAgentCatalog,documentationFiles} from './prepare-agent-docs.mjs';
+import {documentationArchive} from './documentation-archive.mjs';
+import {documentationSnapshot,supportsDocumentationVersion,MAX_DOCUMENTATION_CATALOG_BYTES} from './documentation-versions.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url));
 const read=path=>readFileSync(join(root,path));
@@ -74,6 +77,16 @@ export function prepareSourceRelease({bundle=false,version,status,sourceRevision
   artifacts['capture-installation.mjs']=read('scripts/capture-installation.mjs');
   artifacts['CHANGELOG.md']=read('CHANGELOG.md');artifacts['UPDATING.md']=read('docs/updating-source.md');artifacts['LICENSE']=read('LICENSE');artifacts['BRAND.md']=read('BRAND.md');
   Object.assign(artifacts,distributionNotices({root}),{'licenses/inventory.json':read('licenses/inventory.json'),'scripts/license-policy.mjs':read('scripts/license-policy.mjs')});
+  if(bundle&&supportsDocumentationVersion(version)){
+    const source=createManifest({version,status,registryBase,items,artifacts,sourceRevision});
+    const catalog=buildAgentCatalog({root,origin:catalogue.homepage,releaseOverride:{version,status,registryBase,snapshotKind:'source-graph',snapshot:documentationSnapshot(source),...(sourceRevision?{sourceRevision}:{})},documentationVersion:version,registryBase});
+    const files=documentationFiles(catalog),bytes=Buffer.from(files['catalog.json']);
+    if(bytes.length>MAX_DOCUMENTATION_CATALOG_BYTES)throw Error('Frozen documentation catalogue exceeds its size limit.');
+    artifacts['docs/catalog.json']=bytes;
+    const offline=Object.fromEntries(Object.entries(files).filter(([path])=>path!=='llms-full.txt'));
+    offline['README.md']=`# BLD8 UI ${version} documentation\n\nSource status: ${status}. Source revision: ${sourceRevision??'not frozen'}.\nSource-graph snapshot: ${catalog.release.snapshot}.\n\nThe source manifest covers catalog.json and documentation.zip by exact byte digests. The catalogue snapshot identifies canonical source items, avoiding a circular artifact hash. This archive includes the exact public APIs, complete source examples, guides, notices and a Markdown index. It contains no retained runtime or interactive preview. Links to unversioned live demos show the current website.\n`;
+    artifacts['documentation.zip']=documentationArchive(offline);
+  }
   // Validate freshly generated portable copies before hashing. Agent documents
   // are produced afterwards because they identify this resulting snapshot.
   checkLicenses({root,generated:true,includeAgent:false,checkManifest:false,releaseArtifacts:artifacts});

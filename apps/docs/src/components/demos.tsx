@@ -1,4 +1,5 @@
 'use client';
+import {ExamplePreview} from './component-examples';
 import {FacetedFilter,Fieldset,CheckboxGroup} from '@bld8/ui';
 import {TreeSelectDemo} from './tree-select-demo';
 import {CoreControlDemo} from './core-controls-demo';
@@ -49,7 +50,16 @@ export function ComponentDemo({ id }: { id: string }) {
   const newExamples:Record<string,string>={'toggle-group':'toggle-formatting','tag-input':'tag-input-validation','range-slider':'range-budget','otp-input':'otp-code'};
   if(newExamples[id])return <CoreControlDemo id={id}/>;
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
-  switch(id) {
+  switch (id) {
+    case 'resizable-panels': return <ExamplePreview id="resizable-workspace-panes"/>;
+    case 'scroll-area': return <ExamplePreview id="scroll-area-native-region"/>;
+    case 'animated-list': return <ExamplePreview id="motion-list-updates"/>;
+    case 'animated-number': return <ExamplePreview id="motion-number-metric"/>;
+    case 'auto-height': return <ExamplePreview id="motion-intrinsic-height"/>;
+    case 'layout-transition': return <ExamplePreview id="motion-shared-selection"/>;
+    case 'donut-chart': return <ExamplePreview id="chart-donut-allocation"/>;
+    case 'sparkline': return <ExamplePreview id="chart-sparkline-missing"/>;
+    case 'stacked-bar-chart': return <ExamplePreview id="chart-stacked-periods"/>;
     case 'tree-select': return <TreeSelectDemo/>;
     case 'data-grid': return <DataGridDemo/>;
     case 'upload-queue': return <UploadHttpDemo />;

@@ -30,6 +30,7 @@ test('agent catalogue keeps source identities and APIs tied to the existing auth
   const issue = catalog.entries.find(entry => entry.kind === 'block' && entry.id === 'issue-table')!;
   expect(issue.api[0].name).toBe('IssueTable');
   expect(issue.api[0].properties.some(property => property.name === 'repository')).toBe(true);
+  const resources=catalog.entries.find(entry=>entry.kind==='block'&&entry.id==='data-workspace')!;expect(resources.api.map(section=>section.name)).toEqual(['DataWorkspace','ResourceWorkspace','useResourceWorkspace']);expect(resources.api[1].properties.map(property=>property.name)).toEqual(expect.arrayContaining(['dataSource','columns','fields','renderGrid','renderInspector','renderField','onSaveView','onShareView']));
 });
 
 test('exact example documents and registry compositions share the complete canonical source',()=>{

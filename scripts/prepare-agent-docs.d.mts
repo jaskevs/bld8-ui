@@ -34,7 +34,7 @@ export interface AgentEntry extends LicenseMetadata {
 }
 export interface AgentCatalog extends LicenseMetadata {
   schemaVersion:1;
-  release:{version:string;status:string;snapshot:string};
+  release:{version:string;status:string;snapshot:string;snapshotKind?:'manifest'|'source-graph';sourceRevision?:string};
   homepage:string;
   license:'MIT';
   installation:{requirements:string[];notes:string[];registryBase:string};
@@ -42,7 +42,10 @@ export interface AgentCatalog extends LicenseMetadata {
   guides:(LicenseMetadata & {id:string;title:string;url:string;markdownUrl:string;content:string})[];
 }
 export function readExportLiteral(source:string,name:string):unknown;
-export function buildAgentCatalog(options?:{root?:string;origin?:string}):AgentCatalog;
+export interface AgentDocumentationOptions {root?:string;origin?:string;releaseOverride?:AgentCatalog['release'] & {registryBase:string};documentationVersion?:string;registryBase?:string}
+export function buildAgentCatalog(options?:AgentDocumentationOptions):AgentCatalog;
+export function pinDocumentationCatalog(catalog:AgentCatalog,options:{version:string;registryBase:string}):AgentCatalog;
+export function documentationFiles(catalog:AgentCatalog):Record<string,string>;
 export function entryMarkdown(entry:AgentEntry,catalog:AgentCatalog):string;
 export function exampleMarkdown(example:AgentExample,catalog:AgentCatalog):string;
-export function prepareAgentDocs(options?:{root?:string;origin?:string}):AgentCatalog;
+export function prepareAgentDocs(options?:AgentDocumentationOptions):AgentCatalog;

@@ -42,7 +42,7 @@ export default defineConfig({
     }))),
     ...(['chromium', 'firefox', 'webkit'] as const).flatMap(browserName => viewports.flatMap(size => themes.map(theme => ({
       name: `smoke-${browserName}-${size}-${theme}`,
-      testMatch: ['portable-smoke.spec.ts', 'core-controls.spec.ts', 'date-fields.spec.ts', 'tree-select.spec.ts', 'grid-editors.spec.ts', 'component-expansion.spec.ts', 'faceted-filter.spec.ts', 'async-form-parity.spec.ts', 'grid-bulk.spec.ts', 'adoption-workflows.spec.ts'],
+      testMatch: ['portable-smoke.spec.ts', 'core-controls.spec.ts', 'date-fields.spec.ts', 'tree-select.spec.ts', 'grid-editors.spec.ts', 'component-expansion.spec.ts', 'faceted-filter.spec.ts', 'async-form-parity.spec.ts', 'grid-bulk.spec.ts', 'adoption-workflows.spec.ts', 'resource-workspace.spec.ts', 'application-foundations.spec.ts'],
       // A phone-sized viewport is portable to Firefox; this does not emulate a real iPhone.
       use: {browserName, viewport:sizes[size], colorScheme:theme, reducedMotion:'no-preference' as const},
     })))),

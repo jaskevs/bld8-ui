@@ -1,3 +1,22 @@
+# Recorded production evidence and current development — 13 November 2026
+
+The last recorded production acceptance is 0.3.0 at source
+b1854f50b618c27b58d181b8f534f59db253132d, verified on 12 November.
+GitHub run 43176894267 passed its protected checks; immutable release assets and
+the deployed routes were independently checked. Local evidence is
+.local/release-0.3.0-acceptance.json. This is historical evidence, not a claim that
+the following development changes are deployed.
+
+Development is 0.4.0/unreleased. It adds resource workspaces, scoped interfaces,
+date/time entry, virtual editing, layouts, motion, charts and versioned docs.
+Use the normal complete validation and protected release path. Keep retained
+0.2.0/0.3.0 bytes unchanged. Future frozen documentation is delivered as
+docs/catalog.json and documentation.zip with manifest digests.
+
+The earlier deployment history follows.
+
+---
+
 # Latest production evidence - 9 November 2026
 
 Implementation f7c8998aaf4042f2e3433a276089dbf872a7b581 is live at ui.bld8.dev.

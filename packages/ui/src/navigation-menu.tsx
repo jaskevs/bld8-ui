@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import { forwardRef, useId, type CSSProperties, type HTMLAttributes, type ReactNode, type Ref } from 'react';
 import { NavigationMenu as Primitive } from '@base-ui/react/navigation-menu';
 import { ChevronDown } from 'lucide-react';
@@ -61,5 +62,5 @@ export interface NavigationMenuPopupProps extends Omit<Primitive.Positioner.Prop
 }
 /** One shared, collision-aware viewport resizes between flyouts and retains its size during exit. The forwarded ref points to the popup nav. */
 export const NavigationMenuPopup = forwardRef<HTMLElement, NavigationMenuPopupProps>(function NavigationMenuPopup({ children, className, style, minWidth = 240, positionerClassName, positionerRef, portalContainer, popupProps, sideOffset = 8, collisionPadding = 12, ...positionerProps }, ref) {
-  return <Primitive.Portal container={portalContainer}><Primitive.Positioner {...positionerProps} ref={positionerRef} sideOffset={sideOffset} collisionPadding={collisionPadding} className={cx('bui-navigation-positioner', positionerClassName)}><Primitive.Popup {...popupProps} ref={ref} className={cx('bui-navigation-popup', className)} style={{ ...style, '--bui-navigation-min-width': typeof minWidth === 'number' ? minWidth + 'px' : minWidth } as CSSProperties}><NavigationMenuViewport>{children}</NavigationMenuViewport></Primitive.Popup></Primitive.Positioner></Primitive.Portal>;
+  return <UIPortal render={Primitive.Portal} container={portalContainer}><Primitive.Positioner {...positionerProps} ref={positionerRef} sideOffset={sideOffset} collisionPadding={collisionPadding} className={cx('bui-navigation-positioner', positionerClassName)}><Primitive.Popup {...popupProps} ref={ref} className={cx('bui-navigation-popup', className)} style={{ ...style, '--bui-navigation-min-width': typeof minWidth === 'number' ? minWidth + 'px' : minWidth } as CSSProperties}><NavigationMenuViewport>{children}</NavigationMenuViewport></Primitive.Popup></Primitive.Positioner></UIPortal>;
 });

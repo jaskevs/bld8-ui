@@ -18,10 +18,10 @@ function responseJson(result: Awaited<ReturnType<Client['callTool']>>) {
   return JSON.parse(block.text);
 }
 
-async function withServer(run: (client: Client) => Promise<void>) {
+async function withServer(run: (client: Client) => Promise<void>,args=[entrypoint]) {
   const client = new Client({ name: 'bld8-documentation-check', version: '1.0.0' });
   const transport = new StdioClientTransport({
-    command: process.execPath, args: [entrypoint], cwd: os.tmpdir(), env: {}, stderr: 'pipe',
+    command: process.execPath, args, cwd: os.tmpdir(), env: {}, stderr: 'pipe',
   });
   let diagnostics = '';
   transport.stderr?.on('data', chunk => { diagnostics += String(chunk); });
@@ -36,7 +36,7 @@ async function withServer(run: (client: Client) => Promise<void>) {
 test('documentation MCP initializes over stdio outside its checkout and advertises only read-only tools', async () => {
   await withServer(async client => {
     const { tools } = await client.listTools();
-    expect(tools.map(item => item.name).sort()).toEqual(['get_component','get_example','get_guide','list_components','search_components','search_examples']);
+    expect(tools.map(item => item.name).sort()).toEqual(['get_component','get_example','get_guide','list_components','list_versions','search_components','search_examples']);
     for (const tool of tools) expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
     const { resources } = await client.listResources();
     expect(resources).toHaveLength(1 + catalog.entries.length + catalog.guides.length+catalog.entries.reduce((count,item)=>count+item.examples.length,0));
@@ -54,6 +54,45 @@ test('documentation MCP initializes over stdio outside its checkout and advertis
     expect(summary.entries.every((item:Record<string,unknown>)=>item.license==='MIT'&&!('notices' in item))).toBe(true);
     expect(summary.notices).toEqual(catalog.notices);
   });
+});
+
+test('MCP version selection is explicit and unavailable retained docs never change current discovery',async()=>{
+  await withServer(async client=>{
+    const versions=responseJson(await client.callTool({name:'list_versions',arguments:{}}));
+    expect(versions.current).toEqual({id:'current',...catalog.release});
+    for(const version of ['0.2.0','0.3.0']){
+      expect(versions.versions.find((item:{version:string})=>item.version===version)?.state).toBe('unsupported');
+      const missing=await client.callTool({name:'get_component',arguments:{id:'button',version}});
+      expect(missing.isError).toBe(true);expect(JSON.stringify(missing)).toContain('currentFallback');
+    }
+    expect((await client.callTool({name:'get_component',arguments:{id:'button',version:'99.0.0'}})).isError).toBe(true);
+    expect((await client.callTool({name:'get_component',arguments:{id:'button',version:'../private'}})).isError).toBe(true);
+    const current=responseJson(await client.callTool({name:'get_component',arguments:{id:'button',version:'current'}}));
+    expect(current.release).toEqual(catalog.release);expect(current.registry.url).toBe(catalog.homepage+'/r/button.json');
+  });
+});
+
+test('explicit retained MCP reads remain isolated from current requests over the real protocol',async()=>{
+  const script=`
+    import {serveStdio} from ${JSON.stringify(new URL('../node_modules/@modelcontextprotocol/server/dist/stdio.mjs',import.meta.url).href)};
+    import {createDocumentationServer} from ${JSON.stringify(new URL('../packages/mcp/dist/server.js',import.meta.url).href)};
+    import {readFileSync} from 'node:fs';
+    const current=JSON.parse(readFileSync(new URL(${JSON.stringify(new URL('../apps/docs/public/agent/catalog.json',import.meta.url).href)}),'utf8'));
+    const retained=structuredClone(current);retained.release={version:'0.4.0',status:'released',snapshotKind:'source-graph',snapshot:'a'.repeat(64),sourceRevision:'b'.repeat(40)};
+    retained.entries=retained.entries.filter(entry=>entry.id==='button'&&entry.kind==='component');retained.guides=[];
+    retained.entries[0].title='Retained fixture button';retained.entries[0].registry.url='https://ui.bld8.dev/releases/0.4.0/r/button.json';
+    retained.entries[0].api=[{name:'RetainedButton',kind:'Component props',properties:[{name:'retainedOnly',type:'string',required:false,defaultValue:'—',description:'Protocol fixture',native:false}]}];
+    const versions={versions:[{version:'0.4.0',title:'Retained fixture',state:'cached'}],catalogs:new Map([['0.4.0',retained]])};
+    await serveStdio(()=>createDocumentationServer(current,versions));
+  `;
+  await withServer(async client=>{
+    const retained=responseJson(await client.callTool({name:'get_component',arguments:{id:'button',version:'0.4.0',section:'all'}}));
+    expect(retained.title).toBe('Retained fixture button');expect(retained.registry.url).toBe('https://ui.bld8.dev/releases/0.4.0/r/button.json');expect(retained.api.properties.map((property:{name:string})=>property.name)).toEqual(['retainedOnly']);expect(retained.release.snapshotKind).toBe('source-graph');
+    const current=responseJson(await client.callTool({name:'get_component',arguments:{id:'button',section:'all'}}));
+    expect(current.release).toEqual(catalog.release);expect(current.registry.url).toBe(catalog.homepage+'/r/button.json');expect(current.api.properties.some((property:{name:string})=>property.name==='retainedOnly')).toBe(false);
+    const retainedAgain=responseJson(await client.callTool({name:'search_components',arguments:{query:'button',version:'0.4.0'}}));
+    expect(retainedAgain.release.version).toBe('0.4.0');expect(retainedAgain.total).toBe(1);
+  },['--input-type=module','-e',script]);
 });
 
 test('documentation search is case-insensitive, bounded and consistent across pages and kinds', async () => {

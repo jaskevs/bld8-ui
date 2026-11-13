@@ -3,7 +3,7 @@
 ## Shared material and sizing - 16 October 2026
 
 Use a warm grey canvas (#eeede9), borderless white panels, near-black type and
-the existing warm yellow (#ffe24a). Raised surfaces have a fine upper highlight
+the existing warm yellow (#FFD900). Raised surfaces have a fine upper highlight
 and a quiet lower shadow. Fields sit slightly inward. Selections use a recessed
 yellow face with a dark indicator. The effect comes from CSS shadows, never
 blurred text, raster artwork, enlarged controls or decorative movement.

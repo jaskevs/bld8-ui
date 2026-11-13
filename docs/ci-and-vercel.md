@@ -16,9 +16,10 @@ a Vercel token or application credentials.
   normal-motion interactions in Chromium, Firefox and WebKit, with generated licence integrity checked after its build. It uses the pinned
   Linux Playwright image and browser versions documented in visual-quality.md.
 - **UI PR checks** or **UI Release checks** is the final aggregate. It runs after
-  both jobs, including when either failed or was skipped. It succeeds only when
-  both results are success. Keep these public check names stable: the production
-  gate depends on the release name.
+  core, browser quality and retained source release jobs, including when one
+  failed or was skipped. Core and quality must succeed; source release must
+  succeed or be intentionally skipped for PR/non-main validation. Keep these
+  public check names stable: the production gate depends on the release name.
 
 Run `npm run test:licenses` and `npm run check:licenses` after a build to check original MIT ownership, complete third-party notices, registry dependency closures, all actual starter archives, themed fonts, copied human/agent source and the release manifest. Dependency additions or changed versions/licences require review of `licenses/inventory.json`. Root workspace patterns, package identity/MIT metadata and lockfile workspace paths/links are reviewed too; additional or nested layouts require an explicit policy update. The release generator checks portable licence artifacts before hashing; CI repeats the complete gate before any frozen-source publication.
 
@@ -27,17 +28,21 @@ or approve replacement images. Review a deliberate update in the same pinned
 Linux environment. See [visual quality](visual-quality.md) and
 [clean registry consumers](registry-consumer-checks.md).
 
-Core and browser-quality jobs have 45-minute execution budgets. The expanded
-local suite contains 878 core and 650 browser-quality cases. The earlier
-764-case core acceptance took 9.0 minutes with three workers (CI uses two);
-the earlier 398-case quality run took 18.4 minutes with two workers. Core also
+Core and browser-quality jobs have 45-minute execution budgets. The current
+browser-quality suite configures 734 cases: twenty approved visual comparisons,
+66 touch cases and 648 normal-motion checks across 54 flows. Current core counts
+and final run outcomes belong in verification.md; a configured test count is not
+a passing result. Historical timing examples apply only to their recorded
+source: the earlier 764-case core acceptance took 9.0 minutes with three workers
+(CI uses two), and an earlier 398-case quality run took 18.4 minutes with two.
+Core also
 builds eight independent Vite downloads, clean Next.js/Vite registry consumers
 and themed downloads. Setup, installation and build require room beyond test
 execution. Job ceilings are not predicted runtimes. Per-test expectations,
 retries, screenshot tolerances, source publication and the production gate are
 unchanged; monitor the actual full run before promotion.
 
-## Current connection and gate
+## Connection and gate history
 
 The personal Vercel project bld8-ui is linked to jaskevs/bld8-ui with main as its
 production branch. The 29 October source release 6d839e3 passed its then-current
@@ -52,8 +57,9 @@ container's root user. The setting is scoped to that step and does not alter
 Windows, local shells, npm installation, checkout, browser coverage or tolerances.
 A probe in the pinned image reproduces the ownership failure with /github/home,
 then launches Firefox and exercises an input with /root. Local evidence is
-.local/firefox-home-proof.json. This correction must still pass the remote jobs
-and production check before the new source is treated as live.
+.local/firefox-home-proof.json. At that October checkpoint the correction still
+needed its remote jobs and production check. This dated account is historical;
+read the current handoff/deployment evidence for the published source revision.
 
 On 29 October 2026 the project's production gate was configured and read back
 through Vercel's API. Check chk_31529cb7-fbb0-4a03-a047-a8edc0aecb54 requires the
@@ -61,9 +67,9 @@ GitHub check **UI Release checks**, starts when the build is ready, and blocks
 production-domain aliasing. Its timeout is 3,600 seconds. Automatic production
 aliasing remains enabled, and no unrelated project setting or check was changed.
 
-The 30 October failure verifies that a failed aggregate does not replace the
-production domain. Successful promotion for the corrected source still needs
-verification against its exact pushed revision and the live domain.
+The 30 October failure demonstrated that a failed aggregate did not replace the
+production domain. Every later promotion requires verification against its exact
+pushed revision and the live domain.
 Do not force-promote to bypass a failed check as part of normal release work.
 
 GitHub branch rules are separate. A main-branch ruleset can require **UI PR

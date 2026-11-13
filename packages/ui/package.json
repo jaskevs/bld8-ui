@@ -162,6 +162,50 @@
     "./preview-card": {
       "types": "./dist/preview-card.d.ts",
       "import": "./dist/preview-card.js"
+    },
+    "./ui-motion": {
+      "types": "./dist/ui-motion.d.ts",
+      "import": "./dist/ui-motion.js"
+    },
+    "./analytics-chart-state": {
+      "types": "./dist/analytics-chart-state.d.ts",
+      "import": "./dist/analytics-chart-state.js"
+    },
+    "./donut-chart": {
+      "types": "./dist/donut-chart.d.ts",
+      "import": "./dist/donut-chart.js"
+    },
+    "./sparkline": {
+      "types": "./dist/sparkline.d.ts",
+      "import": "./dist/sparkline.js"
+    },
+    "./stacked-bar-chart": {
+      "types": "./dist/stacked-bar-chart.d.ts",
+      "import": "./dist/stacked-bar-chart.js"
+    },
+    "./ui-config": {
+      "types": "./dist/ui-config.d.ts",
+      "import": "./dist/ui-config.js"
+    },
+    "./advanced-data-state": {
+      "types": "./dist/advanced-data-state.d.ts",
+      "import": "./dist/advanced-data-state.js"
+    },
+    "./advanced-data-grid": {
+      "types": "./dist/advanced-data-grid.d.ts",
+      "import": "./dist/advanced-data-grid.js"
+    },
+    "./resizable-panel-state": {
+      "types": "./dist/resizable-panel-state.d.ts",
+      "import": "./dist/resizable-panel-state.js"
+    },
+    "./resizable-panels": {
+      "types": "./dist/resizable-panels.d.ts",
+      "import": "./dist/resizable-panels.js"
+    },
+    "./scroll-area": {
+      "types": "./dist/scroll-area.d.ts",
+      "import": "./dist/scroll-area.js"
     }
   },
   "sideEffects": [

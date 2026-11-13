@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import {useLayoutEffect,useRef,useState,type ReactNode} from 'react';
 import {Popover} from '@base-ui/react/popover';
 import {Check,ChevronDown} from 'lucide-react';
@@ -52,7 +53,7 @@ export function GridRichEditor<T extends DataRecord>({label,column,value,active,
   // restore a controlled field's old value before its change handler reads it.
   return <Popover.Root open={active&&open&&!disabled} onOpenChange={(next,details)=>close(next,details.reason)} onOpenChangeComplete={next=>{if(!next)onClosed();}}>
     <Popover.Trigger className="bui-data-grid-choice-trigger" aria-label={label} aria-invalid={!!errorId||undefined} aria-describedby={errorId} data-grid-choice-owner={owner} data-closing={!active||undefined} tabIndex={-1}><span className="bui-data-grid-value"><GridCellValue column={column} value={draft}/></span><Icon icon={ChevronDown} size={14}/></Popover.Trigger>
-    <Popover.Portal><Popover.Positioner className="bui-positioner bui-data-grid-rich-positioner" align="start" sideOffset={6} collisionPadding={12} disableAnchorTracking={!active||!open}>
+    <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner bui-data-grid-rich-positioner" align="start" sideOffset={6} collisionPadding={12} disableAnchorTracking={!active||!open}>
       <Popover.Popup className="bui-popup bui-data-grid-rich-popup" data-grid-choice-owner={owner} initialFocus={input} finalFocus={false} onFocusCapture={event=>onOwnedFocus(event.target as HTMLElement)} onPointerDownCapture={event=>onOwnedFocus(event.target as HTMLElement)} onInput={()=>{reserveFields();if(column.type==='date')setError('');}} onKeyDown={event=>{
         if(event.defaultPrevented||!event.currentTarget.contains(event.target as Node))return;
         if(event.key==='Enter'&&event.target===input.current&&column.type==='date'){event.preventDefault();apply();}
@@ -63,6 +64,6 @@ export function GridRichEditor<T extends DataRecord>({label,column,value,active,
         {column.type==='date'&&error&&<p role="alert" className="bui-error">{error}</p>}</div></div>
         <div className="bui-data-grid-rich-actions"><Button variant="ghost" size="sm" disabled={disabled} onClick={()=>finish({value:draftRef.current,intent:'dismiss',restoreFocus:true})}>Cancel</Button><Button size="sm" disabled={disabled} onClick={apply}>Apply changes</Button></div>
       </Popover.Popup>
-    </Popover.Positioner></Popover.Portal>
+    </Popover.Positioner></UIPortal>
   </Popover.Root>;
 }

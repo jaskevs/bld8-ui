@@ -1,0 +1,3 @@
+/* SPDX-FileCopyrightText: 2026 Jaison
+ * SPDX-License-Identifier: MIT */
+.bui-auto-height-content{display:flow-root;min-width:0}.bui-animated-number{font-variant-numeric:tabular-nums}.bui-animated-list{position:relative;display:grid;gap:var(--bui-space-3,12px);padding:0;margin:0;list-style:none;min-width:0}.bui-animated-list>li{min-width:0;outline-offset:3px}.bui-animated-list-empty{color:var(--bui-muted);padding-block:12px}.bui-layout-transition{min-width:0}@media(prefers-reduced-motion:reduce){.bui-auto-height{height:auto!important}}

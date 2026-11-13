@@ -5,8 +5,8 @@ import {join, relative, resolve} from 'node:path';
 /** Resolve the public UI API once; consumers receive its actual module imports. */
 export function createSourceGraph(root) {
   const uiRoot=join(root,'packages/ui/src'),blockRoot=join(root,'packages/blocks/src');
-  const entry=join(uiRoot,'index.ts');
-  const program=ts.createProgram([entry],{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,jsx:ts.JsxEmit.ReactJSX,skipLibCheck:true});
+  const entry=join(uiRoot,'index.ts'),blockEntry=join(blockRoot,'index.ts');
+  const program=ts.createProgram([entry,blockEntry],{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext,moduleResolution:ts.ModuleResolutionKind.Bundler,jsx:ts.JsxEmit.ReactJSX,skipLibCheck:true});
   const checker=program.getTypeChecker(),api=checker.getSymbolAtLocation(program.getSourceFile(entry));
   if(!api)throw Error('UI entry point has no exported API');
   const exports=new Map(checker.getExportsOfModule(api).map(symbol=>{
@@ -17,6 +17,13 @@ export function createSourceGraph(root) {
     if(!resolve(filename).startsWith(resolve(uiRoot)))throw Error('UI export is outside its source package: '+symbol.name);
     return[symbol.name,relative(uiRoot,filename).replaceAll('\\','/').replace(/\.tsx?$/,'')];
   }));
+  const blockApi=checker.getSymbolAtLocation(program.getSourceFile(blockEntry));
+  if(!blockApi)throw Error('Blocks entry point has no exported API');
+  const blockExports=new Map(checker.getExportsOfModule(blockApi).map(symbol=>{
+    const declaration=(symbol.flags&ts.SymbolFlags.Alias?checker.getAliasedSymbol(symbol):symbol).declarations?.[0];
+    if(!declaration||!resolve(declaration.getSourceFile().fileName).startsWith(resolve(blockRoot)))throw Error('Cannot resolve block export '+symbol.name);
+    return [symbol.name,relative(blockRoot,declaration.getSourceFile().fileName).replaceAll('\\','/').replace(/\.tsx?$/,'')];
+  }));
   const filename=(kind,key)=>{
     if(!/^[a-z0-9-]+$/.test(key))throw Error('Unsupported source module '+key);
     const base=join(kind==='ui'?uiRoot:blockRoot,key);
@@ -26,7 +33,7 @@ export function createSourceGraph(root) {
   };
   const parse=source=>ts.createSourceFile('source.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
   function rewriteUiImports(source,prefix='../') {
-    const modules=new Set(),changes=[];
+    const modules=new Set(),blockModules=new Set(),changes=[];
     for(const node of parse(source).statements){
       if(!ts.isImportDeclaration(node)||!ts.isStringLiteral(node.moduleSpecifier))continue;
       const specifier=node.moduleSpecifier.text;
@@ -41,6 +48,16 @@ export function createSourceGraph(root) {
           groups.get(module).push(item.getText(node.getSourceFile()));
         }
         changes.push({start:node.getStart(),end:node.getEnd(),text:[...groups].map(([module,members])=>`import ${clause.isTypeOnly?'type ':''}{${members.join(',')}} from '${prefix}${module}';`).join('\n')});
+      }else if(specifier==='@bld8/blocks'){
+        const clause=node.importClause;
+        if(!clause?.namedBindings||!ts.isNamedImports(clause.namedBindings)||clause.name)throw Error('Use named imports for the BLD8 blocks API');
+        const groups=new Map();
+        for(const item of clause.namedBindings.elements){const name=(item.propertyName||item.name).text,module=blockExports.get(name);if(!module)throw Error('Unknown public block export '+name);blockModules.add(module);if(!groups.has(module))groups.set(module,[]);groups.get(module).push(item.getText(node.getSourceFile()));}
+        changes.push({start:node.getStart(),end:node.getEnd(),text:[...groups].map(([module,members])=>`import ${clause.isTypeOnly?'type ':''}{${members.join(',')}} from '${prefix}blocks/${module}';`).join('\n')});
+      }else if(specifier.startsWith('@bld8/blocks/')){
+        const module=specifier.slice('@bld8/blocks/'.length);
+        if(module!=='styles.css'){filename('block',module);blockModules.add(module);}
+        changes.push({start:node.moduleSpecifier.getStart(),end:node.moduleSpecifier.getEnd(),text:`'${prefix}blocks/${module}'`});
       }else if(specifier.startsWith('@bld8/ui/')){
         const module=specifier.slice('@bld8/ui/'.length);
         if(!['styles.css','tokens.css','tailwind.css'].includes(module)){filename('ui',module);modules.add(module);}
@@ -48,7 +65,7 @@ export function createSourceGraph(root) {
       }
     }
     for(const change of changes.sort((a,b)=>b.start-a.start))source=source.slice(0,change.start)+change.text+source.slice(change.end);
-    return{source,modules};
+    return{source,modules,blockModules};
   }
   function imports(source){
     const result=new Set();const walk=node=>{

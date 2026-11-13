@@ -12,6 +12,7 @@ import {validateManifest,byteHash,createReceipt,planReceiptUpdate,manifestHash,s
 import {localReader} from './check-source-updates.mjs';
 import {hasFullNotice,mitNotice} from './license-policy.mjs';
 import {readComponentExamples} from './prepare-component-examples.mjs';
+import {foundationExampleIds,checkInstalledFoundations} from './check-foundations.mjs';
 import {checkEditingExamples} from './check-control-editing.mjs';
 import {installedCompositionExampleIds,checkInstalledCompositionExamples} from './check-new-controls.mjs';
 import {installedAdoptionExampleIds,checkInstalledAdoptionExamples} from './check-adoption-controls.mjs';
@@ -101,7 +102,8 @@ const editingModules=[...new Set(installedEditingExamples.flatMap(item=>item.mod
 const compositionControls=['autocomplete','toolbar','alert-dialog','navigation-menu','preview-card'];
 const compositionExamplesAvailable=compositionControls.every(name=>originals.has(name+'.json'));
 const adoptionAvailable=originals.has('faceted-filter.json')&&originals.has('checkbox-group.json');
-const compositionExampleIds=[...installedCompositionExampleIds,...(adoptionAvailable?installedAdoptionExampleIds:[])];
+const foundationsAvailable=originals.has('resizable-panels.json')&&originals.has('donut-chart.json');
+const compositionExampleIds=[...(foundationsAvailable?foundationExampleIds:[]),...installedCompositionExampleIds,...(adoptionAvailable?installedAdoptionExampleIds:[])];
 const installedCompositionExamples=compositionExamplesAvailable?readComponentExamples(root).filter(item=>compositionExampleIds.includes(item.id)):[];
 if(compositionExamplesAvailable)assert.equal(installedCompositionExamples.length,compositionExampleIds.length,'All representative new controls and workflow examples must be available.');
 const compositionInstallItems=installedCompositionExamples.map(item=>item.registryName);
@@ -301,6 +303,7 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
         if(installedEditingExamples.length){await checkEditingExamples(page,id=>page.locator('[data-installed-editing="'+id+'"]'));await checkGridEditorRaceFixture(page);}
         if(installedCompositionExamples.length)await checkInstalledCompositionExamples(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
         if(adoptionAvailable)await checkInstalledAdoptionExamples(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
+        if(foundationsAvailable)await checkInstalledFoundations(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
         const files = page.getByRole('region', {name:'Installed file browser',exact:true});
         const tree = files.getByRole('tree',{name:'Workspace folders',exact:true});
         await expect(tree).toBeVisible();

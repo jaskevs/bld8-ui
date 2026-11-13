@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import {useCallback,useEffect,useId,useLayoutEffect,useMemo,useRef,useState,type ComponentProps,type ReactNode,type Ref} from 'react';
 import {Autocomplete as AutocompletePrimitive} from '@base-ui/react/autocomplete';
 
@@ -82,12 +83,12 @@ export function Autocomplete({label,options,value,defaultValue='',onValueChange,
         <AutocompletePrimitive.Input {...inputProps} ref={attach} id={id} autoComplete={autoComplete} aria-invalid={error?true:inputProps['aria-invalid']} aria-describedby={description} aria-busy={loading||undefined} data-density={density} className="bui-input bui-autocomplete-input" onBlur={event=>{inputProps.onBlur?.(event);if(!event.currentTarget.closest('.bui-autocomplete-input-group')?.contains(event.relatedTarget as Node|null))setOpen(false);}} onKeyDown={event=>{inputProps.onKeyDown?.(event);if(event.nativeEvent.isComposing||event.keyCode===229){event.preventBaseUIHandler();return;}if(!event.defaultPrevented&&event.key==='Tab')setOpen(false);}}/>
         {clearable&&!disabled&&!readOnly&&<AutocompletePrimitive.Clear aria-label={'Clear '+label} className="bui-autocomplete-clear"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><path d="m4 4 8 8m0-8-8 8"/></svg></AutocompletePrimitive.Clear>}
       </AutocompletePrimitive.InputGroup>
-      <AutocompletePrimitive.Portal><AutocompletePrimitive.Positioner className="bui-autocomplete-positioner" sideOffset={6} collisionPadding={12} disableAnchorTracking={!open} render={(positioner,state)=><div {...positioner}><AutocompletePopupShell open={open} side={state.side} unmount={()=>actions.current?.unmount()}>
+      <UIPortal render={AutocompletePrimitive.Portal}><AutocompletePrimitive.Positioner className="bui-autocomplete-positioner" sideOffset={6} collisionPadding={12} disableAnchorTracking={!open} render={(positioner,state)=><div {...positioner}><AutocompletePopupShell open={open} side={state.side} unmount={()=>actions.current?.unmount()}>
           {loading&&<AutocompletePrimitive.Status className="bui-autocomplete-status">{loadingText}</AutocompletePrimitive.Status>}
           <AutocompletePrimitive.Empty className="bui-autocomplete-empty">{loading?loadingText:emptyText}</AutocompletePrimitive.Empty>
           <AutocompletePrimitive.List className="bui-autocomplete-list" aria-label={label+' suggestions'}>{(group:{label:string;items:AutocompleteOption[]})=>group.label?<AutocompletePrimitive.Group key={group.label} items={group.items} className="bui-autocomplete-group"><AutocompletePrimitive.GroupLabel className="bui-autocomplete-group-label">{group.label}</AutocompletePrimitive.GroupLabel><AutocompletePrimitive.Collection>{renderItem}</AutocompletePrimitive.Collection></AutocompletePrimitive.Group>:group.items.map(renderItem)}</AutocompletePrimitive.List>
         </AutocompletePopupShell></div>}/>
-      </AutocompletePrimitive.Portal>
+      </UIPortal>
     </AutocompletePrimitive.Root>
     {hint&&<p className="bui-hint" id={id+'-hint'}>{hint}</p>}
     {error&&<p className="bui-error" id={id+'-error'} role="alert">{error}</p>}

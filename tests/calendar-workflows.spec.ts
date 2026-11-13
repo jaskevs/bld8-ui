@@ -108,6 +108,7 @@ for(const theme of ['light','dark'] as const)test('compact calendar selections k
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   for(const layout of [{width:1440,path:'/components?category=data'},{width:390,path:componentRoute},{width:320,path:componentRoute}]){
     await page.setViewportSize({width:layout.width,height:1100});await page.goto(layout.path);
+    if(layout.path.startsWith('/components?'))await page.locator('.component-card').filter({has:page.locator('.component-bottom a[href="/components/event-calendar"]')}).scrollIntoViewIfNeeded();
     const sample=calendar(page);await expect(sample.locator('[data-calendar-date="2026-11-02"]')).toBeVisible();
     if((await page.locator('html').getAttribute('data-ui-theme')??'light')!==theme)await page.getByRole('button',{name:'Switch to '+theme+' theme',exact:true}).click();
     await expect.poll(async()=>await page.locator('html').getAttribute('data-ui-theme')??'light').toBe(theme);await page.evaluate(()=>document.fonts.ready);

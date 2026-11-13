@@ -62,6 +62,12 @@ receipt first. Do not use current documentation as evidence that an older retain
 version has a new feature. [Source updates](https://ui.bld8.dev/releases) explain
 versioned registry URLs and review of local customisations.
 
+[Versioned documentation](https://ui.bld8.dev/docs/versions/development) separates
+the labelled development preview from a selected retained reference. Future
+releases from 0.4.0 include a manifest-verified API catalogue and documentation
+archive. Earlier immutable releases remain unchanged and report that retained
+documentation is unsupported. There is no fallback to current APIs.
+
 ## Use the local MCP server
 
 The optional read-only MCP server lets an editor or coding assistant discover
@@ -94,6 +100,10 @@ exact resources at `bld8://example/<id>`. Component, block and template kinds
 remain unchanged; examples are named compositions within their parent entries.
 Native React props are omitted by default to keep responses
 focused; request them when needed. No environment variables or API key are required.
+Use `list_versions` before requesting an exact source version. Every discovery
+tool accepts `version: "current"` or a retained version with a verified local
+cache. The separate `docs:sync` command populates that cache; MCP handlers remain
+read-only and do not fetch documents or install source.
 Restart the MCP connection after rebuilding to load the new catalogue. No hosted
 MCP service or published npm command is required for this local integration.
 Read [MCP setup and boundaries](mcp.md) for client examples and response limits.

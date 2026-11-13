@@ -10,6 +10,11 @@
       "version": "0.3.0",
       "tag": "v0.3.0",
       "title": "Core controls, complete forms and editable data workflows"
+    },
+    {
+      "version": "0.4.0",
+      "tag": "v0.4.0",
+      "title": "Reusable workspaces, scoped configuration and application motion"
     }
   ]
 }

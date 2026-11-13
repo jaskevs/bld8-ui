@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 // Adapted from shadcn/ui's Base UI composition. See SHADCN_LICENSE and docs/upstream.json.
 import { ContextMenu as Primitive } from '@base-ui/react/context-menu';
 import { Check, ChevronRight, Circle } from 'lucide-react';
@@ -18,9 +19,9 @@ export function ContextMenuTrigger(props:Primitive.Trigger.Props) {
 }
 type Styled<P> = Omit<P,'className'> & {className?:string};
 export function ContextMenuContent({className,side='right',align='start',sideOffset=4,...props}:Styled<Primitive.Popup.Props> & Pick<Primitive.Positioner.Props,'side'|'align'|'sideOffset'>) {
-  return <Primitive.Portal><Primitive.Positioner className="bui:fixed bui:z-90" sideOffset={sideOffset} side={side} align={align}>
+  return <UIPortal render={Primitive.Portal}><Primitive.Positioner className="bui:fixed bui:z-90" sideOffset={sideOffset} side={side} align={align}>
     <Primitive.Popup {...props} className={cn('bui-context-menu bui:min-w-52 bui:max-w-[calc(100vw-24px)] bui:rounded-panel bui:bg-background bui:p-1.5 bui:font-body bui:text-sm bui:text-foreground bui:shadow-panel',className)} />
-  </Primitive.Positioner></Primitive.Portal>;
+  </Primitive.Positioner></UIPortal>;
 }
 const itemClass='bui-context-item bui:relative bui:flex bui:min-h-10 bui:items-center bui:gap-3 bui:rounded-control bui:px-3 bui:py-2 bui:cursor-default bui:outline-none bui:select-none bui:data-highlighted:bg-surface bui:data-disabled:opacity-45 bui:data-disabled:pointer-events-none';
 export function ContextMenuItem({className,destructive=false,...props}:Styled<Primitive.Item.Props>&{destructive?:boolean}) {

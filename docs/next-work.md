@@ -1,3 +1,72 @@
+# Frozen 0.4.0 release preparation — 13 November 2026
+
+1. Finish the owner-authorised frozen 0.4.0 release. Review this metadata and
+   documentation-tracing diff, create the personal commit only during permitted
+   actual Melbourne hours, and satisfy the clean exact-commit verification guard.
+   Historical local 943-core/734-quality acceptance does not replace that receipt.
+2. Use the regular protected publication and deployment pathway. Confirm CI,
+   the immutable v0.4.0 tag and assets, version-matched documentation and starter
+   downloads, production routes and unchanged retained 0.2.0/0.3.0 bytes. These
+   publication and acceptance steps remain pending until independently verified.
+3. Keep the later 0.5.0 source separate and resume its acceptance/release review
+   after the frozen release. Gather real installation feedback when available;
+   do not report hypothetical users or device/assistive-technology sign-off.
+
+The owner request supersedes the earlier publication-authorisation limitation
+below. The historical implementation and acceptance record remains unchanged.
+
+---
+
+# Next work after application foundations — 13 November 2026
+
+The full 0.4.0 application-foundations batch is implemented locally; final integrated local acceptance passes. This is an ordered backlog, not a
+calendar commitment or publication request. Earlier plans remain below as history
+and do not re-open features delivered by this batch.
+
+## Delivered locally
+
+Reusable resource controllers/workspaces, adjustable panels/native scroll areas,
+optional virtualized and hierarchical data editing, scoped summaries, local theme
+and portal configuration, explicit locale/direction/message contracts, richer
+date/time entry, reusable application motion, additional charts and version-matched
+human/MCP references are implemented. Read handoff.md for the boundaries.
+
+Current authorities: 81 families, 136 complete examples, 18 blocks, 3 templates,
+388 registry items, 102 agent entries and 22 guides. No dependency was added.
+Playground expansion remains lower priority than adoption and control quality.
+
+## Ordered follow-up
+
+1. **Prepare publication only on an explicit owner request.** Review the final
+   diff, use actual personal commit times outside the restricted window, and run
+   the normal protected 0.4.0 release/deployment path. Verify the exact immutable
+   tag, manifest, documentation assets, production routes and retained 0.2.0/0.3.0
+   bytes. A local ZIP or passing build is not publication. No release/push action
+   is authorised by this backlog.
+2. **Gather actual installation and accessibility evidence.** Use a real first
+   install to theme a screen, connect a host callback and recover a failed save.
+   Triage reproducible feedback rather than inventing users or reports. When
+   available, review physical phone keyboard/zoom and assistive technology on
+   the time/date, grid, portal and resizing workflows. Outreach remains subject
+   to an explicit owner instruction; emulated engines are not device sign-off.
+3. **Extend translation and direction coverage from real workflows.** Audit the
+   current message map, long translated labels, chart/table captions, validation
+   and announcements. Add complete dictionaries and targeted RTL interaction
+   checks where required. Keep application content, civil-date/time conversion
+   and business errors host-owned. Existing scoped direction support is not a
+   blanket statement that every control or locale is fully supported.
+4. **Choose the next feature from that evidence.** Prefer a concrete consumer's
+   missing contract or interaction over more cosmetic variants. Keep the current
+   bounded supplied-data, host persistence, upload and concurrency contracts
+   explicit; broader service/windowing models need their own reviewed scope.
+
+The daily 08:00–17:00 Australia/Melbourne no-commit/push restriction, personal
+account isolation and existing hooks remain in force. No backdating, deferred
+release or global/company account change is included. UI work remains additional
+scope; preserve the Workbench dates, exam allocation and 135-hour baseline.
+
+---
+
 # Core workflows and release follow-up — 12 November 2026
 
 The authorised five-item batch is implemented and locally verified. Source

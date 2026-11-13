@@ -29,7 +29,8 @@
     "check:starter:uploads": "node scripts/check-upload-starter.mjs",
     "check:starters:data-workspace": "node scripts/check-data-workspace-starters.mjs",
     "check:licenses": "node scripts/check-licenses.mjs",
-    "test:licenses": "node --test scripts/check-licenses.test.mjs scripts/license-distributions.test.mjs"
+    "test:licenses": "node --test scripts/check-licenses.test.mjs scripts/license-distributions.test.mjs",
+    "docs:sync": "node scripts/sync-documentation.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

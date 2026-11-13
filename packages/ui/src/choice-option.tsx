@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import {useEffect,useLayoutEffect,useRef,useState,type ReactNode,type RefObject} from 'react';
 import {Combobox} from '@base-ui/react/combobox';
 import {Icon,type Option} from './core.js';
@@ -50,7 +51,7 @@ export function useChoiceValue<T>(value:T|undefined,defaultValue:T,onChange:((va
 interface ChoicePopupProps {open:boolean;actions:RefObject<{unmount:()=>void}|null>;onOpenChangeComplete?:(open:boolean)=>void;className?:string;id?:string;ariaBusy?:boolean;children:ReactNode}
 /** Outside-input comboboxes keep native input focus and never hide unrelated page controls. */
 export function ChoiceComboboxPopup(props:ChoicePopupProps){
-  return <Combobox.Portal><Combobox.Positioner className="bui-positioner" sideOffset={6} disableAnchorTracking={!props.open} render={(positioner,state)=><div {...positioner}><ChoicePopupShell {...props} side={state.side}/></div>}/></Combobox.Portal>;
+  return <UIPortal render={Combobox.Portal}><Combobox.Positioner className="bui-positioner" sideOffset={6} disableAnchorTracking={!props.open} render={(positioner,state)=><div {...positioner}><ChoicePopupShell {...props} side={state.side}/></div>}/></UIPortal>;
 }
 function ChoicePopupShell({open,actions,onOpenChangeComplete,children,side,className,id,ariaBusy}:ChoicePopupProps&{side:string}){
   const element=useRef<HTMLDivElement>(null),callback=useRef(onOpenChangeComplete);callback.current=onOpenChangeComplete;

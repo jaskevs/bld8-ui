@@ -5,6 +5,7 @@
 'use client';
 import { useEffect, useRef, useState, type ComponentProps, type FormEvent } from 'react';
 import { Alert } from './core.js';
+import {useUIConfig} from './ui-config.js';
 
 export type FormErrors<T> = Partial<Record<keyof T, string>>;
 export interface FormResult<T> { values?:T; fieldErrors?:FormErrors<T>; error?:string }
@@ -54,8 +55,9 @@ export interface FormErrorSummaryProps {
   onFocusField?:(name:string)=>void;
 }
 export function FormErrorSummary({error,errors,fieldIds,fieldLabels,formId,onFocusField}:FormErrorSummaryProps) {
+  const {message}=useUIConfig();
   const messages=Object.entries(errors??{}).filter((entry):entry is [string,string]=>!!entry[1]);
-  return error||messages.length?<div className="bui-form-error-summary"><Alert title={error||'Check the highlighted fields.'} tone="danger" live>{messages.length>0&&<ul>{messages.map(([name,message])=><li key={name}><a href={'#'+encodeURIComponent(fieldIds?.[name]??name)} onClick={event=>{
+  return error||messages.length?<div className="bui-form-error-summary"><Alert title={error||message('formErrorTitle','Check the highlighted fields.') } tone="danger" live>{messages.length>0&&<ul>{messages.map(([name,message])=><li key={name}><a href={'#'+encodeURIComponent(fieldIds?.[name]??name)} onClick={event=>{
     event.preventDefault();if(onFocusField){onFocusField(name);return;}
     const document=event.currentTarget.ownerDocument,owner=formId?document.getElementById(formId):event.currentTarget.closest('form');
     const explicit=fieldIds?.[name]?document.getElementById(fieldIds[name]):null;

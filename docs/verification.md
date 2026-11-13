@@ -1,3 +1,78 @@
+# Frozen 0.4.0 release preparation — 13 November 2026
+
+Publication is owner-authorised for frozen 0.4.0 only. The recorded local
+application-foundations acceptance below remains 943 core cases and 734
+browser-quality cases. It predates this release-preparation diff and is not an
+exact-commit push receipt, a new CI result or evidence of a deployed release.
+
+This preparation adds 0.4.0 to the retained-version catalogue, requests it in
+publication intent and backports only bounded documentation tracing. The
+0.4.0/unreleased descriptor and all earlier retained asset bytes stay unchanged.
+The exact committed revision must still pass the local verification guard and
+regular CI before publication and production promotion. Verify the final tag,
+manifest and documentation/starter assets publicly, and compare retained
+0.2.0/0.3.0 hashes. No new passing counts or publication claims are recorded here.
+
+---
+
+# Application foundations acceptance — 13 November 2026
+
+Source is **0.4.0/unreleased**. The completed working tree passed local acceptance
+in the pinned Linux Playwright image under Node 22.22.0. This is working-tree
+evidence, not a clean committed-revision push receipt or a deployed release.
+
+## Final checks
+
+- Production build, all workspace types and quality-suite types pass. Generated
+  authorities contain **81 families, 136 complete examples, 18 blocks, 3 templates,
+  388 registry items, 102 agent entries and 22 guides**. No dependency was added.
+- **943 core cases pass (7.2m).** This includes native forms, pointer-safe time
+  feedback, unavailable date/range entry, narrow LTR/RTL navigation, scoped portal
+  inheritance, resource recovery, virtual editor retention, simultaneous tree
+  child responses, motion, chart geometry and complete-example accessibility.
+- **734 browser-quality cases pass (13.2m).** All 20 approved screenshots
+  match without baseline updates. Coarse-pointer checks and normal-motion flows
+  run in Chromium, Firefox and WebKit, light/dark, desktop/phone configurations.
+- Actual shadcn registry source installs pass in clean Next.js and custom-alias
+  Vite applications, including the 16 new installed foundation workflows. The
+  installed registry graph contains 179 items, including required block modules.
+- Eight independent Vite starters build. Actual themed Next.js/Vite downloads
+  build and pass their browser interactions. Both HTTP Data Workspace references
+  build and exercise atomic revision-checked save, conflict and retry behavior.
+- All **38 licence fixtures** and generated distribution integrity pass: 162
+  reviewed dependencies, 12 complete notices, registry closures, every starter,
+  fonts, SVGs, human/agent source and release manifests.
+- Versioned documentation's 17 Node fixtures and 12 actual stdio MCP cases pass
+  within the core suite. They cover immutable caches, bounded transport, version
+  selection, read-only tool boundaries and filesystem-write-denied readers.
+- The local draft candidate has **478 artifacts**, all byte hashes
+  verified. Its documentation catalogue and offline ZIP match the source-graph
+  identity and each other; archive CRCs, entry/raw-byte limits and notices pass.
+  Draft source snapshot: 2d9a42f17cd526c0fc77aeafb425861f6812b7a17f806dd6cd6dc5265cef3c49. It remains unreleased with no
+  fabricated source revision. Retained 0.2.0/0.3.0 and publish intent are unchanged.
+- Six production preview captures were inspected across desktop and narrow
+  inventory, panels, calendar, charts, motion and a scoped RTL dialog. The native
+  development preview is refreshed; overview and representative routes return 200.
+
+The calendar's unintended default inset was narrowed to opt-in dropdown navigation.
+A real TimePicker defect moved Submit between pointerdown/up when blur inserted
+an error. Disclosure now waits through native pointer activation; validity stays
+synchronous and reset/Cancel clear pending feedback. Their original visual, focus
+and native-invalid assertions pass. No timeout, tolerance or baseline was relaxed.
+
+## Evidence and boundaries
+
+Logs and candidate audit are in
+.local/core-plan-linux/e7fdd3fe-aee6-461d-a535-e793ac6cebfd/.
+.local/foundations-0.4-acceptance.json records the final changed-source digest and
+individual stage logs. The normal exact-clean-commit pre-push guard is separate.
+
+No commit, push, deployment or immutable 0.4.0 publication was performed. Physical
+phone keyboard/zoom, assistive technology, external installation feedback and
+performance certification are not established by these automated checks.
+
+---
+
 ## Dependency-free release preflight — 12 November 2026
 
 Commit d2e30c4 passed all 877 core cases and 650 browser-quality cases in GitHub

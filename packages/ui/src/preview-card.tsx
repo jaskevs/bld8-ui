@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import { forwardRef, type CSSProperties, type ReactNode, type Ref } from 'react';
 import { PreviewCard as Primitive } from '@base-ui/react/preview-card';
 import { cx } from './core.js';
@@ -29,5 +30,5 @@ export interface PreviewCardPopupProps extends Omit<Primitive.Positioner.Props, 
 }
 /** Visual preview only: no buttons, inputs or unique instructions. Popup content is hidden from assistive technology so the link keeps its reading context. */
 export const PreviewCardPopup = forwardRef<HTMLDivElement, PreviewCardPopupProps>(function PreviewCardPopup({ children, className, style, width = 304, positionerClassName, positionerRef, portalContainer, popupProps, sideOffset = 8, collisionPadding = 12, align = 'start', ...positionerProps }, ref) {
-  return <Primitive.Portal container={portalContainer}><Primitive.Positioner {...positionerProps} ref={positionerRef} align={align} sideOffset={sideOffset} collisionPadding={collisionPadding} className={cx('bui-preview-positioner', positionerClassName)}><Primitive.Popup {...popupProps} ref={ref} aria-hidden="true" className={cx('bui-preview-popup', className)} style={{ width, ...style }}><Primitive.Viewport className="bui-preview-viewport">{children}</Primitive.Viewport></Primitive.Popup></Primitive.Positioner></Primitive.Portal>;
+  return <UIPortal render={Primitive.Portal} container={portalContainer}><Primitive.Positioner {...positionerProps} ref={positionerRef} align={align} sideOffset={sideOffset} collisionPadding={collisionPadding} className={cx('bui-preview-positioner', positionerClassName)}><Primitive.Popup {...popupProps} ref={ref} aria-hidden="true" className={cx('bui-preview-popup', className)} style={{ width, ...style }}><Primitive.Viewport className="bui-preview-viewport">{children}</Primitive.Viewport></Primitive.Popup></Primitive.Positioner></UIPortal>;
 });

@@ -40,11 +40,12 @@ export function assertPublisherContext(env){
 }
 export async function publicReleaseAcceptance(version,manifest,{fetcher=fetch,pause=delay}={}){
   const selected=['manifest.json','r/button.json','r/outline.json','downloads/outline-vite.zip','capture-installation.mjs'];
+  for(const path of ['docs/catalog.json','documentation.zip'])if(manifest.artifacts.some(item=>item.path===path))selected.push(path);
   for(const path of selected){
     let passed=false;
     for(let attempt=0;attempt<6;attempt++){
       const response=await fetcher(`https://github.com/${releaseRepository}/releases/download/v${version}/${releaseAssetName(path)}`,{headers:{'User-Agent':'bld8-release-acceptance','Cache-Control':'no-cache'},signal:AbortSignal.timeout(60000)});
-      if(response.ok){const bytes=Buffer.from(await response.arrayBuffer());if(path==='manifest.json'){const value=JSON.parse(bytes.toString('utf8'));passed=value.snapshot===manifest.snapshot;}else passed=byteHash(bytes)===manifest.artifacts.find(item=>item.path===path)?.sha256;if(passed)break;}
+      if(response.ok){const bytes=Buffer.from(await response.arrayBuffer());if(path==='manifest.json'){const value=JSON.parse(bytes.toString('utf8'));passed=value.snapshot===manifest.snapshot;}else passed=byteHash(bytes)===manifest.artifacts.find(item=>item.path===path)?.sha256;if(passed&&path==='docs/catalog.json'){const {validateDocumentation}=await import('./documentation-versions.mjs');validateDocumentation(manifest,bytes,{version});}if(passed)break;}
       if(attempt<5)await pause(5000);
     }
     if(!passed)throw Error('Public immutable artifact could not be verified: '+path);

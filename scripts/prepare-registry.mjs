@@ -44,6 +44,7 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
 }
 add('bld8-block-styles', 'BLD8 block styles', [file('registry/bld8/blocks/LICENSE',read('packages/blocks/LICENSE'),'@ui/bld8/blocks/LICENSE','registry:file'),file('registry/bld8/blocks/styles.css', licenseCode(read('packages/blocks/src/styles.css'),{standalone:true,sourcePath:'packages/blocks/src/styles.css',root}), '@ui/bld8/blocks/styles.css','registry:file')],[],['bld8-styles']);
 const groups = {
+  'ui-motion':['animated-list','animated-number','auto-height','layout-transition'],'donut-chart':['donut-chart'],sparkline:['sparkline'],'stacked-bar-chart':['stacked-bar-chart'],'resizable-panels':['resizable-panels'],'scroll-area':['scroll-area'],
   'faceted-filter':['faceted-filter'],fieldset:['fieldset'],'checkbox-group':['checkbox-group'],
   autocomplete:['autocomplete'], toolbar:['toolbar'], 'alert-dialog':['alert-dialog'], 'navigation-menu':['navigation-menu'], 'preview-card':['preview-card'],
   'toggle-group':['toggle-group'], 'tag-input':['tag-input'], 'range-slider':['range-slider'], 'otp-input':['otp-input'],
@@ -87,7 +88,7 @@ add('react-hook-form-example','React Hook Form example',[file('registry/bld8/exa
 // the CLI UI transformer drops leading licence comments when rewriting modules.
 for(const example of readComponentExamples(root)) {
   const rewritten=graph.rewriteUiImports(example.source,'../');
-  add(example.registryName,example.title,[file('registry/bld8/examples/'+example.id+'.tsx',rewritten.source,'@ui/bld8/examples/'+example.id+'.tsx','registry:file')],[],[...rewritten.modules].map(module=>'bld8-'+module),'registry:block');
+  add(example.registryName,example.title,[file('registry/bld8/examples/'+example.id+'.tsx',rewritten.source,'@ui/bld8/examples/'+example.id+'.tsx','registry:file')],[],[...rewritten.modules].map(module=>'bld8-'+module).concat([...(rewritten.blockModules??[])].map(module=>'bld8-block-'+module)),'registry:block');
   const item=items.at(-1);
   Object.assign(item,{description:example.description,provenance:example.provenance,notices:example.notices});
   item.docs='Complete React client module. Import its '+example.exportName+' export from your configured UI directory under bld8/examples/'+example.id+'.tsx. Keep included notices; use UIProvider from bld8/overlays when the example includes toast or overlay workflows. Documentation: '+origin+example.documentationPath;

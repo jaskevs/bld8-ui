@@ -10,7 +10,7 @@ export function readComponentExamples(root=defaultRoot) {
   const read=path=>readFileSync(join(root,path),'utf8');
   const components=readExportLiteral(read('apps/docs/src/lib/catalog.ts'),'components');
   const families=new Set(components.map(item=>item.id)),ids=new Set(),graph=createSourceGraph(root),examples=[];
-  for(const [family,authority] of [['basic','basicExamples'],['choice','choiceExamples'],['menu','menuExamples'],['field','fieldExamples'],['grid','gridExamples'],['date-field','dateFieldExamples'],['tree-select','treeSelectExamples'],['grid-editor','gridEditorExamples'],['autocomplete','autocompleteExamples'],['toolbar-alert','toolbarAlertExamples'],['navigation-preview','navigationPreviewExamples'],['workflow','workflowExamples'],['facet','facetExamples'],['form-workflow','formWorkflowExamples'],['async-form','asyncFormExamples'],['grid-bulk','gridBulkExamples']]) {
+  for(const [family,authority] of [['basic','basicExamples'],['choice','choiceExamples'],['menu','menuExamples'],['field','fieldExamples'],['grid','gridExamples'],['date-field','dateFieldExamples'],['tree-select','treeSelectExamples'],['grid-editor','gridEditorExamples'],['autocomplete','autocompleteExamples'],['toolbar-alert','toolbarAlertExamples'],['navigation-preview','navigationPreviewExamples'],['workflow','workflowExamples'],['facet','facetExamples'],['form-workflow','formWorkflowExamples'],['async-form','asyncFormExamples'],['motion','motionExamples'],['analytics-chart','analyticsChartExamples'],['advanced-data','advancedDataExamples'],['scoped-date-time','scopedDateTimeExamples'],['resource-workspace','resourceWorkspaceExamples'],['grid-bulk','gridBulkExamples']]) {
     const file=`apps/docs/src/lib/${family}-examples.ts`;
     if(!existsSync(join(root,file))) {if(!['basic','choice','menu','field'].includes(family))continue;throw Error('Missing example authority: '+file);}
     for(const item of readExportLiteral(read(file),authority)) {
@@ -29,7 +29,7 @@ export function readComponentExamples(root=defaultRoot) {
       if(!declaration||declaration.parameters.some(parameter=>!parameter.questionToken&&!parameter.initializer))throw Error('Example needs an exported, no-prop component: '+item.id);
       const exportName=declaration.modifiers.some(mod=>mod.kind===ts.SyntaxKind.DefaultKeyword)?'default':declaration.name.text;
       const rewritten=graph.rewriteUiImports(source,'@/components/ui/bld8/');
-      ids.add(item.id);examples.push({...item,...licenseMetadata({sourcePaths:[file],root}),source,family,documentationPath:`/components/${item.componentId}/examples/${item.id}`,registryName:`example-${item.id}`,exportName,preview:item.preview??'live',registrySource:rewritten.source,modules:[...rewritten.modules].sort()});
+      ids.add(item.id);examples.push({...item,...licenseMetadata({sourcePaths:[file],root}),source,family,documentationPath:`/components/${item.componentId}/examples/${item.id}`,registryName:`example-${item.id}`,exportName,preview:item.preview??'live',registrySource:rewritten.source,modules:[...rewritten.modules].sort(),blockModules:[...(rewritten.blockModules??[])].sort()});
     }
   }
   for(const component of components)if(!examples.some(item=>item.componentId===component.id))throw Error('Missing complete example: '+component.id);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal} from './ui-config.js';
 import {useCallback,useEffect,useId,useMemo,useRef,useState,type FocusEventHandler,type KeyboardEvent,type ReactNode,type Ref} from 'react';
 import {Popover} from '@base-ui/react/popover';
 import {ChevronDown,ChevronLeft,ChevronRight,Check,X} from 'lucide-react';
@@ -100,7 +101,7 @@ export function Cascader<T extends CascaderNode=CascaderNode>({label,loadOptions
       <div className="bui-cascader-control"><Popover.Trigger render={<Button id={id} ref={node=>{trigger.current=node;if(typeof inputRef==='function')inputRef(node);else if(inputRef)inputRef.current=node;}} variant="secondary" className="bui-cascader-trigger" disabled={disabled} data-density={density} aria-labelledby={id+'-label'} aria-describedby={described} aria-invalid={!!error||undefined} onBlur={onBlur}><span id={id+'-value'}>{text}</span><Icon icon={ChevronDown} size={16}/></Button>}/>
         {clearable&&values.length>0&&<IconButton icon={X} label={'Clear '+label.toLowerCase()} variant="ghost" className="bui-cascader-clear" disabled={disabled} onClick={()=>{setCommitted([]);setOpened(false);requestAnimationFrame(()=>trigger.current?.focus({preventScroll:true}));}}/>}
       </div>
-      <Popover.Portal><Popover.Positioner sideOffset={6} className="bui-positioner"><Popover.Popup ref={popup} onFocusCapture={event=>{popupFocus.current=event.target as HTMLElement;}} onPointerDownCapture={()=>{actionOrigin.current=null;}} onKeyDownCapture={()=>{actionOrigin.current=null;}} className="bui-popup bui-cascader-popup" initialFocus={search} finalFocus={trigger} aria-busy={state.loading||state.loadingMore||undefined}>
+      <UIPortal render={Popover.Portal}><Popover.Positioner sideOffset={6} className="bui-positioner"><Popover.Popup ref={popup} onFocusCapture={event=>{popupFocus.current=event.target as HTMLElement;}} onPointerDownCapture={()=>{actionOrigin.current=null;}} onKeyDownCapture={()=>{actionOrigin.current=null;}} className="bui-popup bui-cascader-popup" initialFocus={search} finalFocus={trigger} aria-busy={state.loading||state.loadingMore||undefined}>
         <Popover.Title className="bui-sr-only">{label} choices</Popover.Title>
         <div className="bui-cascader-navigation"><Button className="bui-cascader-back" variant="ghost" size="sm" leadingIcon={ChevronLeft} disabled={!browse.length} aria-label={'Back to '+(browse.at(-2)?.label??'all options')} onClick={()=>navigate(browse.slice(0,-1),browse.at(-1)?.value??null)}>Back</Button><nav aria-label={label+' path'}><Button variant="ghost" size="sm" onClick={()=>navigate([])}>All options</Button>{browse.map((node,index)=><span key={node.value}><Icon icon={ChevronRight} size={12}/><Button variant="ghost" size="sm" onClick={()=>navigate(browse.slice(0,index+1))}>{node.label}</Button></span>)}</nav></div>
         <label htmlFor={id+'-search'} className="bui-label">Search this level</label><Input id={id+'-search'} ref={search} type="search" aria-label={'Search '+label.toLowerCase()+' choices'} value={query} placeholder="Find an option…" maxLength={1000} onChange={event=>{pendingFocus.current=null;actionOrigin.current=null;setQuery(event.target.value.slice(0,1000));setActive(null);}} onKeyDown={event=>{if(event.key==='ArrowDown'||event.key==='ArrowUp'||event.key==='Enter'){const target=event.key==='ArrowUp'?enabled.at(-1):enabled[0];if(target){event.preventDefault();focusValue(target.value);}}}}/>
@@ -111,7 +112,7 @@ export function Cascader<T extends CascaderNode=CascaderNode>({label,loadOptions
         <Reveal open={!!state.error}><div className="bui-cascader-feedback"><p className="bui-error" role="alert">{state.error}</p><Button ref={choicesRetry} variant="secondary" size="sm" onClick={event=>{actionOrigin.current=event.currentTarget;wasLoading.current=true;state.retry();}}>Retry {label.toLowerCase()} choices</Button></div></Reveal>
         {state.hasMore&&!state.error&&<Button className="bui-cascader-more" variant="ghost" size="sm" loading={state.loadingMore} onClick={event=>{actionOrigin.current=event.currentTarget;wasLoading.current=true;state.loadMore();}}>Load more {label.toLowerCase()}</Button>}
         {state.limitReached&&<p className="bui-hint">Narrow this level's search to see more choices.</p>}
-      </Popover.Popup></Popover.Positioner></Popover.Portal>
+      </Popover.Popup></Popover.Positioner></UIPortal>
     </Popover.Root>
     {name&&<input type="hidden" name={name} value={JSON.stringify(values)} disabled={disabled}/>}
     {hint&&<p id={id+'-hint'} className="bui-hint">{hint}</p>}{error&&<p id={id+'-error'} className="bui-error" role="alert">{error}</p>}

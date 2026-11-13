@@ -6,6 +6,19 @@ React components, reusable blocks and complete interface examples. Built with Ba
 
 [Core component guide](docs/core-components.md) · [Developer and coding-agent guide](docs/agents.md) · [Documentation index](https://ui.bld8.dev/llms.txt) · [Structured catalogue](https://ui.bld8.dev/agent/catalog.json)
 
+## Development 0.4.0
+
+This checkout adds generic resource workspaces, scoped theme/locale/direction
+configuration, editable time fields and calendar navigation, large editable grids,
+adjustable layouts, additional charts and reusable application motion. These APIs
+are unreleased; retained 0.3.0 keeps its published source.
+
+[Resource workflows](docs/resource-workspace.md) · [Scoped interfaces and dates](docs/scoped-interface-contracts.md) · [Large and hierarchical data](docs/advanced-data.md) · [Motion and charts](docs/motion-and-charts.md)
+
+Future retained releases from 0.4.0 include hashed API/example documentation and
+an offline archive. Human and MCP requests select an exact source version;
+versions without a documentation snapshot do not fall back to newer APIs.
+
 ## Install source
 
 In a React 19 application with shadcn initialised:
@@ -58,7 +71,7 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 72 component families, 117 complete named examples, eighteen blocks and three templates. Families and examples are counted separately.
+- 81 component families, 136 complete named examples, eighteen blocks and three templates. Families and examples are counted separately.
 - A searchable example catalogue with exact URLs, real previews and individual source registry installs. Example modules follow the same lean dependency graph in Next.js and Vite.
 - FacetedFilter, Fieldset and CheckboxGroup with native form contracts; linked error summaries, async read-only/reset parity and atomic DataGrid bulk edits.
 - Autocomplete, Toolbar, AlertDialog, NavigationMenu and PreviewCard compositions on the installed Base UI primitives, with explicit keyboard, focus and recovery contracts.

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
+import {UIPortal,useUIConfig} from './ui-config.js';
 import {useEffect,useRef,useState,type ReactElement,type ReactNode} from 'react';
 import {AlertDialog as PrimitiveAlertDialog} from '@base-ui/react/alert-dialog';
 import {TriangleAlert} from 'lucide-react';
@@ -47,7 +48,8 @@ interface Confirmation {controller:AbortController;attempt:number;resetKey:unkno
  * Base UI supplies alertdialog semantics, modal focus containment, Escape and focus
  * return. Outside pointer presses do not dismiss this alert dialog.
  */
-export function AlertDialog({trigger,title,description,confirmLabel,cancelLabel='Cancel',pendingLabel='Working…',destructive=false,confirmDisabled=false,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,onConfirm,onCancel,resetKey,errorMessage,children,finalFocus,className}:AlertDialogProps) {
+export function AlertDialog({trigger,title,description,confirmLabel,cancelLabel,pendingLabel='Working…',destructive=false,confirmDisabled=false,open,defaultOpen=false,onOpenChange,onOpenChangeComplete,onConfirm,onCancel,resetKey,errorMessage,children,finalFocus,className}:AlertDialogProps) {
+  const {message}=useUIConfig();
   const [internalOpen,setInternalOpen]=useState(defaultOpen),[pending,setPending]=useState(false),[error,setError]=useState<string|null>(null),[attempt,setAttempt]=useState(0);
   const isOpen=open??internalOpen,cancel=useRef<HTMLButtonElement>(null),confirm=useRef<HTMLButtonElement>(null),active=useRef<Confirmation|null>(null),attempts=useRef(0),mounted=useRef(true);
   const latest=useRef({isOpen,resetKey});latest.current={isOpen,resetKey};
@@ -79,14 +81,14 @@ export function AlertDialog({trigger,title,description,confirmLabel,cancelLabel=
   };
   return <PrimitiveAlertDialog.Root open={isOpen} onOpenChange={(next)=>{changeOpen(next);if(!next)onCancel?.();}} onOpenChangeComplete={onOpenChangeComplete}>
     {trigger&&<PrimitiveAlertDialog.Trigger render={trigger}/>}
-    <PrimitiveAlertDialog.Portal>
+    <UIPortal render={PrimitiveAlertDialog.Portal}>
       <PrimitiveAlertDialog.Backdrop className="bui-alert-dialog-backdrop"/>
       <PrimitiveAlertDialog.Popup className={cx('bui-alert-dialog',className)} initialFocus={cancel} finalFocus={finalFocus} aria-busy={pending||undefined}>
         <div className="bui-alert-dialog-heading"><span className="bui-alert-dialog-mark" data-destructive={destructive||undefined} aria-hidden="true"><Icon icon={TriangleAlert} size={21}/></span><div><PrimitiveAlertDialog.Title className="bui-alert-dialog-title">{title}</PrimitiveAlertDialog.Title><PrimitiveAlertDialog.Description className="bui-alert-dialog-description">{description}</PrimitiveAlertDialog.Description></div></div>
         {children&&<div className="bui-alert-dialog-body">{typeof children==='function'?children({pending,error,attempt,clearError:()=>setError(null)}):children}</div>}
         <div className="bui-alert-dialog-feedback">{error&&<p className="bui-alert-dialog-error" role="alert">{error}</p>}{pending&&<p className="bui-alert-dialog-status" role="status">{pendingLabel} You can cancel this request.</p>}</div>
-        <div className="bui-alert-dialog-actions"><PrimitiveAlertDialog.Close render={<Button ref={cancel} variant="secondary">{cancelLabel}</Button>}/><Button ref={confirm} variant={destructive?'danger':'primary'} disabled={confirmDisabled} loading={pending} onClick={()=>{void runConfirm();}}>{pending?pendingLabel:confirmLabel}</Button></div>
+        <div className="bui-alert-dialog-actions"><PrimitiveAlertDialog.Close render={<Button ref={cancel} variant="secondary">{cancelLabel??message('cancel','Cancel')}</Button>}/><Button ref={confirm} variant={destructive?'danger':'primary'} disabled={confirmDisabled} loading={pending} onClick={()=>{void runConfirm();}}>{pending?pendingLabel:confirmLabel}</Button></div>
       </PrimitiveAlertDialog.Popup>
-    </PrimitiveAlertDialog.Portal>
+    </UIPortal>
   </PrimitiveAlertDialog.Root>;
 }

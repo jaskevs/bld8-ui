@@ -41,6 +41,7 @@ formats differ; the JSON above shows the common `mcpServers` structure.
 
 | Tool | Purpose |
 | --- | --- |
+| `list_versions` | Show current development source and which retained documentation versions are verified, unsupported or missing locally. |
 | `list_components` | List component, block or template entries; filter by kind/category. |
 | `search_components` | Search names, descriptions and behavior notes with plain text. |
 | `get_component` | Read an exact entry's overview, API properties, example or all sections. |
@@ -83,8 +84,36 @@ the host; read each example's notes before connecting a service.
 
 ## Source and access boundaries
 
-The process reads one generated file:
-`apps/docs/public/agent/catalog.json`. Generation takes metadata, prop tables and
+All discovery tools accept an optional `version`. `version: "current"` reads
+the moving catalogue and is the default. An exact version reads only that
+retained version's verified local cache. Calls do not change a global selection.
+Unknown, unsupported, missing or invalid versions return an error without using
+current APIs instead. Existing resource URIs describe current source; use tools
+with an explicit version for retained APIs and complete examples.
+
+Version-matched documentation starts with future source releases from 0.4.0.
+The immutable 0.2.0 and 0.3.0 releases did not ship these assets and remain
+unsupported by retained-documentation selection. Their source is unchanged.
+After a supporting version is published, populate the local cache separately:
+
+```sh
+npm run docs:sync -- --version 0.4.0
+```
+
+The command accepts an allowlisted source version, not an origin or file path.
+It downloads only the fixed manifest and catalogue, verifies byte digests, source
+revision and source-graph identity, then atomically saves two files in the
+checkout's ignored cache. Redirects, transfer sizes and time are bounded;
+different existing bytes are never overwritten. Restart the MCP connection
+afterwards. MCP handlers perform no network requests or cache writes.
+
+[Versioned documentation](https://ui.bld8.dev/docs/versions/development) provides
+a human reference with a labelled development preview. Retained pages verify
+their selected source; current interactive demos are not historical runtimes.
+
+For current source the process reads `apps/docs/public/agent/catalog.json`.
+Retained versions load only their verified two-file cache at startup.
+Generation takes metadata, prop tables and
 allowlisted guides from the same repository build as the website. It never
 accepts file paths, external URLs, project roots or shell commands from a tool
 call, and it performs no network requests, writes or installations. Tool metadata
