@@ -5,7 +5,7 @@ test('editable dates preserve native form values and reset through normal and re
   await openQualityPage(page,'/components/date-picker',info);
   await checkDateEntryExamples(page,id=>example(page,id));await expectContained(page);
   const field=example(page,'date-entry-lifecycle'),opener=field.getByRole('button',{name:'Open review date calendar',exact:true});
-  await opener.click();const popup=page.getByRole('dialog',{name:'Review date',exact:true});await expect(popup).toBeVisible();
+  await opener.click();const popup=page.getByRole('dialog',{name:'Review date',exact:true});await expect(popup).toBeVisible();const initialDay=popup.locator('.bui-calendar-day-button[tabindex="0"]:not(:disabled):not([aria-disabled="true"])');await expect(initialDay).toBeFocused();await initialDay.press('ArrowRight');await expect(popup.locator('.bui-calendar-day-button:focus')).toHaveCount(1);await expect(field.getByRole('textbox',{name:'Review date',exact:true})).toHaveValue('2026-11-12');
   expect(await popup.evaluate(element=>getComputedStyle(element).transitionDuration.split(',').some(value=>parseFloat(value)>0))).toBe(true);
   await page.emulateMedia({reducedMotion:'reduce'});
   expect(await popup.evaluate(element=>getComputedStyle(element).transitionDuration.split(',').every(value=>parseFloat(value)===0))).toBe(true);

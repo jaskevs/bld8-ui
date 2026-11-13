@@ -154,10 +154,10 @@ export function DatePicker({label,value,defaultValue=null,onValueChange,name,for
         {clearable&&!readOnly&&(!!key||editable&&!!text)&&<IconButton icon={X} label={'Clear '+label.toLowerCase()} size="sm" variant="ghost" className={editable?'bui-date-clear':undefined}
           disabled={calendar.disabled} onClick={()=>{commit(null);setOpen(false);(editable?input.current:trigger.current)?.focus({preventScroll:true});}}/>}
       </div>
-      <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" data-month-count={calendar.numberOfMonths??1}
+      <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" data-month-count={calendar.numberOfMonths??1} initialFocus={()=>popup.current?.querySelector<HTMLButtonElement>('.bui-calendar-day-button[tabindex="0"]:not(:disabled):not([aria-disabled="true"])')??popup.current}
         finalFocus={()=>closeReason.current==='outside-press'||closeReason.current==='focus-out'?false:editable?input.current:trigger.current}>
         <Popover.Title className="bui-sr-only">{label}</Popover.Title>
-        <Calendar {...calendar} label={label} value={parseDateValue(text)??selectedDate??undefined} autoFocus onValueChange={date=>{commit(date??null);setOpen(false);}}/>
+        <Calendar {...calendar} label={label} value={parseDateValue(text)??selectedDate??undefined} autoFocus={false} onValueChange={date=>{commit(date??null);setOpen(false);}}/>
       </Popover.Popup></Popover.Positioner></UIPortal>
     </Popover.Root>
     {required&&!editable&&<span className="bui-sr-only" id={id+'-required'}>Required. Choose a date before submitting.</span>}
@@ -251,13 +251,13 @@ export function DateRangePicker({label,value,defaultValue=null,onValueChange,nam
         {clearable&&!readOnly&&(!!selected?.from||editable&&(!!texts[0]||!!texts[1]))&&<IconButton icon={X} label={'Clear '+label.toLowerCase()} size="sm" variant="ghost" className={editable?'bui-date-range-clear':undefined}
           disabled={calendar.disabled} onClick={()=>{if(explicit){setDraft(null);setTexts(['','']);setTouched(false);if(!editable)setOpen(true);}else{commit(null);setOpen(false);}(editable?start.current:trigger.current)?.focus({preventScroll:true});}}/>}
       </div>
-      <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" data-month-count={calendar.numberOfMonths??1} finalFocus={()=>closeReason.current==='outside-press'||closeReason.current==='focus-out'?false:editable?start.current:trigger.current}>
+      <UIPortal render={Popover.Portal}><Popover.Positioner className="bui-positioner" sideOffset={8}><Popover.Popup ref={popup} className="bui-popup bui-calendar-popup" data-month-count={calendar.numberOfMonths??1} initialFocus={()=>popup.current?.querySelector<HTMLButtonElement>('.bui-calendar-day-button[tabindex="0"]:not(:disabled):not([aria-disabled="true"])')??popup.current} finalFocus={()=>closeReason.current==='outside-press'||closeReason.current==='focus-out'?false:editable?start.current:trigger.current}>
         <Popover.Title className="bui-sr-only">{label}</Popover.Title>
         {presets.length>0&&<div className="bui-date-presets" role="group" aria-label={label+' presets'}>{presets.map(preset=>{
           const invalid=preset.value&&(!dateOrNull(preset.value.from)||!dateOrNull(preset.value.to))?'Choose both start and end dates.':rangeEntryMessage(formatDateValue(preset.value?.from),formatDateValue(preset.value?.to),{required,...calendar});
           return <Button key={preset.id} size="sm" variant="ghost" disabled={!!invalid} title={invalid||undefined} aria-pressed={rangeKey(preset.value)===draftKey} onClick={()=>{updateDraft(preset.value);setCalendarEpoch(epoch=>epoch+1);}}>{preset.label}</Button>;
         })}</div>}
-        <Calendar {...calendar} key={calendarEpoch} defaultMonth={draft?.from??calendar.defaultMonth} label={label} mode="range" value={draft??undefined} autoFocus={calendarEpoch===0} onValueChange={range=>updateDraft(range??null)}/>
+        <Calendar {...calendar} key={calendarEpoch} defaultMonth={draft?.from??calendar.defaultMonth} label={label} mode="range" value={draft??undefined} autoFocus={false} onValueChange={range=>updateDraft(range??null)}/>
         {footer}
       </Popover.Popup></Popover.Positioner></UIPortal>
     </Popover.Root>

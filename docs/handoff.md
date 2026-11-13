@@ -1,3 +1,24 @@
+# Date-popup focus repair before publication — 13 November 2026
+
+The first protected 0.4.0 run passed core validation and 733 of 734 browser-quality
+cases. The remaining phone/light range case left the calendar open after Cancel;
+publication was skipped and production remained on the prior verified release.
+Run: https://github.com/jaskevs/bld8-ui/actions/runs/43394374231.
+
+A controlled scheduling reproduction found competing initial focus owners:
+DayPicker focused a day, while a queued popup request could later focus a preset
+and scroll the Cancel button during pointer activation. The repair assigns initial
+day focus to the popup alone. Existing commit, dismissal, keyboard and return-focus
+contracts remain. The reproduction establishes that race; it does not establish
+the unavailable historical CI trace's exact event order.
+
+The earlier local 943-core/734-quality pass belongs to the preceding source.
+This repair requires fresh focused regression evidence, a clean exact-commit
+20-check receipt, and the normal protected CI/publication/deployment checks.
+No release is claimed until its immutable assets and live routes are verified.
+
+---
+
 # Frozen 0.4.0 release preparation — 13 November 2026
 
 The owner has authorised publication of the frozen application-foundations
