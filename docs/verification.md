@@ -1,3 +1,25 @@
+# Grid editor startup focus repair before publication — 13 November 2026
+
+GitHub run https://github.com/jaskevs/bld8-ui/actions/runs/43407470087 passed
+all 734 browser-quality cases, including the earlier calendar failure. Core
+validation passed 944 of 945 cases; the remaining fast reopen-and-Tab case left
+the next grid cell inactive. Publication was skipped and production stayed on
+the prior verified release.
+
+The controlled scheduling diagnostic found a keyboard ownership gap: an editor
+was open while focus remained on its grid cell, before queued popup focus. A Tab
+at that point missed the editor's existing Tab handler. The bounded repair hands
+focus to the actual editor trigger during layout, only while its own grid cell
+still owns focus. The existing session/commit/dismissal path handles the key;
+outside and popup-control focus are preserved.
+
+The earlier exact-commit 945-core/734-quality pass belongs to the preceding
+source. This repair requires its own ordinary regressions, fresh unchanged
+20-check guard and full GitHub checks before another push/publication claim.
+The source version remains 0.4.0/unreleased; retained assets remain unchanged.
+
+---
+
 # Date-popup focus repair before publication — 13 November 2026
 
 The first protected 0.4.0 run passed core validation and 733 of 734 browser-quality

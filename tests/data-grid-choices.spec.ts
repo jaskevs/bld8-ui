@@ -42,3 +42,17 @@ for(const theme of ['light','dark'])test(`choice menu in ${theme} fits its viewp
   await expect(cell.getByRole('combobox')).toHaveCSS('outline-style','none');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.keyboard.press('Escape');await expect(cell).toBeFocused();
 });
+
+test('rapid choice editor Tab handoff is independent of pending animation frames',async({page})=>{
+  for(const reducedMotion of ['no-preference','reduce'] as const){
+    await page.emulateMedia({reducedMotion});await page.goto(route);const grid=page.getByRole('grid',{name:'Issue data grid'}),priority=grid.getByRole('gridcell',{name:'Priority for ISS-102',exact:true}),assignee=grid.getByRole('gridcell',{name:'Assignee for ISS-102',exact:true});
+    await expect(priority).toBeVisible();await page.evaluate(()=>{const host=window as Window&{gridChoiceOriginalRaf?:typeof requestAnimationFrame};host.gridChoiceOriginalRaf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;});
+    try{
+      for(let cycle=0;cycle<2;cycle++){
+        await priority.focus();await priority.press('Enter');await page.keyboard.press('Tab');await expect(assignee).toBeFocused();
+        await assignee.press('Enter');await page.keyboard.press('Shift+Tab');await expect(priority).toBeFocused();
+      }
+      await expect(priority).toContainText('Medium');await expect(assignee).toContainText('Oliver Reed');await expect(grid.locator('[data-dirty]')).toHaveCount(0);
+    }finally{await page.evaluate(()=>{const host=window as Window&{gridChoiceOriginalRaf?:typeof requestAnimationFrame};if(host.gridChoiceOriginalRaf)window.requestAnimationFrame=host.gridChoiceOriginalRaf;delete host.gridChoiceOriginalRaf;});}
+  }
+});

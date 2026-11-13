@@ -4,7 +4,7 @@
  */
 'use client';
 import {UIPortal} from './ui-config.js';
-import {useRef,useState,type KeyboardEvent,type PointerEvent,type TouchEvent} from 'react';
+import {useLayoutEffect,useRef,useState,type KeyboardEvent,type PointerEvent,type TouchEvent} from 'react';
 import {Select} from '@base-ui/react/select';
 import {Combobox} from '@base-ui/react/combobox';
 import {Check,ChevronDown,Search} from 'lucide-react';
@@ -20,7 +20,11 @@ interface GridChoiceProps {
 /** Internal cell editor. Only a choice writes a value; filtering never does. */
 export function GridChoiceEditor({label,columnKey,owner,options,value,active,searchable,disabled,errorId,onFinish,onClosed}:GridChoiceProps) {
   const [open,setOpen]=useState(true),[query,setQuery]=useState('');
-  const finished=useRef(false),search=useRef<HTMLInputElement>(null);
+  const finished=useRef(false),search=useRef<HTMLInputElement>(null),editorTrigger=useRef<HTMLButtonElement>(null);
+  // Each keyed editor session accepts keyboard ownership from its own cell.
+  // Keep rapid Tab in the editor while popup focus waits for an animation frame,
+  // without taking focus back from a popup control or an outside action.
+  useLayoutEffect(()=>{const trigger=editorTrigger.current;if(active&&!disabled&&trigger?.closest('[role="gridcell"]')?.contains(trigger.ownerDocument.activeElement))trigger.focus({preventScroll:true});},[active,disabled]);
   const touch=useRef<{id:number;value:string;x:number;y:number}|null>(null);
   const labelFor=(value:string)=>options.find(option=>option.value===value)?.label??value;
   function finish(result:GridChoiceResult){if(finished.current)return true;finished.current=true;setOpen(false);return onFinish(result);}
@@ -38,7 +42,7 @@ export function GridChoiceEditor({label,columnKey,owner,options,value,active,sea
     onTouchCancel:()=>{touch.current=null;},
     onTouchEnd:(event:TouchEvent<HTMLDivElement>)=>{const start=touch.current,point=event.changedTouches[0];touch.current=null;if(disabled||options.find(option=>option.value===value)?.disabled||!start||!point||start.value!==value||Math.hypot(point.clientX-start.x,point.clientY-start.y)>8||!event.currentTarget.contains(document.elementFromPoint(point.clientX,point.clientY)))return;event.preventDefault();finish({value,intent:'choose',restoreFocus:true});},
   };}
-  const trigger={className:'bui-data-grid-choice-trigger','aria-label':label,'aria-invalid':!!errorId||undefined,'aria-describedby':errorId,'data-grid-choice-owner':owner,'data-closing':!active||undefined,tabIndex:-1,onKeyDownCapture:tab};
+  const trigger={ref:editorTrigger,className:'bui-data-grid-choice-trigger','aria-label':label,'aria-invalid':!!errorId||undefined,'aria-describedby':errorId,'data-grid-choice-owner':owner,'data-closing':!active||undefined,tabIndex:-1,onKeyDownCapture:tab};
   const content=<><span className="bui-data-grid-value bui-data-grid-choice-value" data-value={value}>{labelFor(value)||'Choose an option'}</span><Icon icon={ChevronDown} size={14}/></>;
   const popup={className:'bui-data-grid-choice-popup','data-grid-column-key':columnKey,'data-grid-choice-owner':owner,'data-searchable':searchable||undefined,onKeyDownCapture:tab,finalFocus:false as const};
   const completed=(next:boolean)=>{if(!next)onClosed();};
