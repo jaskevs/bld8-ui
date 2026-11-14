@@ -79,7 +79,7 @@ accessibility certification, adoption evidence, roadmap progress or effort hours
 
 ## Source versions
 
-Development is 0.4.0/unreleased; retained 0.2.0 and 0.3.0 are immutable. Read `releases/next.json`,
+Development is 0.5.0/unreleased; retained 0.2.0, 0.3.0 and 0.4.0 are immutable. Read `releases/next.json`,
 `releases/catalog.json` and `docs/updating-source.md` before release changes.
 Generate manifests and receipts with the existing tools. Never replace retained
 assets, move a published tag, remove a retained version or bypass release checks.

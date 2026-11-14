@@ -25,7 +25,20 @@ export const mitNotice=(holder=copyright)=>`MIT License\n\n${holder}\n\n${mitBod
 // Formatting (line wrapping, CRLF, comment decoration) is insignificant; every word is required.
 export const normalizeNotice=value=>Buffer.from(value).toString('utf8').replace(/^\s*\* ?/gm,'').replace(/\s+/g,' ').trim();
 export const hasFullNotice=(value,notice)=>normalizeNotice(value).includes(normalizeNotice(notice));
-export const uiNoticeNames=['LICENSE','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','THIRD_PARTY_NOTICES.md','UPSTREAM.json'];
+export const uiNoticeNames=['LICENSE','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','EDITOR_LICENSES','PHONE_LICENSE','RECURRENCE_LICENSES','THIRD_PARTY_NOTICES.md','UPSTREAM.json'];
+/** Optional sidecars follow the registry's actual delivered package dependency closure.
+ * Full npm/starter/release distributions and public licence metadata still carry every notice. */
+export const registryOptionalNoticeNames=['EDITOR_LICENSES','PHONE_LICENSE','RECURRENCE_LICENSES'];
+export const registryBaseNoticeNames=uiNoticeNames.filter(name=>!registryOptionalNoticeNames.includes(name));
+export function registryNoticeNamesForPackages(specifiers){
+  const notices=new Set();
+  for(const value of specifiers){
+    if(value.startsWith('@tiptap/'))notices.add('EDITOR_LICENSES');
+    if(value==='libphonenumber-js'||value.startsWith('libphonenumber-js/')||value.startsWith('libphonenumber-js@'))notices.add('PHONE_LICENSE');
+    if(value==='@js-temporal/polyfill'||value.startsWith('@js-temporal/polyfill/')||value.startsWith('@js-temporal/polyfill@'))notices.add('RECURRENCE_LICENSES');
+  }
+  return [...notices];
+}
 export function distributionNotices({root=repositoryRoot}={}){
   return Object.fromEntries(['LICENSE','packages/blocks/LICENSE',...uiNoticeNames.map(name=>'packages/ui/'+name)].map(path=>[path,readFileSync(join(root,path))]));
 }

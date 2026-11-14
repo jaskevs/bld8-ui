@@ -4,10 +4,10 @@ import {join,resolve,sep,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {tmpdir} from 'node:os';
 import {spawnSync} from 'node:child_process';
-import {createManifest,byteHash} from '../scripts/source-release.mjs';
+import {createManifest,byteHash,validateManifest} from '../scripts/source-release.mjs';
 import {releaseAssetName,versionAssetUrl,assertRetainedVersions,readPreparedRelease,publishPreparedRelease,verifyPublishedRelease} from '../scripts/release-hosting.mjs';
 import {publicationState,assertPublisherContext,publicReleaseAcceptance,githubReleaseClient} from '../scripts/publish-source-release.mjs';
-import {sourceVersionAsset} from '../apps/docs/src/lib/source-versions';
+import {sourceVersionAsset,sourceVersions} from '../apps/docs/src/lib/source-versions';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),revision='a'.repeat(40),registryBase='https://ui.bld8.dev/releases/0.2.0/r';
 const catalog={schemaVersion:1,versions:[{version:'0.2.0',tag:'v0.2.0',title:'First release'}]};
@@ -24,6 +24,14 @@ test('version paths are fixed, bounded and remain identical when another version
   expect(sourceVersionAsset('unknown','manifest.json')).toBeNull();expect(sourceVersionAsset('0.2.0','../secret')).toBeNull();
   expect(()=>assertRetainedVersions({schemaVersion:1,versions:[]},[{tag_name:'v0.2.0',immutable:true,draft:false}])).toThrow('drop a retained');
 });
+test('every generated artifact has a safe retained version route',()=>{
+  const manifest=validateManifest(JSON.parse(readFileSync(join(root,'apps/docs/public/releases/current.json'),'utf8'))),actualCatalog={schemaVersion:1,versions:sourceVersions};
+  expect(sourceVersions.some(entry=>entry.version===manifest.version)).toBe(true);
+  const paths=new Set([...manifest.artifacts.map(artifact=>artifact.path),'manifest.json','docs/catalog.json','documentation.zip']);
+  for(const path of paths)expect(sourceVersionAsset(manifest.version,path),path).toBe(versionAssetUrl(actualCatalog,manifest.version,path));
+  for(const name of ['EDITOR_LICENSES','PHONE_LICENSE','RECURRENCE_LICENSES'])expect(manifest.artifacts.some(artifact=>artifact.path==='packages/ui/'+name),name).toBe(true);
+});
+
 test('publication verifies every draft asset before locking and never replaces a published version',async()=>{
   const fixture=clientFixture(),bundle=prepared();const release=await publishPreparedRelease(bundle,fixture.client);expect(fixture.calls).toEqual(['draft','upload:manifest.json','upload:r--button.json','publish']);expect(release.immutable).toBe(true);
   expect((await verifyPublishedRelease(release,'0.2.0',fixture.client)).sourceRevision).toBe(revision);
@@ -80,6 +88,11 @@ test('GitHub adapter reports useful API failures without exposing its explicit t
 });
 test('versioned HTTP routes redirect to retained assets and reject unsafe paths',async({request})=>{
   const response=await request.get('/releases/0.2.0/r/button.json',{maxRedirects:0});expect(response.status()).toBe(308);expect(response.headers().location).toBe('https://github.com/jaskevs/bld8-ui/releases/download/v0.2.0/r--button.json');expect(response.headers()['cache-control']).toContain('immutable');
+  const current=validateManifest(JSON.parse(readFileSync(join(root,'apps/docs/public/releases/current.json'),'utf8')));
+  for(const name of ['EDITOR_LICENSES','PHONE_LICENSE','RECURRENCE_LICENSES'])for(const method of ['get','head'] as const){
+    const path='packages/ui/'+name,notice=await request[method]('/releases/'+current.version+'/'+path,{maxRedirects:0});
+    expect(notice.status()).toBe(308);expect(notice.headers().location).toBe(sourceVersionAsset(current.version,path));expect(notice.headers()['cache-control']).toContain('immutable');
+  }
   expect((await request.get('/releases/99.0.0/r/button.json',{maxRedirects:0})).status()).toBe(404);
   expect((await request.get('/releases/0.2.0/r/private.key',{maxRedirects:0})).status()).toBe(404);
 });
@@ -119,4 +132,42 @@ console.log('Dependency-free preflight and context protection passed with GET-on
   }finally{
     const target=resolve(directory);if(!target.startsWith(parent+sep)||!target.slice(parent.length+1).startsWith('bld8-publisher-preflight-')||lstatSync(target).isSymbolicLink())throw Error('Unexpected publisher fixture.');rmSync(target,{recursive:true,force:true});
   }
+});
+
+
+function artifactBoundFixture(path:string,bytes:Buffer,check:(directory:string)=>void){
+  const parent=join(root,'.local');mkdirSync(parent,{recursive:true});const directory=mkdtempSync(join(parent,'release-artifact-bounds-'));
+  try{
+    const artifacts:Record<string,Buffer>={'r/button.json':Buffer.from('{}'),'r/registry.json':Buffer.from('{}')};artifacts[path]=bytes;
+    const manifest=createManifest({version:'0.2.0',status:'released',sourceRevision:revision,registryBase,items:[{name:'button',files:[{target:'@ui/bld8/button.tsx',content:'source'}],registryDependencies:[],dependencies:[]}],artifacts});
+    writeFileSync(join(directory,'manifest.json'),JSON.stringify(manifest));
+    for(const[artifact,content]of Object.entries(artifacts)){const file=join(directory,artifact);mkdirSync(dirname(file),{recursive:true});writeFileSync(file,content);}
+    check(directory);
+  }finally{const target=resolve(directory);if(!target.startsWith(resolve(parent)+sep)||!target.slice(resolve(parent).length+1).startsWith('release-artifact-bounds-')||lstatSync(target).isSymbolicLink())throw Error('Unexpected bounded artifact fixture.');rmSync(target,{recursive:true,force:true});}
+}
+// Valid JSON whitespace exercises byte bounds without inventing a component payload schema.
+function boundedJsonBytes(size:number){const bytes=Buffer.alloc(size,32);bytes.write('{}');return bytes;}
+
+for(const size of [16*1024*1024+1,32*1024*1024])test('aggregate registry accepts its explicit bound at '+size+' bytes',()=>{
+  const bytes=boundedJsonBytes(size);artifactBoundFixture('r/registry.json',bytes,directory=>{
+    const result=readPreparedRelease(directory),aggregate=result.assets.find(asset=>asset.path==='r/registry.json');
+    expect(aggregate?.bytes.length).toBe(size);expect(aggregate?.sha256).toBe(byteHash(bytes));expect(result.assets).toHaveLength(3);
+  });
+});
+
+test('ordinary registry items retain the inclusive 16 MiB bound',()=>{
+  const bytes=boundedJsonBytes(16*1024*1024);artifactBoundFixture('r/button.json',bytes,directory=>{
+    const ordinary=readPreparedRelease(directory).assets.find(asset=>asset.path==='r/button.json');expect(ordinary?.bytes.length).toBe(bytes.length);expect(ordinary?.sha256).toBe(byteHash(bytes));
+  });
+});
+
+for(const[path,size]of [['r/registry.json',32*1024*1024+1],['r/button.json',16*1024*1024+1],['r/registry-copy.json',16*1024*1024+1]] as const)test('oversized '+path+' is rejected before payload reading and identifies its path',()=>{
+  artifactBoundFixture(path,boundedJsonBytes(size),directory=>{
+    // Use an isolated Node process: do not replace filesystem bindings in the test runner.
+    // The payload interceptor throws if an over-bound file is read before metadata rejection.
+    const fixture="import fs from 'node:fs';\nimport {resolve} from 'node:path';\nimport {syncBuiltinESMExports} from 'node:module';\nconst directory=process.argv[1],target=resolve(process.argv[2]),reader=process.argv[3],read=fs.readFileSync;\nlet payloadReads=0;fs.readFileSync=function(file,...args){if(typeof file==='string'&&resolve(file)===target){payloadReads++;throw Error('OVERSIZED_PAYLOAD_WAS_READ');}return Reflect.apply(read,this,[file,...args]);};syncBuiltinESMExports();\nconst {readPreparedRelease}=await import(reader);let message=null;\ntry{readPreparedRelease(directory);}catch(error){message=String(error.message??error);}\nconsole.log(JSON.stringify({payloadReads,message}));\n";
+    const result=spawnSync(process.execPath,['--input-type=module','-e',fixture,directory,join(directory,path),new URL('../scripts/release-hosting.mjs',import.meta.url).href],{encoding:'utf8',env:{SystemRoot:process.env.SystemRoot??'',PATH:process.env.PATH??''}});
+    expect(result.error).toBeUndefined();expect(result.status,result.stderr).toBe(0);const probe=JSON.parse(result.stdout.trim());
+    expect(probe.payloadReads).toBe(0);expect(probe.message).toContain(path);expect(probe.message).not.toContain('OVERSIZED_PAYLOAD_WAS_READ');
+  });
 });

@@ -91,10 +91,10 @@ Unknown, unsupported, missing or invalid versions return an error without using
 current APIs instead. Existing resource URIs describe current source; use tools
 with an explicit version for retained APIs and complete examples.
 
-Version-matched documentation starts with future source releases from 0.4.0.
+Version-matched documentation is available for retained source releases from 0.4.0.
 The immutable 0.2.0 and 0.3.0 releases did not ship these assets and remain
 unsupported by retained-documentation selection. Their source is unchanged.
-After a supporting version is published, populate the local cache separately:
+Populate the local cache for a published supporting version separately:
 
 ```sh
 npm run docs:sync -- --version 0.4.0

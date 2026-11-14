@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { join, basename } from 'node:path';
 import { blocks, templates } from './library-catalog.mjs';
 import { createSourceGraph } from './source-graph.mjs';
-import {licenseCode,licenseMetadata} from './license-policy.mjs';
+import {licenseCode,licenseMetadata,registryBaseNoticeNames,registryNoticeNamesForPackages} from './license-policy.mjs';
 import {readComponentExamples} from './prepare-component-examples.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -23,7 +23,7 @@ function add(name, title, files, dependencies = [], registryDependencies = [], t
 }
 add('bld8-styles', 'BLD8 styles and licences', [
   ...['styles.css','tokens.css','tailwind.css'].map(name => file('registry/bld8/'+name, licenseCode(read('packages/ui/dist/'+name),{standalone:true,sourcePath:'packages/ui/src/'+name,root}), '@ui/bld8/'+name, 'registry:file')),
-  ...['LICENSE','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','THIRD_PARTY_NOTICES.md','UPSTREAM.json'].map(name => file('registry/bld8/licenses/'+name, read('packages/ui/'+name), '@ui/bld8/licenses/'+name, 'registry:file')),
+  ...registryBaseNoticeNames.map(name => file('registry/bld8/licenses/'+name, read('packages/ui/'+name), '@ui/bld8/licenses/'+name, 'registry:file')),
 ]);
 const uiPackage=JSON.parse(read('packages/ui/package.json'));
 const dependencies = {...uiPackage.dependencies,'react-hook-form':uiPackage.devDependencies['react-hook-form']};
@@ -39,11 +39,32 @@ for (const [kind,folder] of [['ui','packages/ui/src'],['block','packages/blocks/
     if (name.endsWith('.tsx')) content = content.replace(/(['"])use client\1;/, "$&\nimport './styles.css';");
     const subdirectory = kind === 'block' ? 'blocks/' : '';
     if (kind === 'block') local.push('bld8-block-styles');
-    add(`bld8-${kind === 'block' ? 'block-' : ''}${key}`, `BLD8 ${key} source`, [file('registry/bld8/'+subdirectory+name, licenseCode(content,{standalone:true,sourcePath:folder+'/'+name,root}), '@ui/bld8/'+subdirectory+name)], external, [...new Set(['bld8-styles',...local])]);
+    const packageNotices=registryNoticeNamesForPackages(graph.imports(source)).map(notice=>file('registry/bld8/licenses/'+notice,read('packages/ui/'+notice),'@ui/bld8/licenses/'+notice,'registry:file'));
+    add(`bld8-${kind === 'block' ? 'block-' : ''}${key}`, `BLD8 ${key} source`, [file('registry/bld8/'+subdirectory+name, licenseCode(content,{standalone:true,sourcePath:folder+'/'+name,root}), '@ui/bld8/'+subdirectory+name),...packageNotices], external, [...new Set(['bld8-styles',...local])]);
   }
 }
 add('bld8-block-styles', 'BLD8 block styles', [file('registry/bld8/blocks/LICENSE',read('packages/blocks/LICENSE'),'@ui/bld8/blocks/LICENSE','registry:file'),file('registry/bld8/blocks/styles.css', licenseCode(read('packages/blocks/src/styles.css'),{standalone:true,sourcePath:'packages/blocks/src/styles.css',root}), '@ui/bld8/blocks/styles.css','registry:file')],[],['bld8-styles']);
 const groups = {
+  "recurrence-state":["recurrence-state"],
+  "gantt-state":["gantt-state"],
+  "resource-scheduler-state":["resource-scheduler-state"],
+  "phone-input-state":["phone-input-state"],
+  "color-picker-state":["color-picker-state"],
+  "import-wizard-state":["import-wizard-state"],
+  "rich-text-state":["rich-text-state"],
+  "recurrence-editor":["recurrence-editor"],
+  "gantt":["gantt"],
+  "resource-scheduler":["resource-scheduler"],
+  "product-preview":["product-preview"],
+  "carousel":["carousel"],
+  "bento":["bento"],
+  "stagger":["stagger"],
+  "text-reveal":["text-reveal"],
+  "rating":["rating"],
+  "phone-input":["phone-input"],
+  "color-picker":["color-picker"],
+  "import-wizard":["import-wizard"],
+  "rich-text-editor":["rich-text-editor","mentions"],
   'ui-motion':['animated-list','animated-number','auto-height','layout-transition'],'donut-chart':['donut-chart'],sparkline:['sparkline'],'stacked-bar-chart':['stacked-bar-chart'],'resizable-panels':['resizable-panels'],'scroll-area':['scroll-area'],
   'faceted-filter':['faceted-filter'],fieldset:['fieldset'],'checkbox-group':['checkbox-group'],
   autocomplete:['autocomplete'], toolbar:['toolbar'], 'alert-dialog':['alert-dialog'], 'navigation-menu':['navigation-menu'], 'preview-card':['preview-card'],

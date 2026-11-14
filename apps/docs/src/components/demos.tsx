@@ -51,6 +51,20 @@ export function ComponentDemo({ id }: { id: string }) {
   if(newExamples[id])return <CoreControlDemo id={id}/>;
   const [page, setPage] = useState(1); const [created, setCreated] = useState(false); const [email, setEmail] = useState(''); const [loading, setLoading] = useState(false); const [menuAction, setMenuAction] = useState('No action selected'); const toast = useToast();
   switch (id) {
+    case 'recurrence-editor': return <ExamplePreview id="recurrence-finite-rule"/>;
+    case 'gantt': return <ExamplePreview id="gantt-reviewed-delivery"/>;
+    case 'resource-scheduler': return <ExamplePreview id="resource-scheduler-recovery"/>;
+    case 'product-preview': return <ExamplePreview id="product-preview-workflow"/>;
+    case 'carousel': return <ExamplePreview id="carousel-native-controls"/>;
+    case 'bento': return <ExamplePreview id="bento-product-layout"/>;
+    case 'stagger': return <ExamplePreview id="stagger-keyed-cards"/>;
+    case 'text-reveal': return <ExamplePreview id="text-reveal-reading-order"/>;
+    case 'rating': return <ExamplePreview id="rating-fractional-form"/>;
+    case 'phone-input': return <ExamplePreview id="phone-country-form"/>;
+    case 'color-picker': return <ExamplePreview id="color-format-form"/>;
+    case 'import-wizard': return <ExamplePreview id="import-create-reviewed-batch"/>;
+    case 'mentions': return <ExamplePreview id="mentions-async-directory"/>;
+    case 'rich-text-editor': return <ExamplePreview id="rich-text-review-form"/>;
     case 'resizable-panels': return <ExamplePreview id="resizable-workspace-panes"/>;
     case 'scroll-area': return <ExamplePreview id="scroll-area-native-region"/>;
     case 'animated-list': return <ExamplePreview id="motion-list-updates"/>;

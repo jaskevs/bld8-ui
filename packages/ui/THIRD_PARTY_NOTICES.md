@@ -52,3 +52,15 @@ Motion 14.7.1 supplies layout and presence animation as an installed MIT depende
 ## dnd-kit
 
 @dnd-kit/core 6.3.1, @dnd-kit/sortable 10.0.0 and @dnd-kit/utilities 3.2.2 are installed MIT dependencies. Their common licence is included in DND_KIT_LICENSE. https://github.com/clauderic/dnd-kit
+
+## Structured editing
+
+Tiptap community packages 3.33.1 and their ProseMirror/helper dependencies are installed under MIT terms. Their complete upstream notices are included in EDITOR_LICENSES. No paid extensions or hosted editing service is included. Sources: https://github.com/ueberdosis/tiptap and https://github.com/ProseMirror .
+
+## Phone numbers
+
+libphonenumber-js 1.13.16 supplies numbering-plan metadata and validation. Its original MIT notice is included in PHONE_LICENSE. Source: https://github.com/catamphetamine/libphonenumber-js . No verification service is included.
+
+## Recurrence timezone conversion
+
+@js-temporal/polyfill 0.5.1 retains its ISC licence. Its jsbi 4.3.2 dependency retains Apache-2.0. Their complete notices are included in RECURRENCE_LICENSES; original BLD8 source remains MIT. Sources: https://github.com/js-temporal/temporal-polyfill and https://github.com/GoogleChromeLabs/jsbi .

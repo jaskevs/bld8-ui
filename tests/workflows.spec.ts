@@ -90,13 +90,25 @@ test('CSV keeps quoted content and protects formula-leading fields',()=>{
   const csv=createTableCSV([{name:'=HYPERLINK("x")',amount:-12},{name:'a,"b"\nline',amount:10}],[{key:'name',header:'Name',cell:row=>row.name,exportValue:row=>row.name},{key:'amount',header:'Amount',cell:row=>row.amount,exportValue:row=>row.amount}]);
   expect(csv).toContain('"\'=HYPERLINK(""x"")"');expect(csv).toContain('"-12"');expect(csv).toContain('"a,""b""\nline"');
 });
-for(const theme of ['light','dark']) test('workflow controls and open overlays pass axe in '+theme,async ({page},testInfo)=>{
-  for(const route of ['/components/multi-select','/components/calendar','/components/date-picker','/components/file-upload','/components/advanced-table','/blocks/project-planner','/blocks/resources','/templates/outline']) {
-    await page.goto(route);if(theme==='dark') await page.getByRole('button',{name:'Switch to dark theme'}).click();const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(result.violations.map(item=>({id:item.id,targets:item.nodes.map(node=>node.target)})),route).toEqual([]);if(route==='/templates/outline') await page.locator('.library-preview-frame').screenshot({path:testInfo.outputPath('outline-'+theme+'.png')});
-  }
-  await page.goto('/components/command');if(theme==='dark') await page.getByRole('button',{name:'Switch to dark theme'}).click();await page.getByRole('button',{name:'Open command palette'}).click();const command=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(command.violations.map(item=>item.id)).toEqual([]);
-  await page.keyboard.press('Escape');await page.goto('/components/date-range');if(theme==='dark') await page.getByRole('button',{name:'Switch to dark theme'}).click();await page.getByRole('button',{name:'Reporting period',exact:true}).click();const range=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(range.violations.map(item=>item.id)).toEqual([]);
-});
+for(const theme of ['light','dark']) {
+  for(const route of ['/components/multi-select','/components/calendar','/components/date-picker','/components/file-upload','/components/advanced-table','/blocks/project-planner','/blocks/resources','/templates/outline']) test('workflow '+route+' passes axe in '+theme,async({page},testInfo)=>{
+    await page.goto(route);if(theme==='dark')await page.getByRole('button',{name:'Switch to dark theme'}).click();
+    const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+    expect(result.violations.map(item=>({id:item.id,targets:item.nodes.map(node=>node.target)})),route).toEqual([]);
+    if(route==='/templates/outline')await page.locator('.library-preview-frame').screenshot({path:testInfo.outputPath('outline-'+theme+'.png')});
+  });
+  test('open command palette passes axe and dismisses in '+theme,async({page})=>{
+    await page.goto('/components/command');if(theme==='dark')await page.getByRole('button',{name:'Switch to dark theme'}).click();
+    const opener=page.getByRole('button',{name:'Open command palette'});await opener.click();
+    const command=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(command.violations.map(item=>item.id)).toEqual([]);
+    await page.keyboard.press('Escape');await expect(opener).toBeFocused();
+  });
+  test('open reporting period passes axe in '+theme,async({page})=>{
+    await page.goto('/components/date-range');if(theme==='dark')await page.getByRole('button',{name:'Switch to dark theme'}).click();
+    await page.getByRole('button',{name:'Reporting period',exact:true}).click();
+    const range=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(range.violations.map(item=>item.id)).toEqual([]);
+  });
+}
 for(const width of [1440,768,390,320]) test('workflows and open calendars fit at '+width+'px',async ({page},testInfo)=>{
   await page.setViewportSize({width,height:900});const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
   for(const route of ['/components','/components/advanced-table','/blocks/project-planner','/blocks/resources','/templates/outline','/components/date-range']) {await page.goto(route);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),route).toBe(true);if(route==='/templates/outline' && (width===1440 || width===390)) await page.locator('.library-preview-frame').screenshot({path:testInfo.outputPath('outline-'+width+'.png')});}

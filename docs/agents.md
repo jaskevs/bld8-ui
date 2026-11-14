@@ -63,7 +63,7 @@ version has a new feature. [Source updates](https://ui.bld8.dev/releases) explai
 versioned registry URLs and review of local customisations.
 
 [Versioned documentation](https://ui.bld8.dev/docs/versions/development) separates
-the labelled development preview from a selected retained reference. Future
+the labelled development preview from a selected retained reference. Retained
 releases from 0.4.0 include a manifest-verified API catalogue and documentation
 archive. Earlier immutable releases remain unchanged and report that retained
 documentation is unsupported. There is no fallback to current APIs.

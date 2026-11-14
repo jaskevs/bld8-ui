@@ -1,3 +1,109 @@
+# Aggregate registry packaging repair — 14 November 2026
+
+The exact unpublished candidate passed all **1,062 core cases** and **914
+browser-quality cases**, plus build, types, licences, clean registry consumers
+and themed starters. Its final packaging phase then rejected the 29,400,130-byte
+aggregate registry against the ordinary 16 MiB artifact limit. No successful
+full receipt or push was created; those passing stages are historical evidence.
+
+The bounded reader now allows 32 MiB for exactly `r/registry.json`, matching the
+existing aggregate documentation allowance. Ordinary artifacts remain limited to
+16 MiB and the manifest to 8 MiB. Path, link, inventory and digest checks remain.
+Oversize diagnostics identify the path and byte limit. No verification policy,
+workflow, hook, receipt, assertion or timeout was relaxed.
+
+All **17 pure release safety fixtures** pass, including six added inclusive-bound,
+exact-path and rejection-before-read regressions. The preserved actual candidate
+now verifies all **547 files** against its manifest hashes. These focused results
+are not a replacement for the fresh complete exact-commit verification.
+
+Next: amend the same unpublished release at the actual time under the owner's
+approved exception, pass the unchanged full twenty-phase gate, then push.
+GitHub validation, immutable 0.5.0 publication, Vercel promotion and actual public
+Next.js/Vite installation acceptance remain pending. Retained releases stay intact.
+
+# Logical-cell touch activation repair — 14 November 2026
+
+The touch activation repair and deterministic regression are locally verified
+in the real workspace: build/types, 37 core cases and 18 touch/keyboard quality
+cases pass. The earlier candidate had a real touch focus assertion and was never
+pushed; its interrupted browser run is not a successful receipt.
+
+Amend the same unpublished release with actual timestamps under the owner's
+current approved exception. Run the unchanged full twenty-phase exact-commit gate
+from scratch, then push only its real passed receipt. Complete actual GitHub
+validation, retained immutable publication, Vercel promotion, public Next.js/Vite
+installs and the 53-check production acceptance including licence sidecars.
+No 0.5.0 publication is claimed yet.
+
+# Licence sidecar route preflight — 14 November 2026
+
+The final unpublished source includes the three missing upstream-notice
+redirects and artifact-route parity/HTTP regressions. Local before/after route
+proof and eleven safety fixtures pass. The interrupted first guard is not a
+successful receipt.
+
+Next: amend the unpublished release with actual timestamps under the owner's
+current one-time exception, run the unchanged full twenty-phase exact-commit
+gate, then push only on a real passed receipt. Complete GitHub validation,
+immutable publication, Vercel promotion, retained-version checks and clean public
+Next.js/Vite installs. Production acceptance must also fetch and hash all three
+notice sidecars through their site routes. No 0.5.0 publication is claimed yet.
+
+# Next work after content, import and planning — 14 November 2026
+
+The requested 14-family expansion is implemented as **0.5.0/unreleased**; its
+pre-repair working-source acceptance passed. The shared calendar and grid-startup focus repairs have
+separate causal/type proof; final exact-commit verification remains pending.
+Current authorities: 95 component families, 158 complete examples, 18 blocks, 3 templates,
+453 registry items, 116 agent entries and 29 guides.
+The completed scope is not reopened by the historical plans below. Playground
+expansion remains lower priority than useful controls and successful adoption.
+
+1. **Finish the normal 0.5.0 release path.** Review the complete final diff, preserve
+   the assertion-preserving scenario splits and separately recorded shared calendar and grid-startup
+   focus repairs, commit at the actual permitted
+   Melbourne time, and pass the exact-clean-commit guard and full GitHub CI. The
+   reserved v0.5.0 catalogue/publication intent is preparation, not publication.
+   Verify immutable assets, version-matched documentation, production routes and
+   unchanged retained versions before reporting a 0.5.0 release.
+2. **Validate a real installation.** Theme a small screen, connect an authorised
+   host callback and recover a failed save. Gather and triage reproducible feedback
+   from actual developers; do not invent adoption evidence or contact others
+   without explicit authorisation.
+3. **Review physical-device and assistive-technology paths.** Prioritise mobile
+   keyboard/zoom, native forms, rich text/mentions, date/time, grid editing and
+   resource planning. Emulated WebKit and automated axe checks are useful evidence
+   but do not replace those checks.
+4. **Select the next component improvement from that evidence.** Prefer a missing
+   consumer contract, long-label/RTL issue or recovery gap over more cosmetic
+   variants. Keep original MIT terms, upstream notices and explicit service/data
+   boundaries. No additional feature or publication is implied by this backlog.
+
+The full-run counts above are historical acceptance of the frozen working source,
+before the separately reviewed shared calendar and grid-startup focus repairs. The exact
+paired browser diagnostics show Cancel staying under the pointer and rapid Tab
+remaining in its grid editor session. The patched runtime graphs pass no-emit types.
+Ordinary core regressions cover enabled-day focus, held-Cancel geometry and rapid
+grid-editor keyboard ownership; existing browser-quality flows are strengthened. Their
+execution against the final release source remains pending the unchanged
+exact-clean-commit guard. No historical full-suite log is relabelled as proof of
+post-repair source. Repair source/proof hashes are recorded separately; original
+snapshot records remain unchanged.
+
+Immutable **0.4.0** publication and its production version route were verified
+at 2026-11-13T12:10:01.560Z, for source revision
+`e3ed4f50c9f6c49f46f371b3744c248598bab6c8`. Retained earlier manifest bytes were unchanged.
+The actual release evidence and history below belong to 0.4.0; they do not prove
+a 0.5.0 commit, CI run, publication or production deployment.
+
+The original 0.4.0 and frozen 0.5.0 source records stay unchanged. UI remains
+additional scope; preserve the private Workbench dates, exam allocation and
+135-hour baseline. Daily commit/push restrictions and personal identity hooks
+remain in force; do not backdate or change company/global configuration.
+
+---
+
 # Grid editor startup focus repair before publication — 13 November 2026
 
 GitHub run https://github.com/jaskevs/bld8-ui/actions/runs/43407470087 passed

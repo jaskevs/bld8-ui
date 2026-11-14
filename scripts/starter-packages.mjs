@@ -38,7 +38,7 @@ export function createStarterPackages(root) {
         files[folder+'/src/'+file]=read(folder+'/src/'+file);files[folder+'/dist/'+file]=read(folder+'/dist/'+file);
       }
     }
-    for(const name of ['THIRD_PARTY_NOTICES.md','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','UPSTREAM.json'])files['packages/ui/'+name]=read('packages/ui/'+name);
+    for(const name of ['THIRD_PARTY_NOTICES.md','LUCIDE_LICENSE','DAY_PICKER_LICENSE','SHADCN_LICENSE','MOTION_LICENSE','DND_KIT_LICENSE','EDITOR_LICENSES','PHONE_LICENSE','RECURRENCE_LICENSES','UPSTREAM.json'])files['packages/ui/'+name]=read('packages/ui/'+name);
     return files;
   };
 }

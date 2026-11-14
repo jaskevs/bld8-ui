@@ -6,18 +6,21 @@ React components, reusable blocks and complete interface examples. Built with Ba
 
 [Core component guide](docs/core-components.md) · [Developer and coding-agent guide](docs/agents.md) · [Documentation index](https://ui.bld8.dev/llms.txt) · [Structured catalogue](https://ui.bld8.dev/agent/catalog.json)
 
-## Development 0.4.0
+## Development 0.5.0
 
-This checkout adds generic resource workspaces, scoped theme/locale/direction
-configuration, editable time fields and calendar navigation, large editable grids,
-adjustable layouts, additional charts and reusable application motion. These APIs
-are unreleased; retained 0.3.0 keeps its published source.
+This checkout adds structured editing and async mentions, reviewed CSV imports,
+color/phone/rating fields, resource schedules, civil-date Gantt planning, finite
+timezone-aware recurrence and accessible visual components. These APIs are
+unreleased. The 0.4.0 foundations source is available as a verified immutable retained
+release; earlier retained assets keep their original bytes.
 
-[Resource workflows](docs/resource-workspace.md) · [Scoped interfaces and dates](docs/scoped-interface-contracts.md) · [Large and hierarchical data](docs/advanced-data.md) · [Motion and charts](docs/motion-and-charts.md)
+[Content and planning](https://ui.bld8.dev/docs/content-and-planning) · [Structured editing](docs/rich-text.md) · [Imports](docs/import-wizard.md) · [Everyday fields](docs/input-pack.md) · [Visual controls](docs/visual-collection.md) · [Resource scheduling](docs/resource-scheduler.md) · [Gantt](docs/gantt.md) · [Recurrence](docs/recurrence.md)
 
-Future retained releases from 0.4.0 include hashed API/example documentation and
-an offline archive. Human and MCP requests select an exact source version;
-versions without a documentation snapshot do not fall back to newer APIs.
+The 0.4.0 foundation APIs remain available: reusable resource workspaces, scoped
+configuration, editable date/time fields, large grids, panels, charts and motion.
+Retained releases from 0.4.0 include hashed, version-matched human and MCP
+documentation plus an offline archive. Unsupported old versions do not fall back
+to a newer API.
 
 ## Install source
 
@@ -71,7 +74,7 @@ For an installed Edge browser on Windows, set `PLAYWRIGHT_CHANNEL=msedge`. Tests
 
 ## What is included
 
-- 81 component families, 136 complete named examples, eighteen blocks and three templates. Families and examples are counted separately.
+- 95 component families, 158 complete named examples, eighteen blocks and three templates. Families and examples are counted separately.
 - A searchable example catalogue with exact URLs, real previews and individual source registry installs. Example modules follow the same lean dependency graph in Next.js and Vite.
 - FacetedFilter, Fieldset and CheckboxGroup with native form contracts; linked error summaries, async read-only/reset parity and atomic DataGrid bulk edits.
 - Autocomplete, Toolbar, AlertDialog, NavigationMenu and PreviewCard compositions on the installed Base UI primitives, with explicit keyboard, focus and recovery contracts.

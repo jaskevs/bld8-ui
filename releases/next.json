@@ -1,12 +1,11 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "unreleased",
-  "title": "Reusable workspaces, scoped configuration and application motion",
+  "title": "Content, import and planning workflows",
   "changes": [
-    "Generic resource workflows and adjustable workspace layouts.",
-    "Scoped themes, portal inheritance, locale and direction contracts.",
-    "Typed time/date entry and reusable motion primitives.",
-    "Optional virtualized editing, hierarchy and explicit summaries.",
-    "Additional chart primitives and version-matched human/agent discovery."
+    "Structured editing and async mentions.",
+    "Reviewed CSV imports and canonical everyday inputs.",
+    "Resource scheduling, recurrence and project timelines.",
+    "Accessible visual components with consistent motion."
   ]
 }

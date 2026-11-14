@@ -3,7 +3,7 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {dataValuesEqual,parseDataValue,parseDataTsv,stringifyDataTsv,validateDataChanges,type DataColumn} from '../packages/ui/src/data-workspace-state';
 import {gridPasteEdits} from '../packages/ui/src/data-grid-state';
-import {checkMixedGridEditors,checkCustomGridEditor} from '../scripts/check-grid-editing.mjs';
+import {checkMixedGridTransactions,checkMixedGridRecovery,checkMixedGridMotion,checkCustomGridEditor} from '../scripts/check-grid-editing.mjs';
 
 interface Row {id:string;revision:number;due:string;approved:boolean;assignees:string[]}
 const people=[{value:'maya',label:'Maya Chen'},{value:'oliver',label:'Oliver Reed'},{value:'retired',label:'Former contributor',disabled:true}];
@@ -64,9 +64,11 @@ test('presentational custom cells preserve grid focus semantics and allow delibe
   expect(html).toContain('role="grid"');expect(html.match(/tabindex="0"/g)).toHaveLength(1);expect(html).not.toContain('>2026-11-20</span>');expect(html).toContain('<strong>maya</strong>');expect(html).toContain('>No</span>');expect(html).not.toContain('type="checkbox"');
 });
 
-test('mixed editors preserve canonical values, native checkbox cancellation and atomic history',async({page})=>{await page.goto('/components/data-grid');await checkMixedGridEditors(page,id=>example(page,id));});
+test('mixed editors preserve canonical values, native checkbox cancellation and atomic history',async({page})=>{await page.goto('/components/data-grid/examples/grid-editor-mixed');await checkMixedGridTransactions(page,id=>example(page,id));});
+test('mixed editor date recovery preserves invalid drafts, action geometry and saved baselines',async({page})=>{await page.goto('/components/data-grid/examples/grid-editor-mixed');await checkMixedGridRecovery(page,id=>example(page,id));});
+test('mixed editor motion responds to live preferences after a canonical checkbox commit',async({page})=>{await page.goto('/components/data-grid/examples/grid-editor-mixed');await checkMixedGridMotion(page,id=>example(page,id));});
 
-test('public custom editor hooks compose TreeSelect with explicit apply and outside-focus preservation',async({page})=>{await page.goto('/components/data-grid');await checkCustomGridEditor(page,id=>example(page,id));});
+test('public custom editor hooks compose TreeSelect with explicit apply and outside-focus preservation',async({page})=>{await page.goto('/components/data-grid/examples/grid-editor-custom');await checkCustomGridEditor(page,id=>example(page,id));});
 
 test('invalid or incomplete typed dates cannot apply the previous valid grid value',async({page})=>{
   await open(page);const cell=await edit(page,'Due date for REC-1'),panel=page.getByRole('dialog',{name:'Edit due date',exact:true}),field=panel.getByRole('textbox',{name:'Due date for REC-1',exact:true});

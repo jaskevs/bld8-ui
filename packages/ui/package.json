@@ -14,7 +14,10 @@
     "UPSTREAM.json",
     "SHADCN_LICENSE",
     "MOTION_LICENSE",
-    "DND_KIT_LICENSE"
+    "DND_KIT_LICENSE",
+    "EDITOR_LICENSES",
+    "PHONE_LICENSE",
+    "RECURRENCE_LICENSES"
   ],
   "exports": {
     "./core": {
@@ -206,6 +209,86 @@
     "./scroll-area": {
       "types": "./dist/scroll-area.d.ts",
       "import": "./dist/scroll-area.js"
+    },
+    "./rich-text-editor": {
+      "types": "./dist/rich-text-editor.d.ts",
+      "import": "./dist/rich-text-editor.js"
+    },
+    "./rich-text-state": {
+      "types": "./dist/rich-text-state.d.ts",
+      "import": "./dist/rich-text-state.js"
+    },
+    "./import-wizard": {
+      "types": "./dist/import-wizard.d.ts",
+      "import": "./dist/import-wizard.js"
+    },
+    "./import-wizard-state": {
+      "types": "./dist/import-wizard-state.d.ts",
+      "import": "./dist/import-wizard-state.js"
+    },
+    "./color-picker": {
+      "types": "./dist/color-picker.d.ts",
+      "import": "./dist/color-picker.js"
+    },
+    "./color-picker-state": {
+      "types": "./dist/color-picker-state.d.ts",
+      "import": "./dist/color-picker-state.js"
+    },
+    "./phone-input": {
+      "types": "./dist/phone-input.d.ts",
+      "import": "./dist/phone-input.js"
+    },
+    "./phone-input-state": {
+      "types": "./dist/phone-input-state.d.ts",
+      "import": "./dist/phone-input-state.js"
+    },
+    "./rating": {
+      "types": "./dist/rating.d.ts",
+      "import": "./dist/rating.js"
+    },
+    "./text-reveal": {
+      "types": "./dist/text-reveal.d.ts",
+      "import": "./dist/text-reveal.js"
+    },
+    "./stagger": {
+      "types": "./dist/stagger.d.ts",
+      "import": "./dist/stagger.js"
+    },
+    "./bento": {
+      "types": "./dist/bento.d.ts",
+      "import": "./dist/bento.js"
+    },
+    "./carousel": {
+      "types": "./dist/carousel.d.ts",
+      "import": "./dist/carousel.js"
+    },
+    "./product-preview": {
+      "types": "./dist/product-preview.d.ts",
+      "import": "./dist/product-preview.js"
+    },
+    "./resource-scheduler": {
+      "types": "./dist/resource-scheduler.d.ts",
+      "import": "./dist/resource-scheduler.js"
+    },
+    "./resource-scheduler-state": {
+      "types": "./dist/resource-scheduler-state.d.ts",
+      "import": "./dist/resource-scheduler-state.js"
+    },
+    "./recurrence-state": {
+      "types": "./dist/recurrence-state.d.ts",
+      "import": "./dist/recurrence-state.js"
+    },
+    "./gantt-state": {
+      "types": "./dist/gantt-state.d.ts",
+      "import": "./dist/gantt-state.js"
+    },
+    "./gantt": {
+      "types": "./dist/gantt.d.ts",
+      "import": "./dist/gantt.js"
+    },
+    "./recurrence-editor": {
+      "types": "./dist/recurrence-editor.d.ts",
+      "import": "./dist/recurrence-editor.js"
     }
   },
   "sideEffects": [
@@ -225,8 +308,16 @@
     "@dnd-kit/core": "6.3.1",
     "@dnd-kit/sortable": "10.0.0",
     "@dnd-kit/utilities": "3.2.2",
+    "@js-temporal/polyfill": "0.5.1",
+    "@tiptap/core": "3.33.1",
+    "@tiptap/extension-mention": "3.33.1",
+    "@tiptap/pm": "3.33.1",
+    "@tiptap/react": "3.33.1",
+    "@tiptap/starter-kit": "3.33.1",
+    "@tiptap/suggestion": "3.33.1",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "libphonenumber-js": "1.13.16",
     "lucide-react": "1.55.0",
     "motion": "14.7.1",
     "react-day-picker": "10.0.2",

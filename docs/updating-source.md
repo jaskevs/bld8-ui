@@ -158,7 +158,7 @@ retained BLD8 source artifact. Vite starters do not depend on Next.js.
 
 ## Documentation matching a source version
 
-Future retained releases from 0.4.0 include `docs/catalog.json` and one
+Retained releases from 0.4.0 include `docs/catalog.json` and one
 `documentation.zip`. The source manifest covers both artifacts by byte digest.
 The catalogue records the exact version, status and source revision. Its
 `snapshotKind: "source-graph"` digest covers canonical manifest items rather than

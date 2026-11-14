@@ -1,14 +1,18 @@
 import {expect} from '@playwright/test';
 
-async function ready(getExample,id){const example=getExample(id),run=example.getByRole('button',{name:'Run example',exact:true});if(await run.count())await run.click();return example;}
+async function ready(getExample,id){const example=getExample(id),run=example.getByRole('button',{name:'Run example',exact:true}),grid=example.getByRole('grid');await expect.poll(async()=>await grid.isVisible()||await run.isVisible()).toBe(true);if(await run.isVisible())await run.click();return example;}
 async function center(cell){await cell.evaluate(element=>element.scrollIntoView({block:'center',inline:'center',behavior:'instant'}));await cell.click();}
 async function canonical(example,label,id){return JSON.parse((await example.getByLabel(label,{exact:true}).textContent())||'[]').find(row=>row.id===id);}
 async function contained(page,popup){const box=await popup.boundingBox(),viewport=page.viewportSize();expect(box).not.toBeNull();expect(viewport).not.toBeNull();expect(box.x).toBeGreaterThanOrEqual(-.5);expect(box.y).toBeGreaterThanOrEqual(-.5);expect(box.x+box.width).toBeLessThanOrEqual(viewport.width+.5);expect(box.y+box.height).toBeLessThanOrEqual(viewport.height+.5);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
 
-/** Exercise the same canonical editor transactions in docs and clean source consumers. */
-export async function checkMixedGridEditors(page,getExample){
+async function mixedContext(page,getExample){
   const example=await ready(getExample,'grid-editor-mixed'),grid=example.getByRole('grid',{name:'Delivery editor grid',exact:true});await expect(grid).toBeVisible();
-  const approved=grid.getByRole('gridcell',{name:'Approved for REC-1',exact:true});
+  const approved=grid.getByRole('gridcell',{name:'Approved for REC-1',exact:true}),due=grid.getByRole('gridcell',{name:'Due date for REC-1',exact:true});
+  const datePanel=page.getByRole('dialog',{name:'Edit due date',exact:true}),date=datePanel.getByRole('textbox',{name:'Due date for REC-1',exact:true});
+  return {example,grid,approved,due,datePanel,date};
+}
+
+async function mixedTransactions(page,{example,grid,approved,due,datePanel,date}){
   await center(approved);await approved.press('Enter');let checkbox=grid.getByRole('checkbox',{name:'Approved for REC-1',exact:true});await expect(checkbox).toBeFocused();
   await checkbox.press('Space');await expect(checkbox).toBeChecked();await checkbox.press('Escape');await expect(approved).toBeFocused();expect((await canonical(example,'Delivery canonical values','REC-1')).approved).toBe(false);
   await approved.press('Enter');checkbox=grid.getByRole('checkbox',{name:'Approved for REC-1',exact:true});await checkbox.press('Space');await checkbox.press('Enter');
@@ -16,9 +20,9 @@ export async function checkMixedGridEditors(page,getExample){
   await example.getByRole('button',{name:'Undo',exact:true}).click();await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-1')).approved).toBe(false);
   await example.getByRole('button',{name:'Redo',exact:true}).click();await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-1')).approved).toBe(true);
 
-  const due=grid.getByRole('gridcell',{name:'Due date for REC-1',exact:true});await center(due);await due.press('Enter');
-  const datePanel=page.getByRole('dialog',{name:'Edit due date',exact:true});await expect(datePanel).toBeVisible();await contained(page,datePanel);
-  const date=datePanel.getByRole('textbox',{name:'Due date for REC-1',exact:true});await expect(date).toBeFocused();await date.fill('2026-11-28');await date.press('Enter');
+  await center(due);await due.press('Enter');
+  await expect(datePanel).toBeVisible();await contained(page,datePanel);
+  await expect(date).toBeFocused();await date.fill('2026-11-28');await date.press('Enter');
   await datePanel.getByRole('button',{name:'Open due date for rec-1 calendar',exact:true}).click();
   const calendar=page.getByRole('dialog',{name:'Due date for REC-1',exact:true});await expect(calendar).toBeVisible();await contained(page,calendar);
   await calendar.getByRole('button',{name:'Sunday, November 29th, 2026',exact:true}).click();await expect(calendar).toBeHidden();await expect(datePanel).toBeVisible();
@@ -39,6 +43,9 @@ export async function checkMixedGridEditors(page,getExample){
   await other.evaluate((element,text)=>{const event=new ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData:new DataTransfer()});event.clipboardData.setData('text/plain',text);element.dispatchEvent(event);},copied);
   await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-2')).assignees).toEqual(['maya','oliver']);expect((await canonical(example,'Delivery canonical values','REC-2')).due).toBe('2026-11-29');expect((await canonical(example,'Delivery canonical values','REC-2')).approved).toBe(true);
   await example.getByRole('button',{name:'Save delivery draft',exact:true}).click();await expect(example.getByText('Saved together in this local example.',{exact:true})).toBeVisible();await expect(example.getByRole('button',{name:'Save delivery draft',exact:true})).toBeDisabled();
+}
+
+async function mixedRecovery(page,{example,due,datePanel,date}){
   // Exercise repeated invalid-to-valid recovery without moving the pressed action.
   for(const value of ['2026-11-24','2026-11-25','2026-11-26']){
     await center(due);await due.press('Enter');await expect(datePanel).toBeVisible();
@@ -49,10 +56,45 @@ export async function checkMixedGridEditors(page,getExample){
     await apply.click();await expect(datePanel).toBeHidden();await expect(due).toBeFocused();await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-1')).due).toBe(value);
     await example.getByRole('button',{name:'Restore saved records',exact:true}).click();await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-1')).due).toBe('2026-11-29');
   }
+}
+
+async function mixedMotion(page,{approved}){
   const reduced=await page.evaluate(()=>matchMedia('(prefers-reduced-motion:reduce)').matches),mark=approved.locator('.bui-data-grid-boolean');
   await page.emulateMedia({reducedMotion:'no-preference'});await expect.poll(()=>mark.evaluate(element=>getComputedStyle(element).transitionDuration.split(',').some(value=>parseFloat(value)>0))).toBe(true);
   await page.emulateMedia({reducedMotion:'reduce'});await expect.poll(()=>mark.evaluate(element=>getComputedStyle(element).transitionDuration.split(',').every(value=>parseFloat(value)===0))).toBe(true);
   await page.emulateMedia({reducedMotion:reduced?'reduce':'no-preference'});
+}
+
+/** One complete flow remains available to source consumers without a per-test deadline. */
+export async function checkMixedGridEditors(page,getExample){
+  const context=await mixedContext(page,getExample);
+  await mixedTransactions(page,context);
+  await mixedRecovery(page,context);
+  await mixedMotion(page,context);
+}
+
+/** Canonical commits, cancellation, nested choices, atomic history and clipboard transactions. */
+export async function checkMixedGridTransactions(page,getExample){
+  await mixedTransactions(page,await mixedContext(page,getExample));
+}
+
+/** Recovery starts from a real edited-and-saved baseline instead of inherited test state. */
+export async function checkMixedGridRecovery(page,getExample){
+  const context=await mixedContext(page,getExample),{example,due,datePanel,date}=context;
+  await center(due);await due.press('Enter');await expect(datePanel).toBeVisible();await expect(date).toBeFocused();
+  await date.fill('2026-11-29');await datePanel.getByRole('button',{name:'Apply changes',exact:true}).click();
+  await expect(datePanel).toBeHidden();await expect(due).toBeFocused();await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-1')).due).toBe('2026-11-29');
+  await example.getByRole('button',{name:'Save delivery draft',exact:true}).click();await expect(example.getByText('Saved together in this local example.',{exact:true})).toBeVisible();await expect(example.getByRole('button',{name:'Save delivery draft',exact:true})).toBeDisabled();
+  await mixedRecovery(page,context);
+}
+
+/** Motion checks use a genuinely committed native-checkbox value in a fresh example. */
+export async function checkMixedGridMotion(page,getExample){
+  const context=await mixedContext(page,getExample),{example,grid,approved}=context;
+  await center(approved);await approved.press('Enter');const checkbox=grid.getByRole('checkbox',{name:'Approved for REC-1',exact:true});await expect(checkbox).toBeFocused();
+  await checkbox.press('Space');await expect(checkbox).toBeChecked();await checkbox.press('Enter');await expect(approved).toBeFocused();
+  await expect.poll(async()=>(await canonical(example,'Delivery canonical values','REC-1')).approved).toBe(true);
+  await mixedMotion(page,context);
 }
 
 /** Public render hooks compose a hierarchical picker without changing its leaf IDs. */

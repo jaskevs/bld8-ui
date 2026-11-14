@@ -1,8 +1,9 @@
+import ts from 'typescript';
 import {readFileSync,readdirSync,existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {repositoryRoot,mitNotice,normalizeNotice,hasFullNotice,uiNoticeNames,distributionNotices,licenseCode} from './license-policy.mjs';
+import {repositoryRoot,mitNotice,normalizeNotice,hasFullNotice,uiNoticeNames,distributionNotices,licenseCode,registryBaseNoticeNames,registryNoticeNamesForPackages} from './license-policy.mjs';
 import {unzip,themeStarter} from './starter-archive.mjs';
 import {blocks,templates} from './library-catalog.mjs';
 import {readExportLiteral} from './literal-data.mjs';
@@ -97,6 +98,17 @@ export function checkRegistry(items,notices,upstream){
   const byName=new Map(items.map(item=>[item.name,item]));
   if(byName.size!==items.length||!items.length)fail('registry item inventory is empty or duplicated');
   const expected=new Map(uiNoticeNames.map(name=>['@ui/bld8/licenses/'+name,notices['packages/ui/'+name]]));
+  const importCache=new Map();
+  const packageImports=file=>{
+    if(!/\.(?:tsx?|jsx?|mjs)$/.test(file.path))return [];
+    if(importCache.has(file.content))return importCache.get(file.content);
+    const packages=new Set(),tree=ts.createSourceFile(file.path,text(file.content),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+    const visit=node=>{
+      if((ts.isImportDeclaration(node)||ts.isExportDeclaration(node))&&node.moduleSpecifier&&ts.isStringLiteral(node.moduleSpecifier))packages.add(node.moduleSpecifier.text);
+      if(ts.isCallExpression(node)&&(node.expression.kind===ts.SyntaxKind.ImportKeyword||ts.isIdentifier(node.expression)&&node.expression.text==='require')&&node.arguments[0]&&ts.isStringLiteral(node.arguments[0]))packages.add(node.arguments[0].text);
+      ts.forEachChild(node,visit);
+    };visit(tree);const result=[...packages];importCache.set(file.content,result);return result;
+  };
   for(const item of items){
     checkMetadata(item,notices,upstream,'registry '+item.name);
     for(const file of item.files??[]){
@@ -107,15 +119,16 @@ export function checkRegistry(items,notices,upstream){
       const adapted=upstream.files.find(entry=>'@ui/bld8/'+entry.adaptedIn.replace(/^src\//,'')===file.target);
       if(adapted&&!hasFullNotice(file.content,notices['packages/ui/SHADCN_LICENSE']))fail('adapted registry source loses shadcn notice: '+file.target);
     }
-    const seen=new Set(),files=new Map();
+    const seen=new Set(),files=new Map(),packages=new Set();
     function visit(name){
       if(seen.has(name))return;seen.add(name);
       const current=byName.get(name);if(!current)fail('missing registry dependency '+name);
+      for(const dependency of current.dependencies??[])packages.add(dependency);
       for(const dep of current.registryDependencies??[]){const match=/\/r\/([a-z0-9-]+)\.json$/.exec(dep);if(!match)fail('unexpected registry dependency URL '+dep);visit(match[1]);}
-      for(const file of current.files??[]){if(files.has(file.target)&&files.get(file.target)!==file.content)fail('conflicting registry file '+file.target);files.set(file.target,file.content);}
+      for(const file of current.files??[]){for(const specifier of packageImports(file))packages.add(specifier);if(files.has(file.target)&&files.get(file.target)!==file.content)fail('conflicting registry file '+file.target);files.set(file.target,file.content);}
     }
     visit(item.name);
-    for(const [target,content] of expected)requireNotice(files.get(target),content,item.name+' dependency closure '+target);
+    for(const notice of [...registryBaseNoticeNames,...registryNoticeNamesForPackages(packages)]){const target='@ui/bld8/licenses/'+notice;requireNotice(files.get(target),expected.get(target),item.name+' dependency closure '+target);}
     if([...files.keys()].some(path=>path.startsWith('@ui/bld8/blocks/')&&!path.endsWith('/LICENSE')))requireNotice(files.get('@ui/bld8/blocks/LICENSE'),notices['packages/blocks/LICENSE'],item.name+' blocks dependency closure');
   }
 }

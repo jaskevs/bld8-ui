@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-import {mitNotice,licenseCode,licenseMetadata,distributionNotices,repositoryRoot,uiNoticeNames} from './license-policy.mjs';
+import {mitNotice,licenseCode,licenseMetadata,distributionNotices,repositoryRoot,uiNoticeNames,registryOptionalNoticeNames} from './license-policy.mjs';
 import {requireNotice,requireCodeNotice,checkDependencyInventory,checkWorkspaceInventory,discoverWorkspaceManifests,checkUpstreamMappings,checkMetadata,checkRegistry,checkStarter,checkReleaseArtifacts} from './check-licenses.mjs';
 import {zip,unzip} from './starter-archive.mjs';
 import {releaseAssetName,versionAssetUrl} from './release-hosting.mjs';
@@ -12,6 +12,19 @@ const registry=()=>[
   {...metadata(),name:'styles',registryDependencies:[],files:uiNoticeNames.map(name=>({path:'registry/bld8/licenses/'+name,target:'@ui/bld8/licenses/'+name,content:notices['packages/ui/'+name].toString()}))},
   {...metadata(),name:'button',registryDependencies:['https://ui.bld8.dev/r/styles.json'],files:[{path:'registry/bld8/button.tsx',target:'@ui/bld8/button.tsx',content:licenseCode("'use client';\nexport const Button=()=>null;",{standalone:true,root})}]},
 ];
+
+const registryWithoutOptional=()=>{const items=registry();items[0].files=items[0].files.filter(file=>!registryOptionalNoticeNames.some(name=>file.target.endsWith('/'+name)));return items;};
+const optionalRegistry=(notice,specifier,declaredOnly=false)=>{
+  const items=registryWithoutOptional();
+  items.push({...metadata(),name:'package-owner',dependencies:declaredOnly?[specifier]:[],registryDependencies:['https://ui.bld8.dev/r/styles.json'],files:[
+    {path:'registry/bld8/package-owner.ts',target:'@ui/bld8/package-owner.ts',content:licenseCode((declaredOnly?'':"import {example} from '"+specifier+"';\n")+'export const Value=1;',{standalone:true,root})},
+    {path:'registry/bld8/licenses/'+notice,target:'@ui/bld8/licenses/'+notice,content:notices['packages/ui/'+notice].toString()}
+  ]});
+  items.push({...metadata(),name:'consumer',registryDependencies:['https://ui.bld8.dev/r/package-owner.json'],files:[{path:'registry/bld8/consumer.ts',target:'@ui/bld8/consumer.ts',content:licenseCode("export {Value} from './package-owner';",{standalone:true,root})}]});
+  return items;
+};
+const optionalCases=[['EDITOR_LICENSES','@tiptap/core'],['PHONE_LICENSE','libphonenumber-js/max'],['RECURRENCE_LICENSES','@js-temporal/polyfill']];
+
 const starter=()=>({...notices,'package.json':JSON.stringify({license:'MIT'}),'packages/ui/package.json':JSON.stringify({license:'MIT'}),'packages/blocks/package.json':JSON.stringify({license:'MIT'}),'packages/ui/src/index.ts':"export * from './core.js';\n"});
 test('canonical MIT requires every word and exact copyright, allowing line wrapping',()=>{
   requireNotice(mitNotice().replaceAll('\n','\r\n'),mitNotice(),'fixture');
@@ -41,9 +54,9 @@ test('metadata preserves full notices and exact pinned adaptation ledger',()=>{
   const truncated=metadata();truncated.notices[0].content='MIT';assert.throws(()=>checkMetadata(truncated,notices,upstream,'fixture'),bad);
   const drift=metadata();drift.provenance.upstream.revision='0'.repeat(40);assert.throws(()=>checkMetadata(drift,notices,upstream,'fixture'),bad);
 });
-test('registry dependency closure supplies complete sidecars',()=>checkRegistry(registry(),notices,upstream));
-test('registry missing closure sidecar is rejected',()=>{const f=registry();f[0].files=f[0].files.filter(file=>!file.path.endsWith('/SHADCN_LICENSE'));assert.throws(()=>checkRegistry(f,notices,upstream),bad);});
-test('registry truncated sidecar is rejected despite filename and SPDX metadata',()=>{const f=registry();f[0].files.find(file=>file.path.endsWith('/LICENSE')).content='MIT License';assert.throws(()=>checkRegistry(f,notices,upstream),bad);});
+test('registry dependency closure supplies complete sidecars',()=>{checkRegistry(registry(),notices,upstream);checkRegistry(registryWithoutOptional(),notices,upstream);for(const[notice,specifier]of optionalCases){checkRegistry(optionalRegistry(notice,specifier),notices,upstream);checkRegistry(optionalRegistry(notice,specifier+'@1.0.0',true),notices,upstream);}});
+test('registry missing closure sidecar is rejected',()=>{const f=registry();f[0].files=f[0].files.filter(file=>!file.path.endsWith('/SHADCN_LICENSE'));assert.throws(()=>checkRegistry(f,notices,upstream),bad);for(const[notice,specifier]of optionalCases)for(const declaredOnly of[false,true]){const items=optionalRegistry(notice,declaredOnly?specifier+'@1.0.0':specifier,declaredOnly);items.find(item=>item.name==='package-owner').files.pop();assert.throws(()=>checkRegistry(items,notices,upstream),new RegExp(notice));}});
+test('registry truncated sidecar is rejected despite filename and SPDX metadata',()=>{const f=registry();f[0].files.find(file=>file.path.endsWith('/LICENSE')).content='MIT License';assert.throws(()=>checkRegistry(f,notices,upstream),bad);for(const[notice,specifier]of optionalCases){const items=optionalRegistry(notice,specifier);items.find(item=>item.name==='package-owner').files.at(-1).content='MIT License';assert.throws(()=>checkRegistry(items,notices,upstream),new RegExp(notice));}});
 test('registry adapted source cannot lose full upstream notice',()=>{const f=registry();f[1].files[0].path='registry/bld8/sidebar.tsx';f[1].files[0].target='@ui/bld8/sidebar.tsx';assert.throws(()=>checkRegistry(f,notices,upstream),/shadcn notice/);});
 test('actual ZIP round trip preserves complete notices and permits tiny generated barrel',()=>checkStarter(unzip(zip(starter())),{notices,root,themes:false}));
 test('ZIP missing root notice is rejected',()=>{const f=starter();delete f.LICENSE;assert.throws(()=>checkStarter(unzip(zip(f)),{notices,root,themes:false}),bad);});

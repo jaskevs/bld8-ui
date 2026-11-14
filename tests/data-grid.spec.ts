@@ -167,3 +167,17 @@ test('grid rejects off-page and readonly paste without producing any drafts',asy
   await expect(page.locator('.bui-data-grid-status')).toContainText('loaded rows');
   await expect(grid.locator('[data-dirty]')).toHaveCount(0);
 });
+
+test('double activation requires consecutive clicks on the same logical grid cell',async({page})=>{
+  await page.goto('/blocks/data-workspace');const grid=page.getByRole('grid',{name:'Issue data grid',exact:true}),title=grid.getByRole('gridcell',{name:'Title for ISS-101',exact:true}),assignee=grid.getByRole('gridcell',{name:'Assignee for ISS-101',exact:true});
+  await title.click();await expect(title).toBeFocused();await expect(title).toHaveAttribute('aria-selected','true');
+  const activate=async(cell:typeof title,detail:number)=>{await cell.evaluate((element,detail)=>{element.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,detail}));if(detail===2)element.dispatchEvent(new MouseEvent('dblclick',{bubbles:true,cancelable:true,detail}));},detail);};
+  // Chromium can emit this native click/detail sequence after two touches land on different cells.
+  // Dispatch explicit details here so the regression does not depend on an OS double-tap interval.
+  await activate(title,1);await activate(assignee,2);await expect(grid.locator('[data-editing]')).toHaveCount(0);await expect(assignee).toBeFocused();await expect(page.locator('.bui-data-grid-choice-popup')).toHaveCount(0);
+  await assignee.press('Enter');const search=page.getByRole('combobox',{name:'Search Assignee for ISS-101 options',exact:true});await expect(search).toBeFocused();await search.press('Escape');await expect(assignee).toBeFocused();
+  await activate(title,1);await activate(title,2);const editor=grid.getByRole('textbox',{name:'Title for ISS-101',exact:true});await expect(editor).toBeFocused();await editor.press('Escape');
+  await page.getByRole('textbox',{name:'Search issues',exact:true}).click();await activate(title,2);await expect(grid.locator('[data-editing]')).toHaveCount(0);
+  await grid.getByRole('columnheader').first().evaluate(element=>element.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerType:'mouse',isPrimary:true,button:0})));await activate(title,2);await expect(grid.locator('[data-editing]')).toHaveCount(0);
+  await title.dblclick();await expect(editor).toBeFocused();await editor.press('Escape');await expect(title).toBeFocused();await expect(grid.locator('[data-dirty]')).toHaveCount(0);
+});

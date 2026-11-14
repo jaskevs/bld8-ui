@@ -29,8 +29,8 @@ Linux environment. See [visual quality](visual-quality.md) and
 [clean registry consumers](registry-consumer-checks.md).
 
 Core and browser-quality jobs have 45-minute execution budgets. The current
-browser-quality suite configures 734 cases: twenty approved visual comparisons,
-66 touch cases and 648 normal-motion checks across 54 flows. Current core counts
+browser-quality suite configures 914 cases: twenty approved visual comparisons,
+66 touch cases and 828 normal-motion checks across 69 flows. Current core counts
 and final run outcomes belong in verification.md; a configured test count is not
 a passing result. Historical timing examples apply only to their recorded
 source: the earlier 764-case core acceptance took 9.0 minutes with three workers

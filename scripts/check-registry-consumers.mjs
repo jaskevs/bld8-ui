@@ -13,6 +13,8 @@ import {localReader} from './check-source-updates.mjs';
 import {hasFullNotice,mitNotice} from './license-policy.mjs';
 import {readComponentExamples} from './prepare-component-examples.mjs';
 import {foundationExampleIds,checkInstalledFoundations} from './check-foundations.mjs';
+import {inputVisualExampleIds,checkInstalledInputVisual} from './check-input-visual.mjs';
+import {contentPlanningExampleIds,checkInstalledContentPlanning} from './check-content-planning.mjs';
 import {checkEditingExamples} from './check-control-editing.mjs';
 import {installedCompositionExampleIds,checkInstalledCompositionExamples} from './check-new-controls.mjs';
 import {installedAdoptionExampleIds,checkInstalledAdoptionExamples} from './check-adoption-controls.mjs';
@@ -103,7 +105,9 @@ const compositionControls=['autocomplete','toolbar','alert-dialog','navigation-m
 const compositionExamplesAvailable=compositionControls.every(name=>originals.has(name+'.json'));
 const adoptionAvailable=originals.has('faceted-filter.json')&&originals.has('checkbox-group.json');
 const foundationsAvailable=originals.has('resizable-panels.json')&&originals.has('donut-chart.json');
-const compositionExampleIds=[...(foundationsAvailable?foundationExampleIds:[]),...installedCompositionExampleIds,...(adoptionAvailable?installedAdoptionExampleIds:[])];
+const expansionAvailable=originals.has('import-wizard.json');
+if(expansionAvailable)for(const id of [...inputVisualExampleIds,...contentPlanningExampleIds])assert.ok(originals.has('example-'+id+'.json'),'A complete expansion example is missing: '+id);
+const compositionExampleIds=[...(expansionAvailable?[...inputVisualExampleIds,...contentPlanningExampleIds]:[]),...(foundationsAvailable?foundationExampleIds:[]),...installedCompositionExampleIds,...(adoptionAvailable?installedAdoptionExampleIds:[])];
 const installedCompositionExamples=compositionExamplesAvailable?readComponentExamples(root).filter(item=>compositionExampleIds.includes(item.id)):[];
 if(compositionExamplesAvailable)assert.equal(installedCompositionExamples.length,compositionExampleIds.length,'All representative new controls and workflow examples must be available.');
 const compositionInstallItems=installedCompositionExamples.map(item=>item.registryName);
@@ -304,6 +308,7 @@ async function checkThemeInBrowser(browser, target, framework, theme) {
         if(installedCompositionExamples.length)await checkInstalledCompositionExamples(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
         if(adoptionAvailable)await checkInstalledAdoptionExamples(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
         if(foundationsAvailable)await checkInstalledFoundations(page,id=>page.locator('[data-installed-composition="'+id+'"]'));
+        if(expansionAvailable){await checkInstalledInputVisual(page,id=>page.locator('[data-installed-composition="'+id+'"]'));await checkInstalledContentPlanning(page,id=>page.locator('[data-installed-composition="'+id+'"]'));}
         const files = page.getByRole('region', {name:'Installed file browser',exact:true});
         const tree = files.getByRole('tree',{name:'Workspace folders',exact:true});
         await expect(tree).toBeVisible();

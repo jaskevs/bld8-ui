@@ -16,6 +16,20 @@ for(const name of ['index.ts','react-hook-form.tsx']){
   if(module)for(const symbol of checker.getExportsOfModule(module))symbols.set(symbol.name,symbol.flags & ts.SymbolFlags.Alias?checker.getAliasedSymbol(symbol):symbol);
 }
 const groups={
+  "recurrence-editor":["RecurrenceEditor","RecurrenceEditorProps","RecurrenceRule","RecurrenceSeries","RecurrenceException","RecurrenceOccurrence","RecurrenceChange","RecurrenceRequest","RecurrenceSaveResult","RecurrenceSource"],
+  "gantt":["Gantt","GanttProps","GanttSnapshot","GanttTask","GanttDependency","GanttChange","GanttSaveResult"],
+  "resource-scheduler":["ResourceScheduler","ResourceSchedulerProps","SchedulerSnapshot","SchedulerEvent","SchedulerResource","SchedulerDay","SchedulerChange","SchedulerSaveResult"],
+  "product-preview":["ProductPreview","ProductPreviewProps"],
+  "carousel":["Carousel","CarouselProps","CarouselItem"],
+  "bento":["BentoGrid","BentoGridProps","BentoItem","BentoItemProps"],
+  "stagger":["Stagger","StaggerProps"],
+  "text-reveal":["TextReveal","TextRevealProps"],
+  "rating":["Rating","RatingProps"],
+  "phone-input":["PhoneInput","PhoneInputProps","PhoneCountryCode","PhoneValue"],
+  "color-picker":["ColorPicker","ColorPickerProps","ColorRGBA"],
+  "import-wizard":["ImportWizard","ImportWizardProps","ImportField","ImportRequest","ImportApplyResult","ImportIssue"],
+  "mentions":["Mentions","MentionsProps","RichTextMentionSource"],
+  "rich-text-editor":["RichTextEditor","RichTextEditorProps","RichTextDocument","RichTextMentionSource","RichTextMention"],
   "scroll-area":["ScrollArea","ScrollAreaProps"],
   "resizable-panels":["ResizablePanels","ResizablePanelsProps","ResizablePanel","PanelLayout","PanelLayoutDetails"],
   "stacked-bar-chart":["StackedBarChart","StackedDatum","StackedSeries"],

@@ -1,3 +1,152 @@
+# Aggregate registry packaging repair — 14 November 2026
+
+The exact unpublished candidate passed all **1,062 core cases** and **914
+browser-quality cases**, plus build, types, licences, clean registry consumers
+and themed starters. Its final packaging phase then rejected the 29,400,130-byte
+aggregate registry against the ordinary 16 MiB artifact limit. No successful
+full receipt or push was created; those passing stages are historical evidence.
+
+The bounded reader now allows 32 MiB for exactly `r/registry.json`, matching the
+existing aggregate documentation allowance. Ordinary artifacts remain limited to
+16 MiB and the manifest to 8 MiB. Path, link, inventory and digest checks remain.
+Oversize diagnostics identify the path and byte limit. No verification policy,
+workflow, hook, receipt, assertion or timeout was relaxed.
+
+All **17 pure release safety fixtures** pass, including six added inclusive-bound,
+exact-path and rejection-before-read regressions. The preserved actual candidate
+now verifies all **547 files** against its manifest hashes. These focused results
+are not a replacement for the fresh complete exact-commit verification.
+
+Next: amend the same unpublished release at the actual time under the owner's
+approved exception, pass the unchanged full twenty-phase gate, then push.
+GitHub validation, immutable 0.5.0 publication, Vercel promotion and actual public
+Next.js/Vite installation acceptance remain pending. Retained releases stay intact.
+
+# Logical-cell touch activation repair — 14 November 2026
+
+The prior corrected candidate passed all 1,061 core cases, then the browser
+matrix exposed a real touch-chromium-dark focus assertion. Its trace and native
+reproduction show Title click(detail 1), keyboard edit/Escape, then Assignee
+click(detail 2) and dblclick on a different logical cell. The popup opened before
+the following cell-targeted Enter action, which left its search inactive.
+
+- Runtime repair records the two preceding ordinary cell keys and requires
+  both to match before native double-click editing. Existing pointer ownership
+  clears this history for headers, outside/portal actions and consumed drags.
+  No timing threshold, scrolling suppression or choice-focus override is added.
+- Paired native checks reproduce old cross-cell activation and verify the fixed
+  selection behaviour, genuine same-cell mouse/touch double activation, keyboard
+  Enter/search focus and no writes.
+- The permanent core regression uses an explicit click/detail sequence after
+  native focus readiness. It covers cross-cell selection, keyboard entry, genuine
+  same-cell editing and outside/header interruption without an OS timing race.
+- Actual rebuilt real-workspace acceptance passes production build, workspace
+  and quality types, 37 focused grid/release cases (including SSR), and 18
+  touch/keyboard quality cases across the configured browser/theme/viewport matrix.
+  The original real-touch test and its focus assertions remain unchanged.
+- The failed candidate's remaining matrix was stopped after preserving the real
+  assertion failure; quality exit 143 is that later controlled stop. No successful
+  receipt or push was created. All historical counts below remain tied to their
+  original sources. The final amended source must pass the full gate afresh.
+
+# Licence sidecar route preflight — 14 November 2026
+
+The generated 0.5.0 source listed three upstream notice sidecars whose
+versioned site paths returned 404. The fix adds only those exact allowlist paths;
+existing version checks, traversal rejection and immutable redirects remain.
+
+- All three notice GET routes returned 404 before the fix.
+- The generated-artifact parity regression failed on EDITOR_LICENSES before
+  the fix and passed afterwards. It compares every generated artifact, the
+  manifest and offline documentation paths with the release-hosting URL map.
+- Actual GET and HEAD requests now return 308 to the exact retained GitHub asset
+  with the existing immutable cache header for all three notices.
+- Eleven retained-release safety fixtures pass, including unsafe paths,
+  corruption, immutable publication, resumable drafts and dependency-free preflight.
+- The first final-source guard passed 1,060 core tests and 414 quality cases
+  before it was intentionally stopped for this repair (quality exit 143). It
+  created no successful verification receipt and performed no push. The source
+  below remains historical evidence; the corrected committed source must pass
+  the full twenty-phase gate again, now including the new parity case.
+
+# Content, import and planning acceptance — 14 November 2026
+
+Source is **0.5.0/unreleased**. The historical full local stages below passed in
+the pinned Linux Playwright image under Node 22 before the shared calendar and grid-startup focus repairs.
+The targeted repairs have separate causal/type proof. Final exact-commit verification,
+GitHub CI, regenerated release assets and 0.5.0 publication remain pending.
+
+- Production build, workspace types and quality types pass. Generated authorities
+  contain 95 component families, 158 complete examples, 18 blocks, 3 templates,
+  453 registry items, 116 agent entries and 29 guides.
+- **1057 core cases pass (17.0m)**; the focused expansion run passes all
+  **93 cases (42.2s)**. Counts and durations come from the preserved pre-repair stage logs.
+- **914 browser-quality cases pass (29.5m)**: 20 unchanged approved
+  image comparisons, 66 touch cases and 828 normal-motion cases across
+  69 workflows and twelve browser/theme/viewport configurations. Assertion-preserving
+  grid scenario splits do not relax the existing edit, clipboard or recovery checks.
+- Actual shadcn source installs pass in clean Next.js and custom-alias Vite
+  applications, including all 14 new families. Themed downloads, HTTP Data
+  Workspace references and independent Vite starters pass their separate checks.
+- **38 licence fixtures** and distribution integrity pass with **214 reviewed
+  dependencies and 15 complete notices**. Registry closures, fonts, every starter,
+  source/agent payloads and the draft candidate retain their applicable notices.
+- The historical pre-repair draft candidate contains **546 byte/hash-verified artifacts**.
+  Snapshot: `c1a7e9ccf5867737fed70117fc0ed37a9431d50d7b78d60ca1262453441c2b79`. Its catalogue is
+  32,534,566 bytes within the 32 MiB bound; its documentation ZIP is
+  7,909,012 bytes. Both documentation hashes and the offline archive audit
+  pass. It remains unreleased with sourceRevision:null; no 0.5.0 publication is
+  fabricated. Final source/metadata must regenerate these candidate artifacts in
+  the unchanged exact-commit guard. The catalogue is near its existing cap,
+  which is not increased here.
+- **42 private production captures** were inspected across desktop light and phone
+  light/dark for all 14 families. **56 geometry/runtime checks**, including 320px
+  views, found no page overflow or uncaught errors. Mobile Bento, native opacity
+  range alignment, white swatch visibility, recurrence field containment and
+  compact scheduler navigation have focused regression coverage.
+- Development-version HTML and selected HTML/Markdown returned 200. Both Next
+  runtime traces include the public documentation catalogue without private paths.
+
+The full-run counts above are historical acceptance of the frozen working source,
+before the separately reviewed shared calendar and grid-startup focus repairs. The exact
+paired browser diagnostics show Cancel staying under the pointer and rapid Tab
+remaining in its grid editor session. The patched runtime graphs pass no-emit types.
+Ordinary core regressions cover enabled-day focus, held-Cancel geometry and rapid
+grid-editor keyboard ownership; existing browser-quality flows are strengthened. Their
+execution against the final release source remains pending the unchanged
+exact-clean-commit guard. No historical full-suite log is relabelled as proof of
+post-repair source. Repair source/proof hashes are recorded separately; original
+snapshot records remain unchanged.
+
+Immutable **0.4.0** publication and its production version route were verified
+at 2026-11-13T12:10:01.560Z, for source revision
+`e3ed4f50c9f6c49f46f371b3744c248598bab6c8`. Retained earlier manifest bytes were unchanged.
+The actual release evidence and history below belong to 0.4.0; they do not prove
+a 0.5.0 commit, CI run, publication or production deployment.
+
+The checks above preserve historical working-source acceptance and separately
+identify the targeted shared-repair proof. The original frozen
+687-file 0.5.0 source digest remains `ab2362540b9736cbba4689638437ddee3cc26a3c68da824b176fc0e87fccf89e`.
+Final assertion-preserving test splits, scoped registry-notice closure repairs,
+the reviewed shared calendar and grid-startup focus repairs and release/documentation metadata are
+recorded separately; they are not retroactively included in that original digest.
+The final clean committed revision must still pass the exact-commit pre-push guard
+and complete GitHub CI before 0.5.0 publication/deployment is claimed.
+Use actual Melbourne commit times outside the saved 08:00–17:00 restriction; keep
+personal account isolation, ownership hooks and immutable retained assets.
+
+Evidence: .local/expansion-linux/fef8113d-511b-46cd-a197-a186d927c9eb/ and the
+local 0.5.0 acceptance record. The preserved 0.4.0 frozen-source digest is
+`087407082b3049180e0430201e2da2950d39498a2fce753af971aaa8f08bb6db`. Neither original snapshot record is rewritten.
+
+Physical iPhone keyboard/zoom, assistive-technology use, external developer
+feedback and performance certification remain unverified. Emulated browsers and
+clean installation fixtures do not establish real users or blanket accessibility
+certification. Existing host-owned persistence, authorisation, idempotency, revision
+checks and finite supplied-data limits remain in force.
+
+---
+
 # Grid editor startup focus repair before publication — 13 November 2026
 
 GitHub run https://github.com/jaskevs/bld8-ui/actions/runs/43407470087 passed

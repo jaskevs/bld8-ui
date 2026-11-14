@@ -72,8 +72,12 @@ each start on a fresh page, avoiding a long navigation chain
 and prefetch cancellation from replacing unrelated documents. These are 66 touch
 cases, not a reproduction of the physical iPhone keyboard or UIKit zoom.
 
-The suite contains **734 cases**: twenty approved image comparisons, 66 touch
-checks and 648 smoke checks (54 workflows × twelve configurations). Snapshot
+The suite contains **914 cases**: twenty approved image comparisons, 66 touch
+checks and 828 normal-motion checks (69 workflows × twelve configurations).
+This current configured total includes the content, import, common-input, visual,
+resource-planning, Gantt and recurrence workflows. Combined grid workflow checks
+are split into smaller independent scenarios while preserving their assertions.
+Historical acceptance counts and timings remain in verification.md. Snapshot
 updates remain disabled. Run results, initial failures and repaired acceptance
 are recorded separately in [verification](verification.md). Run only touch cases with
 `--project="touch-*"`. Run the choice/menu/core flows with

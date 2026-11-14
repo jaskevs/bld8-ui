@@ -11,6 +11,13 @@ import {supportsDocumentationVersion} from './documentation-versions.mjs';
 
 const defaultRoot = fileURLToPath(new URL('../', import.meta.url));
 const guideFiles = [
+  ['recurrence','Finite timezone-aware recurrence and explicit edit scopes','docs/recurrence.md'],
+  ['gantt','Civil-date Gantt tasks and dependency proposals','docs/gantt.md'],
+  ['resource-scheduler','Resource scheduling and revision-checked proposals','docs/resource-scheduler.md'],
+  ['visual-collection','Accessible visual components and native scrolling','docs/visual-collection.md'],
+  ['input-pack','Color, phone and rating form contracts','docs/input-pack.md'],
+  ['import-wizard','Reviewed CSV imports and host-owned batch saves','docs/import-wizard.md'],
+  ['rich-text','Structured editing and async mentions','docs/rich-text.md'],
   ['advanced-data','Virtualised, hierarchical and summarised data workflows','docs/advanced-data.md'],
   ['scoped-interface-contracts','Scoped themes, portals and interface preferences','docs/scoped-interface-contracts.md'],
   ['resource-workspace','Reusable resources, attachments and recovery','docs/resource-workspace.md'],
