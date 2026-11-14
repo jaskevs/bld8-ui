@@ -161,3 +161,20 @@ test('removing the saved icon keeps mobile inspector dismissal focus recoverable
   await page.keyboard.press('Escape');await expect(dialog).not.toBeVisible();
   const inspect=page.getByRole('button',{name:'Inspect Camera',exact:true});await expect(inspect).toBeVisible();await expect(inspect).toBeFocused();
 });
+
+
+test('icon search waits for client initialization and retains queued input after URL preferences',async({page})=>{
+  await page.setViewportSize({width:1280,height:900});
+  let releaseClient=()=>{},heldScripts=0,pendingFill:Promise<void>|undefined;const clientReady=new Promise<void>(resolve=>{releaseClient=resolve;});
+  const scripts=/\/_next\/static\/chunks\/.*\.js(?:\?|$)/;
+  await page.route(scripts,async route=>{if(route.request().resourceType()==='script'){heldScripts++;await clientReady;}await route.continue();});
+  try{
+    await page.goto('/icons?icon=mail&size=20&stroke=1.5&tone=Accent',{waitUntil:'commit'});
+    const search=page.getByRole('searchbox',{name:'Search icons',exact:true});await expect.poll(()=>heldScripts).toBeGreaterThan(0);await expect(search).toBeDisabled();
+    pendingFill=search.fill('camera');releaseClient();await pendingFill;
+    const inspector=page.getByRole('complementary',{name:'Selected icon',exact:true});await expect(inspector.getByRole('heading',{name:'Mail',exact:true})).toBeVisible();
+    for(const[group,label]of [['Preview size','20px'],['Stroke width','1.5'],['Preview colour','Accent']])await expect(inspector.getByRole('group',{name:group,exact:true}).getByRole('button',{name:label,exact:true})).toHaveAttribute('aria-pressed','true');
+    await expect(inspector.getByRole('button',{name:'Copy SVG',exact:true})).toBeEnabled();
+    await expect(search).toBeEnabled();await expect(search).toHaveValue('camera');await expect(page.getByRole('button',{name:'Camera',exact:true})).toBeVisible();
+  }finally{releaseClient();await pendingFill?.catch(()=>{});await page.unroute(scripts);}
+});

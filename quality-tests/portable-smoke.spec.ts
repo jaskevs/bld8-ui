@@ -622,3 +622,19 @@ test('icon customisation preserves gallery geometry and keyboard sheet focus und
   expect(await tile.evaluate(element=>getComputedStyle(element).transitionDuration)).toBe('0s');
   await expectContained(page);
 });
+
+
+test('icon search remains native and ready before accepting startup input',async({page},info)=>{
+  const theme=info.project.use.colorScheme==='dark'?'dark':'light';await page.addInitScript(value=>{document.addEventListener('DOMContentLoaded',()=>{document.documentElement.dataset.uiTheme=value;},{once:true});},theme);
+  let releaseClient=()=>{},heldScripts=0,pendingFill:Promise<void>|undefined;const clientReady=new Promise<void>(resolve=>{releaseClient=resolve;});
+  const scripts=/\/_next\/static\/chunks\/.*\.js(?:\?|$)/;
+  await page.route(scripts,async route=>{if(route.request().resourceType()==='script'){heldScripts++;await clientReady;}await route.continue();});
+  try{
+    // Keep the URL plain on phones: restoring a shared icon intentionally opens
+    // its sheet, which would be a different focus workflow from native search.
+    await page.goto('/icons',{waitUntil:'commit'});const search=page.getByRole('searchbox',{name:'Search icons',exact:true});await expect.poll(()=>heldScripts).toBeGreaterThan(0);await expect(search).toBeDisabled();
+    pendingFill=search.fill('camera');releaseClient();await pendingFill;
+    const inspector=page.locator('aside[aria-label="Selected icon"]');await expect(inspector.getByRole('button',{name:'Copy SVG',exact:true,includeHidden:true})).toBeEnabled();
+    await expect(search).toBeEnabled();await expect(search).toHaveValue('camera');await expect(page.getByRole('button',{name:'Camera',exact:true})).toBeVisible();await expect(page.locator('html')).toHaveAttribute('data-ui-theme',theme);await expectContained(page);
+  }finally{releaseClient();await pendingFill?.catch(()=>{});await page.unroute(scripts);}
+});

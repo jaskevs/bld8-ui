@@ -1,3 +1,36 @@
+# Icon-search initialization repair — 14 November 2026
+
+The preceding exact local gate passed all twenty stages, including 1,072 core
+and 914 browser-quality cases. GitHub passed core validation but timed out in
+one WebKit icon-search flow; 913 other quality cases passed. Publication and
+deployment stayed blocked. Twenty natural repetitions passed locally.
+
+A controlled native-browser probe reproduced a real initialization race after
+page load and font readiness: the enabled server-rendered field accepted a query
+before its handler attached, then initialization cleared or replaced that query
+with the shared URL preference. Camera remained absent from the unfiltered or
+replaced results. This matches the failure signature; the historical CI trace
+was unavailable, so the probe is not claimed as an exact replay of that run.
+
+Icon search now becomes editable after its existing preference initialization
+finishes, and the directory reports that short busy state. SVG preparation keeps
+its separate readiness. The change adds no focus move, timer or retry.
+The paired native probe passes both query paths and a no-input case: queued
+typing waits for the handler, URL settings survive and initialization keeps focus.
+
+Both permanent startup regressions fail on the previous production build's
+enabled field. The repaired build passes all 17 icon core cases and 24 existing
+and startup browser-quality cases across engines, themes and desktop/phone
+viewports. Production build, workspace types and quality types also pass.
+The URL case checks restored icon settings and the first query after SVG setup;
+the cross-browser case checks typing queued during startup. Existing tests,
+assertions, budgets and visual baselines remain unchanged.
+
+A fresh unchanged twenty-phase exact-commit verification, actual GitHub results,
+immutable 0.5.0 publication, production promotion and public Next.js/Vite
+installation acceptance remain required. Prior receipts stay historical, and
+retained releases keep their original bytes.
+
 # Chart formatting performance repair — 14 November 2026
 
 The preceding exact local gate passed 1,070 core and 914 browser-quality cases.

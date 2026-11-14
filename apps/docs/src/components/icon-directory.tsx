@@ -26,6 +26,7 @@ function svgAtSize(source:string,size:number) {
   return new XMLSerializer().serializeToString(document);
 }
 export function IconDirectory() {
+  const [hydrated,setHydrated]=useState(false);
   const [query,setQuery]=useState(''),[category,setCategory]=useState('All'),[page,setPage]=useState(1);
   const [selected,setSelected]=useState(iconCatalog.find(icon=>icon.name==='camera')||iconCatalog[0]);
   const [size,setSize]=useState(24),[stroke,setStroke]=useState(1.75),[tone,setTone]=useState('Ink');
@@ -42,6 +43,7 @@ export function IconDirectory() {
     if(icon){setSelected(icon);setQuery(icon.name);if(media.matches){returnFocus.current=inspectButton.current;setDrawerOpen(true);}}
     const urlSize=Number(params.get('size')),urlStroke=Number(params.get('stroke')),urlTone=params.get('tone');
     if(sizes.includes(urlSize))setSize(urlSize);if(strokes.includes(urlStroke))setStroke(urlStroke);if(urlTone&&tones.includes(urlTone))setTone(urlTone);
+    setHydrated(true);
     return()=>{media.removeEventListener('change',update);exportRequest.current++;};
   },[]);
   useEffect(()=>{setMessage('');exportRequest.current++;},[selected,size,stroke,tone]);
@@ -100,9 +102,9 @@ export function IconDirectory() {
     <CodeBlock code={code}/><p className="bui-hint">Workspace and ZIP imports shown. For registry installs, use your local <code>bld8/</code> source path.</p>
     <p className="icon-provenance">Lucide {lucideVersion} · ISC, with MIT notices for Feather-derived icons. <a href="/icon-assets/LICENSE.txt">Licence notices</a></p>
   </>;
-  return <div className="icon-directory"><div className="icon-browser">
+  return <div className="icon-directory" aria-busy={!hydrated||undefined}><div className="icon-browser">
     <div className="icon-browser-heading"><div><p className="eyebrow">ICON DIRECTORY</p><h2>Find the right shape.</h2></div><p>Search a name, category or common action.</p></div>
-    <div className="icon-search"><InputGroup leading={<Icon icon={Search}/>} trailing={<IconButton label="Clear icon search" icon={X} variant="ghost" size="sm" disabled={!query} onClick={()=>{setQuery('');setPage(1);setFocused(null);}}/>}><Input type="search" aria-label="Search icons" placeholder="Search icons or actions…" maxLength={80} value={query} onChange={event=>{setQuery(event.target.value);setPage(1);setFocused(null);}}/></InputGroup><Button ref={inspectButton} className="icon-mobile-toggle" size="sm" variant="secondary" onClick={()=>{returnFocus.current=inspectButton.current;setDrawerOpen(true);}}>Inspect {selected.label}<Icon/></Button></div>
+    <div className="icon-search"><InputGroup leading={<Icon icon={Search}/>} trailing={<IconButton label="Clear icon search" icon={X} variant="ghost" size="sm" disabled={!query} onClick={()=>{setQuery('');setPage(1);setFocused(null);}}/>}><Input type="search" disabled={!hydrated} aria-label="Search icons" placeholder="Search icons or actions…" maxLength={80} value={query} onChange={event=>{setQuery(event.target.value);setPage(1);setFocused(null);}}/></InputGroup><Button ref={inspectButton} className="icon-mobile-toggle" size="sm" variant="secondary" onClick={()=>{returnFocus.current=inspectButton.current;setDrawerOpen(true);}}>Inspect {selected.label}<Icon/></Button></div>
     <div className="icon-quick-actions" role="group" aria-label="Common action icons">{commonActions.map(action=><Button key={action.name} leadingIcon={action.icon} variant="ghost" size="sm" aria-label={'Choose '+action.label+' icon'} onClick={event=>chooseCommon(action.name,event.currentTarget)}>{action.label}</Button>)}</div>
     <div className="icon-browser-collections" role="group" aria-label="Icon collection"><Button variant="ghost" size="sm" aria-pressed={collection==='all'} onClick={()=>{setCollection('all');setPage(1);}}>All icons</Button><Button variant="ghost" size="sm" aria-pressed={collection==='saved'} onClick={()=>{setCollection('saved');setPage(1);}}>Saved icons <span>{saved.length}</span></Button></div>
     <div className="icon-category-filter" role="group" aria-label="Icon categories">{categories.map(label=><Button key={label} size="sm" variant="ghost" aria-pressed={category===label} onClick={()=>{setCategory(label);setPage(1);setFocused(null);}}>{label}</Button>)}</div>
