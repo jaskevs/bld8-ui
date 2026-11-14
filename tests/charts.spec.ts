@@ -264,3 +264,21 @@ test('analytics loading reserves the natural report height without moving its to
     }
   }
 });
+
+test('full-year chart exploration reuses fixed number formats while retaining every point label',async({page})=>{
+  await page.addInitScript(()=>{
+    const Native=Intl.NumberFormat,host=window as Window & {chartNumberFormatConstructions?:number;restoreChartNumberFormat?:()=>void};host.chartNumberFormatConstructions=0;
+    Intl.NumberFormat=new Proxy(Native,{construct(target,args,newTarget){const options=args[1] as Intl.NumberFormatOptions|undefined;if(args[0]==='en-US'&&options?.maximumFractionDigits===3&&(options.notation==='standard'||options.notation==='compact'))host.chartNumberFormatConstructions!++;return Reflect.construct(target,args,newTarget);}});
+    host.restoreChartNumberFormat=()=>{Intl.NumberFormat=Native;};
+  });
+  try{
+    await page.goto('/components/chart');await chooseOption(page,chartPreview(page),'Full year (366 points)');const surface=chart(page,'Daily observations');
+    await expect(points(surface)).toHaveCount(366);
+    const first=point(surface,'day-1'),last=point(surface,'day-366');
+    await expect(first).toHaveAttribute('aria-label','Explore Day 1: Series 1 20, Series 2 32, Series 3 44, Series 4 56, Series 5 68, Series 6 80');
+    await expect(last).toHaveAttribute('aria-label','Explore Day 366: Series 1 65, Series 2 30, Series 3 42, Series 4 54, Series 5 66, Series 6 78');
+    await first.focus();await page.keyboard.press('End');await expect(last).toBeFocused();await page.keyboard.press('ArrowLeft');await expect(point(surface,'day-365')).toBeFocused();
+    expect(await page.evaluate(()=>(window as Window & {chartNumberFormatConstructions?:number}).chartNumberFormatConstructions),'The fixed standard/compact formats are reused across chart values and keyboard renders').toBeLessThanOrEqual(2);
+    await expect(points(surface)).toHaveCount(366);await expect(surface.locator('.bui-chart-point[tabindex="0"]')).toHaveCount(1);
+  }finally{await page.evaluate(()=>{(window as Window & {restoreChartNumberFormat?:()=>void}).restoreChartNumberFormat?.();});}
+});

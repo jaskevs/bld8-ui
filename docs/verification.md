@@ -1,3 +1,27 @@
+# Chart formatting performance repair — 14 November 2026
+
+The preceding exact local gate passed 1,070 core and 914 browser-quality cases.
+GitHub then passed browser quality but hit the existing 45-second whole-test
+limit in the full-year chart case. Local production and throttled diagnostics
+retained all 366 accessible points; the remote timeout was not reproduced.
+
+Diagnostics did expose repeated number-formatter construction during exploration.
+The chart now lazily reuses its two fixed standard/compact formats. Locale,
+precision, scientific thresholds, signed values and custom formatter behaviour
+are preserved. No focus path, data limit, timeout, retry or baseline is changed.
+
+A new permanent keyboard regression fails on the previous production build with
+13,404 formatter constructions against a bound of two. The repaired build passes
+all 31 focused chart/model cases, including the original full-year test, plus
+16 existing browser-quality cases across engines, viewports and light/dark.
+Production build, workspace types and quality types also pass. Output cases cover
+negative zero, signed decimals, notation boundaries and finite numeric extremes.
+
+These are working-source results. A fresh unchanged twenty-phase exact-commit
+gate, actual GitHub validation, immutable 0.5.0 publication, Vercel promotion and
+clean public Next.js/Vite installation acceptance remain required. Earlier
+receipts remain historical; retained releases keep their original bytes.
+
 # Filter-menu view-change repair — 14 November 2026
 
 GitHub validated the 0.5.0 core source but caught one browser failure after a

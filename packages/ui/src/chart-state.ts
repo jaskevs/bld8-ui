@@ -98,9 +98,15 @@ export function buildChartPaths(data: readonly ChartDatum[], seriesId: string, d
   return result;
 }
 
+// Exploration reuses the two fixed formats instead of constructing one per label.
+let standardChartFormatter: Intl.NumberFormat | undefined;
+let compactChartFormatter: Intl.NumberFormat | undefined;
 export function formatChartValue(value: number): string {
   if (value !== 0 && (Math.abs(value) < .001 || Math.abs(value) >= 1e15)) return value.toExponential(2);
-  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 3, notation: Math.abs(value) >= 1e6 ? 'compact' : 'standard' }).format(value);
+  const formatter = Math.abs(value) >= 1e6
+    ? compactChartFormatter ??= new Intl.NumberFormat('en-US', { maximumFractionDigits: 3, notation: 'compact' })
+    : standardChartFormatter ??= new Intl.NumberFormat('en-US', { maximumFractionDigits: 3, notation: 'standard' });
+  return formatter.format(value);
 }
 
 /** Describe observed values without inventing trends or treating gaps as zero. */

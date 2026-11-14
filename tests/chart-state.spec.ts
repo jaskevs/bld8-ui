@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import {buildChartPaths, getChartDomain, getChartSummary, validateChartData, type ChartDatum, type ChartSeries} from '../packages/ui/src/chart-state';
+import {buildChartPaths, formatChartValue, getChartDomain, getChartSummary, validateChartData, type ChartDatum, type ChartSeries} from '../packages/ui/src/chart-state';
 
 const series:readonly ChartSeries[] = [{id:'completed',label:'Completed',tone:'primary'},{id:'failed',label:'Failed',tone:'accent'}];
 const sample:readonly ChartDatum[] = [
@@ -102,5 +102,21 @@ test('opposite finite numeric extremes and tiny values still produce bounded SVG
         expect(point.y).toBeGreaterThanOrEqual(0);expect(point.y).toBeLessThanOrEqual(240);
       }
     }
+  }
+});
+
+test('chart formatting preserves signed values, precision and notation boundaries', () => {
+  const cases: readonly (readonly [number, string])[] = [
+    [0, '0'], [-0, '-0'], [12345.6789, '12,345.679'], [-12345.6789, '-12,345.679'],
+    [.001, '0.001'], [-.001, '-0.001'], [.000999, '9.99e-4'], [-.000999, '-9.99e-4'],
+    [999999, '999,999'], [-999999, '-999,999'], [1e6, '1M'], [-1e6, '-1M'],
+    [1.25e6, '1.25M'], [-1.25e6, '-1.25M'], [1e12, '1T'],
+    [1e15, '1.00e+15'], [-1e15, '-1.00e+15'],
+    [Number.MIN_VALUE, '4.94e-324'], [Number.MAX_VALUE, '1.80e+308'],
+    [Number.NaN, 'NaN'], [Infinity, 'Infinity'], [-Infinity, '-Infinity'],
+  ];
+  // Reversing the sequence also checks that precision and notation do not leak between values.
+  for (const [value, expected] of [...cases, ...cases.slice().reverse()]) {
+    expect(formatChartValue(value), String(value)).toBe(expected);
   }
 });
