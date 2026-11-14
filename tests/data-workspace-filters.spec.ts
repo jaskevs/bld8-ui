@@ -36,3 +36,53 @@ test('quick root conditions keep nested group semantics intact',async({page})=>{
   await add(page,'Status');await values(page,'In review');await page.getByRole('button',{name:'Apply filter',exact:true}).click();await expect(page.getByText('No loaded records match this view.',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'1 group · edit conditions',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'Remove Status filter',exact:true}).click();await expect(page.getByRole('gridcell',{name:'Title for ISS-102',exact:true})).toBeVisible();await expect(group.getByRole('textbox')).toHaveValue('Keyboard');
 });
+
+
+for(const {height,anchorTop}of [{height:720,anchorTop:360},{height:800,anchorTop:420}])test('quick-filter native back navigation survives contained resize delivery at '+height+'px',async({page})=>{
+  await page.setViewportSize({width:1440,height});await page.emulateMedia({colorScheme:'dark',reducedMotion:'no-preference'});
+  await page.addInitScript(()=>{
+    type Pending={observed:Set<Element>;entries:Map<Element,ResizeObserverEntry>;callback:ResizeObserverCallback;observer:ResizeObserver};
+    const Native=window.ResizeObserver,pending=new Set<Pending>();let hold=false,downInFields=false;
+    const host=window as Window & {quickFilterResizeGate?:{hold:()=>void;flush:()=>void;restore:()=>void;downInFields:()=>boolean}};
+    // Delay observer delivery, never DOM updates or pointer events. Removed
+    // observations must not be replayed after a child unmounts or disconnects.
+    window.ResizeObserver=class extends Native{
+      private record:Pending;
+      constructor(callback:ResizeObserverCallback){
+        const record:Pending={observed:new Set(),entries:new Map(),callback,observer:null as unknown as ResizeObserver};
+        super((entries,observer)=>{const current=entries.filter(entry=>record.observed.has(entry.target));if(!current.length)return;if(hold){current.forEach(entry=>record.entries.set(entry.target,entry));pending.add(record);}else callback(current,observer);});
+        this.record=record;record.observer=this;
+      }
+      observe(target:Element,options?:ResizeObserverOptions){this.record.entries.delete(target);if(!this.record.entries.size)pending.delete(this.record);this.record.observed.add(target);super.observe(target,options);}
+      unobserve(target:Element){this.record.observed.delete(target);this.record.entries.delete(target);if(!this.record.entries.size)pending.delete(this.record);super.unobserve(target);}
+      disconnect(){this.record.observed.clear();this.record.entries.clear();pending.delete(this.record);super.disconnect();}
+    };
+    const pressed=(event:PointerEvent)=>{const button=event.target instanceof Element?event.target.closest('button'):null;downInFields=button?.textContent?.trim()==='Fields';};
+    document.addEventListener('pointerdown',pressed,true);
+    host.quickFilterResizeGate={hold:()=>{hold=true;downInFields=false;},flush:()=>{hold=false;const queued=[...pending];pending.clear();for(const record of queued){const entries=[...record.entries.values()].filter(entry=>record.observed.has(entry.target));record.entries.clear();if(entries.length)record.callback(entries,record.observer);}},restore:()=>{hold=false;for(const record of pending)record.entries.clear();pending.clear();window.ResizeObserver=Native;document.removeEventListener('pointerdown',pressed,true);},downInFields:()=>downInFields};
+    document.addEventListener('DOMContentLoaded',()=>document.documentElement.dataset.uiTheme='dark',{once:true});
+  });
+  const frames=()=>page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
+  try{
+    await page.goto(route);await page.evaluate(async()=>{await document.fonts.ready;});await expect.poll(()=>page.evaluate(()=>[...document.fonts].filter(font=>font.status==='loaded').length)).toBeGreaterThanOrEqual(2);
+    const add=page.getByRole('button',{name:'Add filter',exact:true}),grid=page.getByRole('grid',{name:'Issue data grid',exact:true});await expect(grid).toBeVisible();await expect(grid.getByRole('gridcell',{name:'Title for ISS-103',exact:true})).toBeVisible();
+    const rows=()=>grid.locator('[data-row-id]').evaluateAll(nodes=>[...new Set(nodes.map(node=>node.getAttribute('data-row-id')))]),beforeRows=await rows(),beforeUrl=page.url();
+    await add.evaluate((button,top)=>scrollBy(0,button.getBoundingClientRect().top-top),anchorTop);await expect.poll(async()=>Math.abs((await add.boundingBox())!.y-anchorTop)).toBeLessThan(1);
+    await add.click();const popup=page.locator('.bui-popover:not([data-ending-style])'),search=page.getByRole('textbox',{name:'Find a filter field',exact:true});await expect(search).toBeFocused();
+    const overflow=()=>popup.evaluate(element=>{const box=element.getBoundingClientRect();return {left:Math.max(0,-box.left),top:Math.max(0,-box.top),right:Math.max(0,box.right-innerWidth),bottom:Math.max(0,box.bottom-innerHeight)};});
+    await expect.poll(overflow).toEqual({left:0,top:0,right:0,bottom:0});await frames();
+    await page.evaluate(()=>{(window as Window & {quickFilterResizeGate:{hold:()=>void}}).quickFilterResizeGate.hold();});
+    await search.fill('Status');await search.press('ArrowDown');await page.keyboard.press('Enter');await expect(page.getByRole('combobox',{name:'Condition',exact:true})).toBeFocused();await frames();
+    // Containment alone is insufficient readiness: delayed position work can
+    // move a fully visible back button between native pointerdown and pointerup.
+    expect(await overflow(),'Old editor rectangle is fully contained before the native press').toEqual({left:0,top:0,right:0,bottom:0});
+    const fields=page.getByRole('button',{name:'Fields',exact:true}),box=(await fields.boundingBox())!;await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+    expect(await page.evaluate(()=>(window as Window & {quickFilterResizeGate:{downInFields:()=>boolean}}).quickFilterResizeGate.downInFields()),'Native press begins on Fields or one of its descendants').toBe(true);
+    await page.evaluate(()=>{(window as Window & {quickFilterResizeGate:{flush:()=>void}}).quickFilterResizeGate.flush();});await frames();
+    expect(await overflow(),'Resized editor rectangle remains fully contained before release').toEqual({left:0,top:0,right:0,bottom:0});await page.mouse.up();
+    await expect(search).toBeFocused();await expect(page.getByRole('button',{name:'Edit Status filter',exact:true})).toHaveCount(0);await expect.poll(rows).toEqual(beforeRows);await expect(page).toHaveURL(beforeUrl);
+    await page.keyboard.press('Escape');await expect(add).toBeFocused();await expect(page.locator('.bui-popover')).toHaveCount(0);
+  }finally{
+    await page.mouse.up();await page.evaluate(()=>{(window as Window & {quickFilterResizeGate?:{restore:()=>void}}).quickFilterResizeGate?.restore();});
+  }
+});

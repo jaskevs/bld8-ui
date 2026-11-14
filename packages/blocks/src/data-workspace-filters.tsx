@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 'use client';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useLayoutEffect,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,CalendarDays,Check,Hash,ListFilter,Search,SlidersHorizontal,Type,X} from 'lucide-react';
 import {Button,Field,Icon,Input,MultiSelect,Popover,Reveal,Select,filterOperators,isFilterGroup,countFilterRules,emptyFilterQuery,validateFilterQuery,FILTER_QUERY_LIMITS,type AnyFilterQuery,type FilterField,type FilterRule,type FilterOperator} from '@bld8/ui';
 
@@ -38,9 +38,33 @@ function RuleEditor({rule,field,onApply,onCancel,disabled}:{rule:FilterRule;fiel
   </form>;
 }
 
+/** Keep a menu's measured canvas while its local views change within one opening. */
+function FilterMenuCanvas({children}:{children:ReactNode}) {
+  const content=useRef<HTMLDivElement>(null),maximum=useRef(0),[height,setHeight]=useState(0);
+  const measure=(node:HTMLElement)=>Math.ceil(node.getBoundingClientRect().height*64)/64;
+  useLayoutEffect(()=>{
+    if(!content.current)return;
+    maximum.current=Math.max(maximum.current,measure(content.current));
+    if(height<maximum.current)setHeight(maximum.current);
+  });
+  useLayoutEffect(()=>{
+    const node=content.current;if(!node||typeof ResizeObserver==='undefined')return;
+    let frame:number|null=null,alive=true;
+    // Observe natural content, not the outer minimum, so reserving space cannot feed back.
+    const observer=new ResizeObserver(()=>{
+      const next=measure(node);if(next<=maximum.current)return;
+      maximum.current=next;
+      if(frame===null)frame=requestAnimationFrame(()=>{frame=null;if(alive)setHeight(current=>Math.max(current,maximum.current));});
+    });
+    observer.observe(node);
+    return()=>{alive=false;observer.disconnect();if(frame!==null)cancelAnimationFrame(frame);};
+  },[]);
+  return <div className="bblocks-filter-menu-canvas" style={height?{minHeight:height}:undefined}><div ref={content} className="bblocks-filter-menu-content">{children}</div></div>;
+}
+
 /** A quick view of root conditions. Grouped queries retain their original tree. */
 export function DataWorkspaceFilters({fields,value,onValueChange,onAdvanced,advancedOpen,advancedId,disabled:hostDisabled,blocked}:Props) {
-  const [open,setOpen]=useState<string|null>(null),[search,setSearch]=useState(''),[newRule,setNewRule]=useState<FilterRule|null>(null);
+  const [open,setOpen]=useState<string|null>(null),[search,setSearch]=useState(''),[newRule,setNewRule]=useState<FilterRule|null>(null),[menuSession,setMenuSession]=useState(0);
   const add=useRef<HTMLButtonElement>(null),picker=useRef<HTMLDivElement>(null);
   const focusSearch=useCallback((input:HTMLInputElement|null)=>{if(open==='add')input?.focus({preventScroll:true});},[open]);
   const rules=directRules(value),count=countFilterRules(value),groups=value.version===2?value.root.children.filter(isFilterGroup).length:0;
@@ -50,12 +74,15 @@ export function DataWorkspaceFilters({fields,value,onValueChange,onAdvanced,adva
   const filtered=fields.filter(field=>field.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
   function focusField(delta:number){const buttons=Array.from(picker.current?.querySelectorAll<HTMLButtonElement>('[data-filter-field]')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);buttons[Math.max(0,Math.min(buttons.length-1,index+delta))]?.focus();}
   return <div className="bblocks-quick-filters" aria-label="Workspace quick filters">
-    <div className="bblocks-quick-filter-actions"><Popover sticky title={newRule?'Configure filter':'Filter by'} open={open==='add'} onOpenChange={next=>{setOpen(next?'add':null);if(next){setNewRule(null);setSearch('');}}} trigger={<Button ref={add} size="sm" variant="secondary" leadingIcon={ListFilter} disabled={disabled||count>=FILTER_QUERY_LIMITS.rules}>Add filter</Button>}>
-      {newRule?<><Button size="sm" variant="ghost" leadingIcon={ArrowLeft} onClick={()=>setNewRule(null)}>Fields</Button><RuleEditor key={newRule.id} rule={newRule} field={fields.find(field=>field.id===newRule.field)!} disabled={disabled} onApply={rule=>changed(replaceRule(value,rule))} onCancel={()=>setOpen(null)}/></>:<div className="bblocks-filter-field-picker" ref={picker}>
+    <div className="bblocks-quick-filter-actions"><Popover sticky title={newRule?'Configure filter':'Filter by'} open={open==='add'} onOpenChange={next=>{setOpen(next?'add':null);if(next){setMenuSession(session=>session+1);setNewRule(null);setSearch('');}}} trigger={<Button ref={add} size="sm" variant="secondary" leadingIcon={ListFilter} disabled={disabled||count>=FILTER_QUERY_LIMITS.rules}>Add filter</Button>}>
+      <FilterMenuCanvas key={menuSession}>
+      <div className="bblocks-filter-menu-header">{newRule?<Button size="sm" variant="ghost" leadingIcon={ArrowLeft} onClick={()=>setNewRule(null)}>Fields</Button>:<p className="bui-label">Filter by</p>}</div>
+      {newRule?<RuleEditor key={newRule.id} rule={newRule} field={fields.find(field=>field.id===newRule.field)!} disabled={disabled} onApply={rule=>changed(replaceRule(value,rule))} onCancel={()=>setOpen(null)}/>:<div className="bblocks-filter-field-picker" ref={picker}>
         <div className="bblocks-filter-search"><Icon icon={Search} size={15}/><Input ref={focusSearch} aria-label="Find a filter field" placeholder="Find a field…" value={search} onChange={event=>setSearch(event.target.value)} onKeyDown={event=>{if(event.key==='ArrowDown'){event.preventDefault();focusField(1);}}}/></div>
         <div className="bblocks-filter-fields" onKeyDown={event=>{if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();focusField(event.key==='ArrowDown'?1:-1);}if(event.key==='Home'){event.preventDefault();picker.current?.querySelector<HTMLButtonElement>('[data-filter-field]')?.focus();}if(event.key==='End'){event.preventDefault();picker.current?.querySelectorAll<HTMLButtonElement>('[data-filter-field]').item(filtered.length-1)?.focus();}}}>{filtered.map(field=><button type="button" key={field.id} data-filter-field={field.id} onClick={()=>{const existing=rules.find(rule=>rule.field===field.id);setNewRule(existing??{id:crypto.randomUUID(),field:field.id,operator:filterOperators[field.kind][0].value,values:[]});}}><Icon icon={fieldIcon(field)} size={16}/><span>{field.label}</span>{rules.some(rule=>rule.field===field.id)&&<span className="bblocks-filter-applied">Applied</span>}</button>)}</div>
         {!filtered.length&&<p className="bui-hint">No matching fields. Try another search.</p>}
       </div>}
+      </FilterMenuCanvas>
     </Popover><Button size="sm" variant="ghost" leadingIcon={SlidersHorizontal} aria-expanded={advancedOpen} aria-controls={advancedId} onClick={onAdvanced} disabled={hostDisabled}>Advanced</Button>{count>0&&<Button size="sm" variant="ghost" leadingIcon={X} onClick={()=>changed(emptyFilterQuery())} disabled={disabled}>Clear filters</Button>}</div>
     {blocked&&<p className="bui-hint">Apply or clear the advanced changes before editing quick filters.</p>}
     <Reveal open={count>0}><div className="bblocks-filter-chips">

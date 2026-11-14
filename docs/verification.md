@@ -1,3 +1,34 @@
+# Filter-menu view-change repair — 14 November 2026
+
+GitHub validated the 0.5.0 core source but caught one browser failure after a
+Fields click; publication and deployment stayed blocked. The earlier exact local
+gate passed 1,068 core and 914 quality cases. Those results belong to that earlier
+commit, not this repair.
+
+Local controlled scheduling reproduced a native click miss while both the old
+and new popup rectangles were fully contained. Pending resize work changed the
+popup side between pointerdown and pointerup. The editor stayed open and the
+field search never appeared, matching the reported failure signature.
+
+The quick-filter menu now retains the intrinsic space used during each opening,
+with a consistent header for the picker and editor. The measurement observes
+natural inner content separately from the reserved outer canvas, cancels pending
+work on unmount and resets on the next opening. Existing keyboard focus,
+explicit Apply, nested controls, viewport scrolling and shared popup defaults remain.
+
+Both new permanent regressions fail on the old source with the missing-search
+error and pass with this repair. The corrected fixture waits for initial rows
+before capturing the unchanged-query baseline. All seven filter cases pass in
+native Chromium and in the rebuilt Linux workspace. Production build, workspace
+and quality types, plus 24 Chromium/Firefox/WebKit filter flows pass. A separate
+36-check native audit covers rapid reopening, short touch viewports, light/dark,
+resizing, nested Escape/Apply and validation recovery with no page errors.
+
+Fresh exact-commit verification, GitHub CI, immutable 0.5.0 publication and actual
+public installation acceptance remain required. No failed-run receipt is reused,
+no assertion, timeout, retry or visual baseline is relaxed, and retained versions
+keep their original bytes.
+
 # Aggregate registry packaging repair — 14 November 2026
 
 The exact unpublished candidate passed all **1,062 core cases** and **914
