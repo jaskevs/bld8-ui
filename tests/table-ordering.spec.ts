@@ -208,3 +208,18 @@ test('the ordering example stays contained on a phone and exposes accessible act
   const scan = await new AxeBuilder({page}).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
   expect(scan.violations.map(item => ({id: item.id, targets: item.nodes.map(node => node.target)}))).toEqual([]);
 });
+
+
+test('row-save recovery follows the committed enabled button after deferred rendering',async({page})=>{
+  const {installRowSaveScheduler,exerciseDeferredRowSave}=await import('./helpers/row-save-scheduler');
+  await installRowSaveScheduler(page);await page.goto(route);
+  const observation=await exerciseDeferredRowSave(page);
+  await test.info().attach('row-save-scheduler-order',{body:JSON.stringify(observation,null,2),contentType:'application/json'});
+});
+
+test('row-save recovery respects deliberate Close focus while saving is pending',async({page})=>{
+  const {installRowSaveScheduler,exerciseDeferredRowSave}=await import('./helpers/row-save-scheduler');
+  await installRowSaveScheduler(page);await page.goto(route);
+  const observation=await exerciseDeferredRowSave(page,{keepCloseFocus:true});
+  await test.info().attach('row-save-deliberate-focus',{body:JSON.stringify(observation,null,2),contentType:'application/json'});
+});

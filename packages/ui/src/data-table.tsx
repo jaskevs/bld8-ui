@@ -111,8 +111,16 @@ export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageS
   const [order,setOrder]=useControllableValue(columnOrderKeys,defaultColumnOrderKeys??columns.map(column=>column.key),onColumnOrderKeysChange);
   const pins=columnPinning??Object.fromEntries(columns.filter(column=>column.pinned).map(column=>[column.key,column.pinned!]));
   const [movingRow,setMovingRow]=useState<string|null>(null),[movePosition,setMovePosition]=useState('end'),[moveNotice,setMoveNotice]=useState(''),[moveError,setMoveError]=useState(''),[savingOrder,setSavingOrder]=useState(false);
-  const moveFocus=useRef<HTMLElement|null>(null),moveForm=useRef<HTMLFormElement>(null),movePending=useRef(false),mounted=useRef(true);
-  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
+  const moveFocus=useRef<HTMLElement|null>(null),moveForm=useRef<HTMLFormElement>(null),movePending=useRef(false),mounted=useRef(true),failedMoveFocus=useRef<string|null>(null);
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;failedMoveFocus.current=null;};},[]);
+  // A frame may precede React's enabling commit; retry focus belongs to that commit.
+  useLayoutEffect(()=>{
+    if(savingOrder)return;
+    const row=failedMoveFocus.current;failedMoveFocus.current=null;
+    if(!row||movingRow!==row||!moveError)return;
+    const form=moveForm.current,submit=form?.querySelector<HTMLButtonElement>('button[type=submit]'),active=document.activeElement;
+    if(form?.isConnected&&submit&&!submit.disabled&&(active===document.body||form.contains(active)||form.closest('[role=dialog]')===active))submit.focus({preventScroll:true});
+  },[savingOrder,movingRow,moveError]);
   const [scrollElement,setScrollElement]=useState<HTMLDivElement|null>(null);
   const [viewportWidth,setViewportWidth]=useState(0);
   useEffect(()=>{if(!scrollElement)return;const observer=new ResizeObserver(([entry])=>setViewportWidth(Math.floor(entry.contentRect.width)));observer.observe(scrollElement);return()=>observer.disconnect();},[scrollElement]);
@@ -148,10 +156,10 @@ export function DataTable<T>({ caption, rows, columns, rowKey, searchText, pageS
     if(!canMoveRows||movePending.current||!onRowMove)return;
     if(!pageRows.some(row=>rowKey(row)===move.rowKey)||!pageRows.some(row=>rowKey(row)===move.targetKey)){setMoveError('The row position is no longer available.');return;}
     const focusAtStart=document.activeElement;
-    movePending.current=true;setSavingOrder(true);setMoveError('');setMoveNotice('Saving row position…');
+    failedMoveFocus.current=null;movePending.current=true;setSavingOrder(true);setMoveError('');setMoveNotice('Saving row position…');
     try{await onRowMove(move);if(mounted.current){setMovingRow(null);setMoveNotice('Row move completed.');}}
-    catch{if(mounted.current){setMoveNotice('');setMoveError('The row position could not be saved. Review the current order and try again.');}}
-    finally{movePending.current=false;if(mounted.current){setSavingOrder(false);const active=document.activeElement;if(!movingRow){if(active===document.body||active===focusAtStart)focusRow(move.rowKey);}else requestAnimationFrame(()=>{const form=moveForm.current,active=document.activeElement;if(form&&(active===document.body||form.contains(active)||form.closest('[role=dialog]')===active))form.querySelector<HTMLButtonElement>('button[type=submit]')?.focus({preventScroll:true});});}}
+    catch{if(mounted.current){failedMoveFocus.current=movingRow;setMoveNotice('');setMoveError('The row position could not be saved. Review the current order and try again.');}}
+    finally{movePending.current=false;if(mounted.current){setSavingOrder(false);const active=document.activeElement;if(!movingRow){if(active===document.body||active===focusAtStart)focusRow(move.rowKey);}}}
   }
   function moveColumn(key:string,target:string,after:boolean){if(key===target||!orderedColumns.some(column=>column.key===key)||!orderedColumns.some(column=>column.key===target)){setMoveNotice('That column position is no longer available.');return;}if(pins[key]!==pins[target]){setMoveNotice('Pinned columns stay at their logical edge. Unpin a column before moving it across that edge.');return;}const next=orderedColumns.map(column=>column.key).filter(item=>item!==key),index=next.indexOf(target);if(index<0)return;next.splice(index+(after?1:0),0,key);setOrder(next);setMoveNotice('Column order updated.');}
   const bodySections: {header?:Extract<TableRowNode<T>,{kind:'group'}>;rows:T[]}[]=grouping?[]:[{rows:pageRows}];

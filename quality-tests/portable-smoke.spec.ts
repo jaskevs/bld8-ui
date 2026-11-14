@@ -638,3 +638,12 @@ test('icon search remains native and ready before accepting startup input',async
     await expect(search).toBeEnabled();await expect(search).toHaveValue('camera');await expect(page.getByRole('button',{name:'Camera',exact:true})).toBeVisible();await expect(page.locator('html')).toHaveAttribute('data-ui-theme',theme);await expectContained(page);
   }finally{releaseClient();await pendingFill?.catch(()=>{});await page.unroute(scripts);}
 });
+
+
+test('row-save focus recovery follows committed rendering under normal motion',async({page},info)=>{
+  const {installRowSaveScheduler,exerciseDeferredRowSave}=await import('../tests/helpers/row-save-scheduler');
+  await installRowSaveScheduler(page);await openQualityPage(page,'/examples/table-ordering',info);
+  const observation=await exerciseDeferredRowSave(page);
+  await info.attach('row-save-scheduler-order',{body:JSON.stringify(observation,null,2),contentType:'application/json'});
+  await expectContained(page);
+});

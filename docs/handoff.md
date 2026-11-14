@@ -1,3 +1,33 @@
+# Table retry-focus repair — 14 November 2026
+
+GitHub validation for `8704e967f39c96b197af21039cafbda0d77a244f` passed core.
+Browser quality passed 925 cases and failed one WebKit desktop-dark check:
+after a rejected row move, the draft remained correct but Save row position
+did not regain focus. Immutable 0.5.0 publication remained blocked.
+
+A controlled native-browser probe held queued React work while the real save
+timer and animation frames continued. The old recovery frame tried to focus
+the still-disabled button; the later enabling commit left focus on the body.
+This proves a scheduling race with the same failure signature, not an exact
+replay of the unavailable historical CI trace.
+
+Retry focus now runs once after the failed-save render commits an enabled
+button. It preserves the same row's draft, order and selection, successful retry
+and deliberate Close-button focus. No timeout, retry policy, assertion or visual
+baseline is relaxed. The paired native probe passes recovery and Close ownership.
+
+The permanent regressions fail at the expected Save-focus assertion on the old
+production build in Chromium core and WebKit desktop-dark quality; the explicit
+Close-focus case passes there. The repaired production build, workspace types
+and quality types pass. All 14 focused table core cases and 24 existing and new
+browser-quality cases pass across Chromium, Firefox and WebKit, both themes
+and desktop/phone viewports. Existing tests and budgets are preserved.
+
+A fresh unchanged twenty-phase exact-commit gate, actual GitHub validation,
+immutable 0.5.0 publication, production promotion and public Next.js/Vite
+installation acceptance remain required. Earlier receipts stay historical;
+retained release bytes remain unchanged.
+
 # Icon-search initialization repair — 14 November 2026
 
 The preceding exact local gate passed all twenty stages, including 1,072 core
